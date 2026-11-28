@@ -4161,6 +4161,8 @@
     "pasteFailed": "Nu s-a putut citi din clipboard. Vă rugăm să introduceți fraza de backup manual.",
     "enterWord": "Cuvânt",
     "invalidMnemonic": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă.",
+    "invalidPhrase": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă. Contactați <link>Asistența</link> dacă problema persistă.",
+    "invalidWord": "Cuvânt invalid, verificați ortografia",
     "restoring": "Se restaurează portofelul...",
     "restoreSuccess": "Portofel restaurat cu succes",
     "restoreFailed": "Restaurarea a eșuat. Încercați din nou.",

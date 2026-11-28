@@ -4161,6 +4161,8 @@
     "pasteFailed": "Panodan okunamadı. Lütfen yedekleme ifadenizi elle girin.",
     "enterWord": "Kelime",
     "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelime sırasının doğru olup olmadığını kontrol edin.",
+    "invalidPhrase": "Geçersiz yedekleme ifadesi. Lütfen kelime sırasının doğru olup olmadığını kontrol edin. Sorun devam ederse <link>Destek</link> ile iletişime geçin.",
+    "invalidWord": "Geçersiz kelime, lütfen yazımını kontrol edin",
     "restoring": "Cüzdanınız geri yükleniyor...",
     "restoreSuccess": "Cüzdan başarıyla geri yüklendi",
     "restoreFailed": "Cüzdan geri yüklenemedi. Lütfen tekrar deneyin.",

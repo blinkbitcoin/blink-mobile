@@ -4161,6 +4161,8 @@
     "pasteFailed": "Không thể đọc từ bộ nhớ tạm. Vui lòng nhập cụm từ sao lưu của bạn theo cách thủ công.",
     "enterWord": "Từ",
     "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không.",
+    "invalidPhrase": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không. Liên hệ <link>Bộ phận hỗ trợ</link> nếu sự cố vẫn tiếp diễn.",
+    "invalidWord": "Từ không hợp lệ, vui lòng kiểm tra chính tả",
     "restoring": "Đang khôi phục ví...",
     "restoreSuccess": "Khôi phục ví thành công",
     "restoreFailed": "Khôi phục ví thất bại. Vui lòng thử lại.",

@@ -4161,6 +4161,8 @@
     "pasteFailed": "No s'ha pogut llegir del porta-retalls. Introdueix la teva frase de recuperació manualment.",
     "enterWord": "Paraula",
     "invalidMnemonic": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte.",
+    "invalidPhrase": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte. Contacta amb <link>Suport</link> si el problema persisteix.",
+    "invalidWord": "Paraula no vàlida, comprova l'ortografia",
     "restoring": "Restaurant la teva cartera...",
     "restoreSuccess": "Cartera restaurada amb èxit",
     "restoreFailed": "No s'ha pogut restaurar la cartera. Si us plau, torna-ho a provar.",

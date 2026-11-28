@@ -4161,6 +4161,8 @@
     "pasteFailed": "Tidak dapat membaca dari papan klip. Silakan masukkan frasa cadangan Anda secara manual.",
     "enterWord": "Kata",
     "invalidMnemonic": "Frasa cadangan tidak valid. Harap periksa apakah urutan kata sudah benar.",
+    "invalidPhrase": "Frasa cadangan tidak valid. Harap periksa apakah urutan kata sudah benar. Hubungi <link>Dukungan</link> jika masalah berlanjut.",
+    "invalidWord": "Kata tidak valid, harap periksa ejaannya",
     "restoring": "Memulihkan dompet Anda...",
     "restoreSuccess": "Dompet berhasil dipulihkan",
     "restoreFailed": "Gagal memulihkan dompet. Silakan coba lagi.",

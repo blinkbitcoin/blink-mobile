@@ -4161,6 +4161,8 @@
     "pasteFailed": "Tidak dapat membaca daripada clipboard. Sila masukkan frasa sandaran anda secara manual.",
     "enterWord": "Perkataan",
     "invalidMnemonic": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul.",
+    "invalidPhrase": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul. Hubungi <link>Sokongan</link> jika masalah berterusan.",
+    "invalidWord": "Perkataan tidak sah, sila semak ejaan",
     "restoring": "Memulihkan dompet anda...",
     "restoreSuccess": "Dompet berjaya dipulihkan",
     "restoreFailed": "Gagal memulihkan dompet. Sila cuba lagi.",

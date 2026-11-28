@@ -4161,6 +4161,8 @@
         "pasteFailed": "Impossibile leggere dagli appunti. Inserisci manualmente la tua frase di backup.",
         "enterWord": "Parola",
         "invalidMnemonic": "Frase di backup non valida. Verifica che l'ordine delle parole sia corretto.",
+        "invalidPhrase": "Frase di backup non valida. Verifica che l'ordine delle parole sia corretto. Contatta il <link>Supporto</link> se il problema persiste.",
+        "invalidWord": "Parola non valida, controlla l'ortografia",
         "restoring": "Ripristino del portafoglio...",
         "restoreSuccess": "Portafoglio ripristinato con successo",
         "restoreFailed": "Ripristino del portafoglio fallito. Riprova.",

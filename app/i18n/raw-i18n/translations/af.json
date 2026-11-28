@@ -4161,6 +4161,8 @@
     "pasteFailed": "Kon nie van die knipbord lees nie. Voer asseblief jou rugsteunfrase met die hand in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige rugsteunfrase. Kontroleer asseblief of die woordvolgorde reg is.",
+    "invalidPhrase": "Ongeldige rugsteunfrase. Kontroleer asseblief of die woordvolgorde reg is. Kontak <link>Ondersteuning</link> as die probleem voortduur.",
+    "invalidWord": "Ongeldige woord, kontroleer asseblief die spelling",
     "restoring": "Jou beursie word herstel...",
     "restoreSuccess": "Beursie suksesvol herstel",
     "restoreFailed": "Kon nie beursie herstel nie. Probeer asseblief weer.",

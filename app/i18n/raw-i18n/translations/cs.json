@@ -4161,6 +4161,8 @@
     "pasteFailed": "Nepodařilo se číst ze schránky. Zadejte prosím zálohovací frázi ručně.",
     "enterWord": "Slovo",
     "invalidMnemonic": "Neplatná záložní fráze. Zkontrolujte prosím, zda je pořadí slov správné.",
+    "invalidPhrase": "Neplatná záložní fráze. Zkontrolujte prosím, zda je pořadí slov správné. Pokud problém přetrvává, kontaktujte <link>podporu</link>.",
+    "invalidWord": "Neplatné slovo, zkontroluj prosím pravopis",
     "restoring": "Obnovování vaší peněženky...",
     "restoreSuccess": "Peněženka úspěšně obnovena",
     "restoreFailed": "Obnova peněženky selhala. Zkuste to prosím znovu.",

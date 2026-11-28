@@ -1,4 +1,5 @@
 import { Keyboard } from "react-native"
+import { it } from "@jest/globals"
 
 import { renderHook, act } from "@testing-library/react-native"
 
@@ -14,8 +15,16 @@ jest.mock("@app/utils/bip39-wordlist", () => ({
     "absent",
     "run",
     "runway",
+    "act",
+    "action",
+    "actor",
+    "actress",
   ],
-  getBip39Suggestions: (prefix: string, options?: { maxResults?: number }) => {
+  getBip39Suggestions: (
+    prefix: string,
+    options?: { minChars?: number; maxResults?: number },
+  ) => {
+    if (prefix.length < (options?.minChars ?? 3)) return []
     const all = [
       "abandon",
       "ability",
@@ -25,6 +34,10 @@ jest.mock("@app/utils/bip39-wordlist", () => ({
       "absent",
       "run",
       "runway",
+      "act",
+      "action",
+      "actor",
+      "actress",
     ].filter((w) => w.startsWith(prefix))
     return options?.maxResults ? all.slice(0, options.maxResults) : all
   },
@@ -108,17 +121,60 @@ describe("useBip39Input", () => {
       result.current.setActiveIndex(0)
     })
 
-    // Suggestions depend on keyboard being visible (keyboardVisible state)
-    // In tests keyboard is not shown so suggestions are empty
+    expect(result.current.suggestions).toEqual(["abandon"])
+  })
+
+  it("caps the suggestions at three", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "act")
+      result.current.setActiveIndex(0)
+    })
+
+    expect(result.current.suggestions).toEqual(["act", "action", "actor"])
+  })
+
+  it("suggests nothing before the third letter", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "ab")
+      result.current.setActiveIndex(0)
+    })
+
     expect(result.current.suggestions).toEqual([])
   })
 
-  it("does not provide suggestions for valid BIP39 word", () => {
+  it("keeps the chip for a full word, as the backup confirm screen does", () => {
     const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
 
     act(() => {
       result.current.updateWord(0, "abandon")
       result.current.setActiveIndex(0)
+    })
+
+    expect(result.current.suggestions).toEqual(["abandon"])
+  })
+
+  it("suggests nothing before a field is focused", () => {
+    const words = ["abandon", ...Array(11).fill("")]
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, initialWords: words }),
+    )
+
+    expect(result.current.activeIndex).toBe(-1)
+    expect(result.current.suggestions).toEqual([])
+  })
+
+  it("suggests nothing for a focused word outside this step", () => {
+    const words = [...Array(5).fill(""), "abo", ...Array(6).fill("")]
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 2, initialWords: words }),
+    )
+
+    act(() => {
+      result.current.setActiveIndex(5)
     })
 
     expect(result.current.suggestions).toEqual([])
@@ -129,28 +185,149 @@ describe("useBip39Input", () => {
 
     act(() => {
       result.current.setActiveIndex(0)
+    })
+    act(() => {
       result.current.selectSuggestion("abandon")
     })
 
     expect(result.current.words[0]).toBe("abandon")
   })
 
-  it("stepFilled is true when all step words are filled", () => {
-    const words = ["a", "b", "c", "", "", "", "", "", "", "", "", ""]
+  it("stepValid is false while a step word is not a backup word", () => {
+    const words = ["abandon", "ability", "abl", ...Array(9).fill("")]
     const { result } = renderHook(() =>
       useBip39Input({ wordCount: 12, wordsPerStep: 3, step: 1, initialWords: words }),
     )
 
-    expect(result.current.stepFilled).toBe(true)
+    expect(result.current.stepValid).toBe(false)
   })
 
-  it("allFilled is true when all words are filled", () => {
+  it("stepValid is true when every step word is a backup word", () => {
+    const words = ["abandon", "ability", "able", ...Array(9).fill("")]
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 3, step: 1, initialWords: words }),
+    )
+
+    expect(result.current.stepValid).toBe(true)
+  })
+
+  it("stepValid on step 2 is false while one of words 7-12 is not a backup word", () => {
+    const words = [...Array(10).fill("abandon"), "helz", "abandon"]
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 2, initialWords: words }),
+    )
+
+    expect(result.current.stepValid).toBe(false)
+  })
+
+  /** Paste stays on step 1, so "Next 6 words" has to unlock from the pasted words, and
+   *  step 2 picks up the rest of them. */
+  it("a full paste makes step 1 valid and fills words 7-12 too", () => {
+    const phrase =
+      "abandon ability able about above absent act action actor actress run runway"
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 1 }),
+    )
+
+    act(() => {
+      result.current.handlePaste(phrase)
+    })
+
+    expect(result.current.stepValid).toBe(true)
+    expect(result.current.allValid).toBe(true)
+    expect(result.current.words.slice(6)).toEqual(phrase.split(" ").slice(6))
+  })
+
+  describe("isWordInvalid", () => {
+    it("is false for an empty word and for a backup word", () => {
+      const words = ["", "abandon", ...Array(10).fill("")]
+      const { result } = renderHook(() =>
+        useBip39Input({ wordCount: 12, initialWords: words }),
+      )
+
+      expect(result.current.isWordInvalid(0)).toBe(false)
+      expect(result.current.isWordInvalid(1)).toBe(false)
+    })
+
+    it("flags the focused word once no backup word starts with it", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "abz")
+      })
+
+      expect(result.current.isWordInvalid(0)).toBe(true)
+    })
+
+    it.each(["wrongw", "helz"])("flags %s in a field the user is not in", (text) => {
+      const words = [text, ...Array(11).fill("")]
+      const { result } = renderHook(() =>
+        useBip39Input({ wordCount: 12, initialWords: words }),
+      )
+
+      expect(result.current.isWordInvalid(0)).toBe(true)
+    })
+
+    it("clears the flag once the word is corrected", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "abz")
+      })
+      expect(result.current.isWordInvalid(0)).toBe(true)
+
+      act(() => {
+        result.current.updateWord(0, "abandon")
+      })
+
+      expect(result.current.isWordInvalid(0)).toBe(false)
+    })
+
+    it("leaves a focused prefix alone while it can still become a word", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "ab")
+      })
+
+      expect(result.current.isWordInvalid(0)).toBe(false)
+    })
+
+    it("flags a prefix once the user moves to another field", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "ab")
+      })
+      act(() => {
+        result.current.setActiveIndex(1)
+      })
+
+      expect(result.current.isWordInvalid(0)).toBe(true)
+    })
+  })
+
+  it("allValid is true when every word is a backup word", () => {
     const words = Array(12).fill("abandon")
     const { result } = renderHook(() =>
       useBip39Input({ wordCount: 12, initialWords: words }),
     )
 
-    expect(result.current.allFilled).toBe(true)
+    expect(result.current.allValid).toBe(true)
+  })
+
+  /** The phrase check keys off this, so a half-typed last word must not count. */
+  it("allValid is false while the last word is only a prefix", () => {
+    const words = [...Array(11).fill("abandon"), "ab"]
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, initialWords: words }),
+    )
+
+    expect(result.current.allValid).toBe(false)
   })
 
   it("rejects paste with empty text", () => {
@@ -164,7 +341,7 @@ describe("useBip39Input", () => {
     expect(success).toBe(false)
   })
 
-  it("advances activeIndex when selecting suggestion mid-step", () => {
+  it("moves focus to the next field when selecting a suggestion mid-step", () => {
     const { result } = renderHook(() =>
       useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 1 }),
     )
@@ -178,7 +355,7 @@ describe("useBip39Input", () => {
     })
 
     expect(result.current.words[2]).toBe("able")
-    expect(result.current.activeIndex).toBe(3)
+    expect(result.current.focusRequest).toBe(3)
   })
 
   it("does not advance past step boundary", () => {
@@ -195,7 +372,7 @@ describe("useBip39Input", () => {
     })
 
     expect(result.current.words[5]).toBe("absent")
-    expect(result.current.activeIndex).toBe(5)
+    expect(result.current.focusRequest).toBeNull()
   })
 
   it("requests focus on next index when input is a prefix-unique BIP39 word", () => {
@@ -256,9 +433,9 @@ describe("useBip39Input", () => {
     expect(result.current.focusRequest).toBeNull()
   })
 
-  /** Suggestions only render while the keyboard is up, so these drive the keyboard
-   *  listeners directly instead of leaving the whole memo untested. */
-  describe("with the keyboard visible", () => {
+  /** Closing the keyboard is how the user leaves a field on Android, so these drive the
+   *  listener directly. */
+  describe("when the keyboard closes", () => {
     const keyboardListeners: Record<string, () => void> = {}
 
     beforeEach(() => {
@@ -272,70 +449,8 @@ describe("useBip39Input", () => {
       jest.restoreAllMocks()
     })
 
-    const showKeyboard = () => act(() => keyboardListeners.keyboardDidShow())
-
-    it("suggests matches for a 3+ character prefix", () => {
+    it("hides suggestions and deselects", () => {
       const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
-      showKeyboard()
-
-      act(() => {
-        result.current.setActiveIndex(0)
-        result.current.updateWord(0, "abo")
-      })
-
-      expect(result.current.suggestions).toEqual(["about", "above"])
-    })
-
-    it("suggests nothing below the character threshold", () => {
-      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
-      showKeyboard()
-
-      act(() => {
-        result.current.setActiveIndex(0)
-        result.current.updateWord(0, "ab")
-      })
-
-      expect(result.current.suggestions).toEqual([])
-    })
-
-    it("suggests nothing for an empty active word", () => {
-      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
-      showKeyboard()
-
-      act(() => {
-        result.current.setActiveIndex(0)
-      })
-
-      expect(result.current.suggestions).toEqual([])
-    })
-
-    it("suggests nothing once the word is complete and unique", () => {
-      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
-      showKeyboard()
-
-      act(() => {
-        result.current.setActiveIndex(2)
-        result.current.updateWord(2, "runway")
-      })
-
-      expect(result.current.suggestions).toEqual([])
-    })
-
-    it("keeps suggesting when the typed word is a prefix of other words", () => {
-      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
-      showKeyboard()
-
-      act(() => {
-        result.current.setActiveIndex(0)
-        result.current.updateWord(0, "run")
-      })
-
-      expect(result.current.suggestions).toEqual(["run", "runway"])
-    })
-
-    it("hides suggestions and deselects when the keyboard closes", () => {
-      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
-      showKeyboard()
 
       act(() => {
         result.current.setActiveIndex(0)
@@ -347,6 +462,20 @@ describe("useBip39Input", () => {
 
       expect(result.current.suggestions).toEqual([])
       expect(result.current.activeIndex).toBe(-1)
+    })
+
+    it("flags a prefix left in the field", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "ab")
+      })
+      expect(result.current.isWordInvalid(0)).toBe(false)
+
+      act(() => keyboardListeners.keyboardDidHide())
+
+      expect(result.current.isWordInvalid(0)).toBe(true)
     })
   })
 })

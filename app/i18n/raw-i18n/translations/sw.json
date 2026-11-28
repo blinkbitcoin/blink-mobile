@@ -4161,6 +4161,8 @@
     "pasteFailed": "Imeshindwa kusoma kutoka kwenye ubao wa kunakili. Tafadhali ingiza msemo wako wa hifadhi mwenyewe.",
     "enterWord": "Neno",
     "invalidMnemonic": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi.",
+    "invalidPhrase": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi. Wasiliana na <link>Msaada</link> kama tatizo litaendelea.",
+    "invalidWord": "Neno si sahihi, tafadhali kagua tahajia",
     "restoring": "Kurudisha mkoba wako...",
     "restoreSuccess": "Mkoba umerejeshwa kwa mafanikio",
     "restoreFailed": "Imeshindikana kurejesha mkoba. Tafadhali jaribu tena.",

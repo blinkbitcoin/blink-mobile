@@ -37,8 +37,9 @@ let mockBip39State = {
   handlePaste: mockHandlePaste,
   suggestions: [],
   selectSuggestion: jest.fn(),
-  stepFilled: false,
-  allFilled: false,
+  isWordInvalid: () => false,
+  stepValid: false,
+  allValid: false,
   focusRequest: null as number | null,
   clearFocusRequest: jest.fn(),
 }
@@ -62,7 +63,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       RestoreScreen: {
-        invalidMnemonic: () => "Invalid mnemonic",
+        invalidPhrase: () => "Invalid mnemonic",
         pasteFailed: () => "Paste failed",
       },
     },
@@ -93,8 +94,9 @@ describe("useRestorePhrase", () => {
       handlePaste: mockHandlePaste,
       suggestions: [],
       selectSuggestion: jest.fn(),
-      stepFilled: false,
-      allFilled: false,
+      isWordInvalid: () => false,
+      stepValid: false,
+      allValid: false,
       focusRequest: null as number | null,
       clearFocusRequest: jest.fn(),
     }
@@ -137,7 +139,9 @@ describe("useRestorePhrase", () => {
     expect(mockHandlePaste).toHaveBeenCalledWith("word1 word2 word3")
   })
 
-  it("auto-navigates to step 2 when full valid phrase is pasted in step 1", () => {
+  /** The user reviews all 12 pasted words, so a valid paste fills step 1 and waits for
+   *  "Next 6 words" instead of skipping ahead. */
+  it("fills the words from a full valid paste and stays on step 1", () => {
     mockHandlePaste.mockReturnValue(true)
     const fullPhrase = "valid a b c d e f g h i j k"
 
@@ -149,34 +153,21 @@ describe("useRestorePhrase", () => {
     })
 
     expect(returned).toBe(true)
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestorePhrase", {
-      step: PhraseStep.Second,
-      words: fullPhrase.split(" "),
-    })
-  })
-
-  it("does not auto-navigate when paste happens on step 2", () => {
-    mockHandlePaste.mockReturnValue(true)
-    const fullPhrase = "valid a b c d e f g h i j k"
-
-    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
-
-    act(() => {
-      result.current.handlePaste(fullPhrase)
-    })
-
+    expect(mockHandlePaste).toHaveBeenCalledWith(fullPhrase)
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("does not auto-navigate when paste yields invalid mnemonic", () => {
+  it("stays on step 1 after a full phrase is pasted from the clipboard", async () => {
+    mockGetString.mockResolvedValue("valid a b c d e f g h i j k")
     mockHandlePaste.mockReturnValue(true)
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
 
-    act(() => {
-      result.current.handlePaste("invalid a b c d e f g h i j k")
+    await act(async () => {
+      await result.current.handlePasteFromClipboard()
     })
 
+    expect(mockHandlePaste).toHaveBeenCalledWith("valid a b c d e f g h i j k")
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
@@ -214,7 +205,7 @@ describe("useRestorePhrase", () => {
   })
 
   it("isValid is false when not all words filled", () => {
-    mockBip39State.allFilled = false
+    mockBip39State.allValid = false
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
 
@@ -222,7 +213,7 @@ describe("useRestorePhrase", () => {
   })
 
   it("isValid is true when all words valid", () => {
-    mockBip39State.allFilled = true
+    mockBip39State.allValid = true
     mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
@@ -231,7 +222,7 @@ describe("useRestorePhrase", () => {
   })
 
   it("isValid is false when mnemonic invalid", () => {
-    mockBip39State.allFilled = true
+    mockBip39State.allValid = true
     mockBip39State.words = "invalid a b c d e f g h i j k".split(" ")
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
@@ -240,7 +231,7 @@ describe("useRestorePhrase", () => {
   })
 
   it("sets validation error on invalid mnemonic restore", async () => {
-    mockBip39State.allFilled = true
+    mockBip39State.allValid = true
     mockBip39State.words = "invalid a b c d e f g h i j k".split(" ")
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
@@ -254,7 +245,7 @@ describe("useRestorePhrase", () => {
   })
 
   it("calls restore with valid mnemonic", async () => {
-    mockBip39State.allFilled = true
+    mockBip39State.allValid = true
     mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
     mockRequestRestore.mockResolvedValue(undefined)
 
@@ -271,7 +262,7 @@ describe("useRestorePhrase", () => {
   /** useRestoreWallet reports its own failures and drives its status state; the hook
    *  only has to keep the rejection from escaping the button's onPress. */
   it("swallows a rejecting restore instead of rethrowing", async () => {
-    mockBip39State.allFilled = true
+    mockBip39State.allValid = true
     mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
     mockRequestRestore.mockRejectedValue(new Error("restore failed"))
 

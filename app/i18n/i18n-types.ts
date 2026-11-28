@@ -13912,6 +13912,14 @@ type RootTranslation = {
 		 */
 		invalidMnemonic: string
 		/**
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​i​f​ ​t​h​e​ ​w​o​r​d​ ​o​r​d​e​r​ ​i​s​ ​c​o​r​r​e​c​t​.​ ​C​o​n​t​a​c​t​ ​<​l​i​n​k​>​S​u​p​p​o​r​t​<​/​l​i​n​k​>​ ​i​f​ ​p​r​o​b​l​e​m​ ​p​e​r​s​i​s​t​s​.
+		 */
+		invalidPhrase: string
+		/**
+		 * I​n​v​a​l​i​d​ ​w​o​r​d​,​ ​p​l​e​a​s​e​ ​c​h​e​c​k​ ​t​h​e​ ​s​p​e​l​l​i​n​g
+		 */
+		invalidWord: string
+		/**
 		 * R​e​s​t​o​r​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
 		 */
 		restoring: string
@@ -28442,6 +28450,14 @@ export type TranslationFunctions = {
 		 * Invalid backup phrase. Please check if the word order is correct.
 		 */
 		invalidMnemonic: () => LocalizedString
+		/**
+		 * Invalid backup phrase. Please check if the word order is correct. Contact <link>Support</link> if problem persists.
+		 */
+		invalidPhrase: () => LocalizedString
+		/**
+		 * Invalid word, please check the spelling
+		 */
+		invalidWord: () => LocalizedString
 		/**
 		 * Restoring your wallet...
 		 */

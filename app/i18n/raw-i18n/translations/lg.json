@@ -4161,6 +4161,8 @@
     "pasteFailed": "Tetusobodde kusoma ku lutimbe. Bambi yingiza ekigambo kyo eky'okukuuma ggwe kennyini.",
     "enterWord": "Ekigambo",
     "invalidMnemonic": "Ebigambo by'enkalakkalira tebituufu. Kakasa nti omulongo gw'ebigambo gwa kituufu.",
+    "invalidPhrase": "Ebigambo by'enkalakkalira tebituufu. Kakasa nti omulongo gw'ebigambo gwa kituufu. Tuukirira <link>Obuyambi</link> singa obuzibu busigalawo.",
+    "invalidWord": "Ekigambo si kituufu, kebera empandiika yaakyo",
     "restoring": "Ezzaawo wallet yo...",
     "restoreSuccess": "Wallet eddiziddwamu bulungi",
     "restoreFailed": "Okuzzaawo wallet kulemye. Gezaako nate.",

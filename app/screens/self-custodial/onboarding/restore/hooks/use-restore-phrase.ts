@@ -8,7 +8,6 @@ import { validateMnemonic } from "bip39"
 import { useBip39Input } from "@app/hooks/use-bip39-input"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
-import { splitWords } from "@app/utils/bip39-wordlist"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
@@ -35,22 +34,9 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     initialWords,
   })
 
-  const handlePaste = useCallback(
-    (text: string) => {
-      const accepted = bip39.handlePaste(text)
-      if (!accepted || !isStep1) return accepted
-
-      const parsed = splitWords(text)
-      if (parsed.length === MNEMONIC_WORD_COUNT && validateMnemonic(parsed.join(" "))) {
-        navigation.navigate("selfCustodialRestorePhrase", {
-          step: PhraseStep.Second,
-          words: parsed,
-        })
-      }
-      return accepted
-    },
-    [bip39, isStep1, navigation],
-  )
+  /** A pasted phrase fills all 12 fields and stays on step 1, so the user reviews every
+   *  word before moving on; nothing skips ahead to step 2. */
+  const { handlePaste } = bip39
 
   /** Wired to a header onPress, so a clipboard rejection would surface as an unhandled
    *  promise rejection; report and toast it instead, and let the user type manually. */
@@ -65,9 +51,9 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
   }, [handlePaste, LL])
 
   const isValid = useMemo(() => {
-    if (!bip39.allFilled) return false
+    if (!bip39.allValid) return false
     return validateMnemonic(bip39.words.join(" "))
-  }, [bip39.words, bip39.allFilled])
+  }, [bip39.words, bip39.allValid])
 
   const handleContinue = useCallback(() => {
     navigation.navigate("selfCustodialRestorePhrase", {
@@ -79,7 +65,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
   const handleRestore = useCallback(async () => {
     const mnemonic = bip39.words.join(" ")
     if (!validateMnemonic(mnemonic)) {
-      setValidationError(LL.RestoreScreen.invalidMnemonic())
+      setValidationError(LL.RestoreScreen.invalidPhrase())
       return
     }
     await requestRestore(mnemonic).catch(() => {})
@@ -102,8 +88,9 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     suggestions: bip39.suggestions,
     selectSuggestion: bip39.selectSuggestion,
     handlePaste,
-    stepFilled: bip39.stepFilled,
-    allFilled: bip39.allFilled,
+    isWordInvalid: bip39.isWordInvalid,
+    stepValid: bip39.stepValid,
+    allValid: bip39.allValid,
     focusRequest: bip39.focusRequest,
     clearFocusRequest: bip39.clearFocusRequest,
     updateWord,

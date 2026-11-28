@@ -4161,6 +4161,8 @@
         "pasteFailed": "Zwischenablage konnte nicht gelesen werden. Bitte gib deine Sicherungsphrase manuell ein.",
         "enterWord": "Wort",
         "invalidMnemonic": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist.",
+        "invalidPhrase": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist. Kontaktiere den <link>Support</link>, wenn das Problem weiterhin besteht.",
+        "invalidWord": "Ungültiges Wort, bitte überprüfe die Schreibweise",
         "restoring": "Wallet wird wiederhergestellt...",
         "restoreSuccess": "Wallet erfolgreich wiederhergestellt",
         "restoreFailed": "Wallet-Wiederherstellung fehlgeschlagen. Bitte versuche es erneut.",
