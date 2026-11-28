@@ -1167,3 +1167,213 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
     expect(result.current.allTransactions).toEqual([{ id: "older-payment-of-b" }])
   })
 })
+
+describe("useSdkLifecycle balance when the account switches during a refresh", () => {
+  beforeEach(resetMocks)
+
+  const deferred = <T>() => {
+    let resolve: (value: T) => void = () => {}
+    const promise = new Promise<T>((r) => {
+      resolve = r
+    })
+    return { promise, resolve }
+  }
+
+  it("keeps the new account loading when the previous account's refresh finishes after the switch", async () => {
+    const sdkA = buildSdk("sdk-A")
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(sdkA).mockResolvedValueOnce(sdkB)
+    const listener = captureListener()
+    const { getServiceStatus: getServiceStatusMock } = jest.requireMock(
+      "@app/self-custodial/providers/is-online",
+    )
+    const snapshotOfB = deferred<unknown>()
+    mockGetSnapshot.mockImplementation((sdk: unknown) =>
+      sdk === sdkB
+        ? snapshotOfB.promise
+        : Promise.resolve({
+            wallets: [{ id: "btc-of-a" }],
+            allTransactions: [],
+            hasMore: false,
+            rawTransactionCount: 0,
+          }),
+    )
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.status).toBe(ActiveWalletStatus.Ready))
+
+    const statusOfA = deferred<number>()
+    getServiceStatusMock.mockImplementationOnce(() => statusOfA.promise)
+    act(() => {
+      listener.current?.({ tag: "Synced" })
+    })
+    await waitFor(() => expect(getServiceStatusMock).toHaveBeenCalledTimes(2))
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+    await act(async () => {
+      statusOfA.resolve(0)
+    })
+
+    expect(result.current.status).toBe(ActiveWalletStatus.Loading)
+    expect(result.current.wallets).toEqual([])
+  })
+
+  it("asks the new account for its balance without waiting on the previous account's refresh", async () => {
+    const sdkA = buildSdk("sdk-A")
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(sdkA).mockResolvedValueOnce(sdkB)
+    const listener = captureListener()
+    const snapshotOfA = deferred<unknown>()
+    mockGetSnapshot
+      .mockResolvedValueOnce({
+        wallets: [{ id: "btc-of-a" }],
+        allTransactions: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      })
+      .mockImplementationOnce(() => snapshotOfA.promise)
+      .mockResolvedValue({
+        wallets: [{ id: "btc-of-b" }],
+        allTransactions: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      })
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.status).toBe(ActiveWalletStatus.Ready))
+    act(() => {
+      listener.current?.({ tag: "Synced" })
+    })
+    await waitFor(() => expect(mockGetSnapshot).toHaveBeenCalledTimes(2))
+
+    rerender({ accountId: "acct-B" })
+
+    await waitFor(() => expect(result.current.wallets).toEqual([{ id: "btc-of-b" }]))
+    expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    expect(mockGetSnapshot).toHaveBeenLastCalledWith(sdkB, 0)
+
+    await act(async () => {
+      snapshotOfA.resolve({
+        wallets: [{ id: "btc-of-a" }],
+        allTransactions: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      })
+    })
+    expect(result.current.wallets).toEqual([{ id: "btc-of-b" }])
+  })
+
+  const snapshotOf = (walletId: string) => ({
+    wallets: [{ id: walletId }],
+    allTransactions: [],
+    hasMore: false,
+    rawTransactionCount: 0,
+  })
+  const snapshotCallsFor = (sdk: object) =>
+    mockGetSnapshot.mock.calls.filter(([calledWith]) => calledWith === sdk).length
+
+  it("settles a refresh queued on the previous account's loop without rerunning it", async () => {
+    const sdkA = buildSdk("sdk-A")
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(sdkA).mockResolvedValueOnce(sdkB)
+    const listener = captureListener()
+    const snapshotOfA = deferred<unknown>()
+    mockGetSnapshot
+      .mockResolvedValueOnce(snapshotOf("btc-of-a"))
+      .mockImplementationOnce(() => snapshotOfA.promise)
+      .mockResolvedValue(snapshotOf("btc-of-b"))
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.status).toBe(ActiveWalletStatus.Ready))
+    act(() => {
+      listener.current?.({ tag: "Synced" })
+    })
+    await waitFor(() => expect(snapshotCallsFor(sdkA)).toBe(2))
+
+    let queuedSettled = false
+    act(() => {
+      result.current.refreshWallets().then(() => {
+        queuedSettled = true
+      })
+    })
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.wallets).toEqual([{ id: "btc-of-b" }]))
+    expect(queuedSettled).toBe(false)
+
+    await act(async () => {
+      snapshotOfA.resolve(snapshotOf("btc-of-a"))
+    })
+
+    await waitFor(() => expect(queuedSettled).toBe(true))
+    expect(snapshotCallsFor(sdkA)).toBe(2)
+    expect(result.current.wallets).toEqual([{ id: "btc-of-b" }])
+  })
+
+  it("keeps the new account's loop when the previous account's loop ends after it started", async () => {
+    const sdkA = buildSdk("sdk-A")
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(sdkA).mockResolvedValueOnce(sdkB)
+    const listener = captureListener()
+    const snapshotOfA = deferred<unknown>()
+    const firstSnapshotOfB = deferred<unknown>()
+    let callsOfA = 0
+    let callsOfB = 0
+    mockGetSnapshot.mockImplementation((sdk: unknown) => {
+      if (sdk === sdkA) {
+        callsOfA += 1
+        return callsOfA === 1
+          ? Promise.resolve(snapshotOf("btc-of-a"))
+          : snapshotOfA.promise
+      }
+      callsOfB += 1
+      return callsOfB === 1
+        ? firstSnapshotOfB.promise
+        : Promise.resolve(snapshotOf("btc-of-b"))
+    })
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.status).toBe(ActiveWalletStatus.Ready))
+    act(() => {
+      listener.current?.({ tag: "Synced" })
+    })
+    await waitFor(() => expect(snapshotCallsFor(sdkA)).toBe(2))
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(snapshotCallsFor(sdkB)).toBe(1))
+
+    await act(async () => {
+      snapshotOfA.resolve(snapshotOf("btc-of-a"))
+    })
+
+    /** Queued behind the new account's loop still in flight, not a second loop beside it. */
+    let queuedSettled = false
+    act(() => {
+      result.current.refreshWallets().then(() => {
+        queuedSettled = true
+      })
+    })
+    expect(snapshotCallsFor(sdkB)).toBe(1)
+
+    await act(async () => {
+      firstSnapshotOfB.resolve(snapshotOf("btc-of-b"))
+    })
+
+    await waitFor(() => expect(queuedSettled).toBe(true))
+    expect(snapshotCallsFor(sdkB)).toBe(2)
+    expect(result.current.wallets).toEqual([{ id: "btc-of-b" }])
+  })
+})

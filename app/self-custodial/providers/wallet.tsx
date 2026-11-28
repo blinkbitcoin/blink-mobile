@@ -20,6 +20,7 @@ import {
   AccountType,
   ActiveWalletStatus,
   type ActiveWalletState,
+  type WalletState,
 } from "@app/types/wallet"
 
 import { getLightningAddress } from "../bridge"
@@ -45,6 +46,10 @@ const FOREGROUND_RETRYABLE_STATUSES: readonly ActiveWalletStatus[] = [
   ActiveWalletStatus.Offline,
   ActiveWalletStatus.Error,
 ]
+
+/** Shared empty list, so the published value keeps its identity across renders while
+ *  the connection belongs to another account. */
+const NO_WALLETS: WalletState[] = []
 
 const LightningAddressOperation = {
   Resolve: "resolve",
@@ -292,11 +297,30 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     ? allTransactions
     : NO_TRANSACTIONS
 
+  /**
+   * The balances, like the transactions above, are the active account's only. Until the
+   * lifecycle clears the list, it still holds the account being left, and home totals any
+   * non-empty list as the balance: the previous account's balance would show under the
+   * new one instead of the skeleton.
+   */
+  const activeAccountWallets = isSdkOnActiveAccount ? wallets : NO_WALLETS
+
+  /**
+   * Ready, like the transactions above, only describes the account the connection is on.
+   * Between a switch and the new connection, a balance still empty for the account now
+   * selected must read as loading: ready with no wallets shows a confirmed 0. Every other
+   * status passes through, so a wallet that never connects still shows its error.
+   */
+  const isReadyStatus =
+    status === ActiveWalletStatus.Ready || status === ActiveWalletStatus.Degraded
+  const activeAccountStatus =
+    isReadyStatus && !isSdkOnActiveAccount ? ActiveWalletStatus.Loading : status
+
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
-      wallets,
+      wallets: activeAccountWallets,
       allTransactions: activeAccountTransactions,
-      status,
+      status: activeAccountStatus,
       accountType: AccountType.SelfCustodial,
       retry,
       sdk,
@@ -313,9 +337,9 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       updateCurrentSelfCustodialAccount,
     }),
     [
-      wallets,
+      activeAccountWallets,
       activeAccountTransactions,
-      status,
+      activeAccountStatus,
       retry,
       sdk,
       connectedAccountId,

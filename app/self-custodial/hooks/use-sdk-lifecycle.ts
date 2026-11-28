@@ -78,6 +78,12 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
 export const WALLET_SNAPSHOT_TIMEOUT_MS = 10000
 
+type RefreshLoop = {
+  sdk: BreezSdkInterface
+  pending: boolean
+  waiters: (() => void)[]
+}
+
 const teardownSdk = async (
   sdk: BreezSdkInterface,
   listenerId: string | null,
@@ -105,12 +111,8 @@ export const useSdkLifecycle = (
   const sdkRef = useRef<BreezSdkInterface | null>(null)
   const listenerIdRef = useRef<string | null>(null)
   const abortRef = useRef(false)
-  const refreshingRef = useRef(false)
-  const pendingRefreshRef = useRef(false)
-  /** Callers waiting for the first refresh iteration that starts at or after
-   *  their call, resolved iteration by iteration — no caller adopts the whole
-   *  drain loop's lifetime (offline, the 10s poll can re-arm it indefinitely). */
-  const refreshWaitersRef = useRef<(() => void)[]>([])
+  /** The refresh drain loop in flight, if any, and the connection it refreshes. */
+  const refreshLoopRef = useRef<RefreshLoop | null>(null)
   const rawTxOffsetRef = useRef(0)
   /**
    * The leeway only feeds the SDK config at connect time, so hold it in a ref:
@@ -121,29 +123,37 @@ export const useSdkLifecycle = (
   const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
     useBackoffRetry(RECONNECT_BACKOFF_MS)
 
-  // `refreshingRef` linearizes concurrent refreshes (10s poll, AppState change,
-  // SDK events): only one runOnce executes at a time, and any overlapping call
-  // sets `pendingRefreshRef` so the in-flight loop reruns once it returns.
-  // Every caller awaits only the iteration that serves it (refreshWaitersRef):
+  // A drain loop linearizes concurrent refreshes of one connection (10s poll,
+  // AppState change, SDK events): only one runOnce executes at a time, and any
+  // overlapping call sets the loop's `pending` so it reruns once it returns.
+  // Every caller awaits only the iteration that serves it (the loop's waiters):
   // fresh data before pull-to-refresh retracts, without waiting on the whole
-  // drain loop. The require-atomic-updates disables below (post-await ref
-  // writes) are safe under that invariant.
+  // drain loop. The loop belongs to the connection it was started for: after an
+  // account switch the new connection starts its own instead of queueing behind
+  // the old one, whose reruns would refresh nothing but the connection it left.
+  // The require-atomic-updates disables below (post-await ref writes) are safe
+  // under that invariant.
   const refreshWallets = useCallback(async () => {
     const sdk = sdkRef.current
     if (!sdk) return
-    const settled = new Promise<void>((resolve) => {
-      refreshWaitersRef.current.push(resolve)
-    })
-    if (refreshingRef.current) {
-      // The in-flight do/while below reruns while pendingRefreshRef is set;
-      // this caller's waiter resolves when the rerun serving it completes —
-      // not before any data landed (the spinner would retract on stale
-      // values), and not after the loop's open-ended lifetime either.
-      pendingRefreshRef.current = true
-      await settled
+    const running = refreshLoopRef.current
+    if (running?.sdk === sdk) {
+      // The in-flight do/while below reruns while `pending` is set; this
+      // caller's waiter resolves when the rerun serving it completes — not
+      // before any data landed (the spinner would retract on stale values),
+      // and not after the loop's open-ended lifetime either.
+      const served = new Promise<void>((resolve) => {
+        running.waiters.push(resolve)
+      })
+      running.pending = true
+      await served
       return
     }
-    refreshingRef.current = true
+    const loop: RefreshLoop = { sdk, pending: false, waiters: [] }
+    const settled = new Promise<void>((resolve) => {
+      loop.waiters.push(resolve)
+    })
+    refreshLoopRef.current = loop
 
     const isStale = () => sdkRef.current !== sdk
 
@@ -161,6 +171,9 @@ export const useSdkLifecycle = (
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
 
         const serviceStatus = await getServiceStatus()
+        /** A switch while the service status was asked has already cleared the balance
+         *  for the next account: marking it ready would show that empty balance as 0. */
+        if (isStale()) return
         const nextStatus = isDegradedStatus(serviceStatus)
           ? ActiveWalletStatus.Degraded
           : ActiveWalletStatus.Ready
@@ -194,23 +207,24 @@ export const useSdkLifecycle = (
 
     // The drain loop runs detached (runOnce never rejects — its catch handles
     // everything); each iteration serves the waiters registered before it
-    // started, and anyone arriving mid-iteration re-arms pendingRefreshRef to
-    // be served by the next.
+    // started, and anyone arriving mid-iteration re-arms `pending` to be served
+    // by the next. A replaced connection stops it: its reruns could only be
+    // dropped as stale.
     ;(async () => {
       try {
         do {
-          const waiters = refreshWaitersRef.current
-          refreshWaitersRef.current = []
-          pendingRefreshRef.current = false
+          const waiters = loop.waiters
+          loop.waiters = []
+          loop.pending = false
           await runOnce()
           for (const resolve of waiters) resolve()
-        } while (pendingRefreshRef.current)
+        } while (loop.pending && !isStale())
       } finally {
-        refreshingRef.current = false // eslint-disable-line require-atomic-updates
+        if (refreshLoopRef.current === loop) refreshLoopRef.current = null // eslint-disable-line require-atomic-updates
         // Belt and braces: a waiter can only be left behind if the loop exits
-        // abnormally; never strand its caller.
-        const leftover = refreshWaitersRef.current
-        refreshWaitersRef.current = [] // eslint-disable-line require-atomic-updates
+        // abnormally or its connection was replaced; never strand its caller.
+        const leftover = loop.waiters
+        loop.waiters = [] // eslint-disable-line require-atomic-updates
         for (const resolve of leftover) resolve()
       }
     })()
