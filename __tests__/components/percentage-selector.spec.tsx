@@ -1,8 +1,11 @@
 import React from "react"
-import { StyleSheet, Text as ReactNativeText } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { ActivityIndicator, StyleSheet, Text as ReactNativeText } from "react-native"
+import { render, fireEvent, screen } from "@testing-library/react-native"
 
 import { PercentageSelector } from "@app/components/percentage-selector/percentage-selector"
+import { haptics } from "@app/utils/haptics"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof ReactNativeText>) => (
@@ -154,6 +157,56 @@ describe("PercentageSelector", () => {
     expect(mockOnSelect).not.toHaveBeenCalled()
   })
 
+  describe("select haptic", () => {
+    it("fires once per chip press, before the selection", () => {
+      const order: string[] = []
+      jest.mocked(haptics.select).mockImplementation(() => order.push("haptic"))
+      mockOnSelect.mockImplementation(() => order.push("select"))
+      render(
+        <PercentageSelector
+          isLocked={false}
+          loadingPercent={null}
+          onSelect={mockOnSelect}
+        />,
+      )
+
+      fireEvent.press(screen.getByText("25%"))
+      fireEvent.press(screen.getByText("100%"))
+
+      expect(haptics.select).toHaveBeenCalledTimes(2)
+      expect(order).toEqual(["haptic", "select", "haptic", "select"])
+    })
+
+    it("stays silent on a locked chip", () => {
+      render(
+        <PercentageSelector
+          isLocked={true}
+          loadingPercent={null}
+          onSelect={mockOnSelect}
+        />,
+      )
+
+      fireEvent.press(screen.getByText("50%"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
+
+    it("stays silent on a disabled option", () => {
+      render(
+        <PercentageSelector
+          isLocked={false}
+          loadingPercent={null}
+          onSelect={mockOnSelect}
+          disabledOptions={[100]}
+        />,
+      )
+
+      fireEvent.press(screen.getByText("100%"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
+  })
+
   it("shows ActivityIndicator when loadingPercent matches option", () => {
     const { getByTestId, queryByText } = render(
       <PercentageSelector
@@ -165,7 +218,9 @@ describe("PercentageSelector", () => {
     )
 
     expect(getByTestId("test-75%")).toBeTruthy()
-    expect(queryByText("75%")).toBeNull()
+    // The label stays mounted under the spinner so the chip keeps its width, but hidden.
+    expect(StyleSheet.flatten(queryByText("75%")?.props.style).opacity).toBe(0)
+    expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
   })
 
   it("shows percentage text when not loading", () => {
@@ -265,5 +320,22 @@ describe("PercentageSelector", () => {
 
     expect(StyleSheet.flatten(getByText("50%").props.style).color).toBe("textOnAccent")
     expect(StyleSheet.flatten(getByText("25%").props.style).color).toBe("accent")
+  })
+
+  /** Each chip used to be read as its test-ID prefix ("send", "convert"). */
+  it("reads each chip as its percentage", () => {
+    const { getByLabelText, queryByLabelText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        testIdPrefix="send"
+      />,
+    )
+
+    ;["25%", "50%", "75%", "100%"].forEach((label) => {
+      expect(getByLabelText(label).props.accessibilityRole).toBe("button")
+    })
+    expect(queryByLabelText("send")).toBeNull()
   })
 })

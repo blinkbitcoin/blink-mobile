@@ -39,7 +39,9 @@ import {
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
+import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
+import { haptics } from "@app/utils/haptics"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
@@ -488,6 +490,7 @@ const ConversionDetailsScreenContent = ({
   const toggleInputs = () => {
     if (uiLocked) return
 
+    haptics.select()
     setLockFormattingInputId(null)
     setIsTyping(false)
     setSelectedPercent(null)
@@ -908,7 +911,9 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "column",
     marginHorizontal: 20,
     marginTop: 16,
-    ...(currencyInput ? { minHeight: 70 } : {}),
+    /** The selector clips what overflows it, so the row that holds the amount has to grow
+     *  with the amount: fixed, the figure loses its top half at the larger text sizes. */
+    ...(currencyInput ? { minHeight: 70 * cappedFontScale() } : {}),
   },
   walletSelectorContainer: {
     flexDirection: "column",

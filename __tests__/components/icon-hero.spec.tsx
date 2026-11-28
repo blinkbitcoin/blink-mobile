@@ -1,5 +1,6 @@
 import React from "react"
 import { StyleSheet, Text } from "react-native"
+import { ReactTestInstance } from "react-test-renderer"
 import { render } from "@testing-library/react-native"
 
 import { IconHero } from "@app/components/icon-hero"
@@ -14,6 +15,18 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
     ),
   }
 })
+
+/** The send flow's Sent frame, the shape a caller grows the icon frame to. */
+const GROWN_FRAME = { width: 72, height: 72, marginBottom: 10 }
+
+/** The icon frame: the first view above the glyph that sizes it. */
+const iconFrameStyle = (glyph: ReactTestInstance) => {
+  for (let at = glyph.parent; at; at = at.parent) {
+    const style = StyleSheet.flatten(at.props.style)
+    if (style?.width !== undefined) return style
+  }
+  return undefined
+}
 
 describe("IconHero", () => {
   it("renders title", async () => {
@@ -158,5 +171,65 @@ describe("IconHero", () => {
     )
     await flushEffects()
     expect(getByTestId("icon-cloud-arrow-up")).toBeTruthy()
+  })
+
+  it("marks a text title as a heading, so a screen reader can jump to it", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <IconHero icon="warning" iconColor="orange" title="A small problem" />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByText("A small problem").props.accessibilityRole).toBe("header")
+  })
+  it("draws the caller's own node in place of a glyph", async () => {
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <IconHero
+          icon={<Text testID="own-icon">badge</Text>}
+          iconColor="green"
+          title="Sent"
+        />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("own-icon")).toBeTruthy()
+    expect(queryByTestId(/^icon-/)).toBeNull()
+  })
+
+  it("lays the caller's frame style over the icon frame", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <IconHero
+          icon="send"
+          iconColor="green"
+          title="Sent"
+          iconFrameStyle={GROWN_FRAME}
+        />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(iconFrameStyle(getByTestId("icon-send"))).toMatchObject({
+      width: 72,
+      height: 72,
+      marginBottom: 10,
+    })
+  })
+
+  it("keeps the 44 icon frame when the caller passes no frame style", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <IconHero icon="send" iconColor="green" title="Sent" />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(iconFrameStyle(getByTestId("icon-send"))).toMatchObject({
+      width: 44,
+      height: 44,
+    })
   })
 })

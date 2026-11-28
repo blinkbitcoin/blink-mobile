@@ -2354,15 +2354,41 @@
     "title": "Xác nhận thanh toán",
     "totalLabel": "Tổng cộng:",
     "totalExceed": "Tổng vượt quá số dư của bạn là {balance: string}",
+    "feeExceedsAmount": "Phí mạng lưới cao hơn số tiền bạn đang gửi",
     "maxFeeSelected": "Đây là mức phí tối đa bạn sẽ phải trả cho giao dịch này. Nó có thể sẽ ít hơn sau khi thanh toán được thực hiện.",
     "invoiceAlreadyPaid": "Hóa đơn này đã được thanh toán",
     "somethingWentWrong": "Đã xảy ra sự cố",
+    "priceUpdated": "Giá đã thay đổi nên số tiền đã được cập nhật. Hãy kiểm tra trước khi gửi.",
     "paymentAlreadyAttempted": "Thanh toán đã được thử.\n\nNếu bạn muốn gửi lại khoản thanh toán này, hãy bắt đầu lại từ đầu.",
-    "slideToConfirm": "Vuốt để Xác nhận",
+    "paymentMayStillLand": "Vui lòng đợi một chút, giao dịch có thể sẽ sớm hoàn tất. Tiền của bạn sẽ đến nơi an toàn hoặc vẫn ở lại với bạn.",
     "slideConfirming": "Đang xác nhận...",
+    "slideToSend": "Vuốt để Gửi",
+    "calculatingFee": "Đang tính phí…",
+    "sendProgress": {
+      "reviewing": "Đang xem xét",
+      "signing": "Đang ký",
+      "findingRoute": "Đang tìm đường",
+      "broadcasting": "Đang phát",
+      "checkingDelivery": "Đang kiểm tra giao nhận",
+      "almostThere": "Sắp xong",
+      "anyTimeNow": "Sắp rồi",
+      "hangTight": "Chờ chút nhé",
+      "stillOnItsWay": "Vẫn đang trên đường"
+    },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
-    "lightningRecommended": "Phí cao! Chúng tôi khuyên bạn nên dùng Lightning.",
-    "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}."
+    "lightningRecommended": "Phí cao. Chúng tôi khuyên bạn nên dùng Lightning.",
+    "sending": "Đang gửi",
+    "sent": "Đã gửi",
+    "receipt": "Biên nhận",
+    "sentAnnouncement": "Đã gửi, {amount: string}",
+    "fromBalance": "Từ số dư",
+    "details": "Chi tiết",
+    "changeAmount": "Đổi số tiền",
+    "tryAgain": "Thử lại",
+    "home": "Nhà",
+    "dustSweepSheetTitle": "Trước khi gửi",
+    "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}.",
+    "sendAnyway": "Tôi đã kiểm tra lịch sử, vẫn gửi"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Tên người dùng {bankName: string} hiện là địa chỉ {bankName: string}.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",
+    "addAmount": "Thêm số tiền",
+    "slideToSelectAmount": "Vuốt để chọn số tiền",
+    "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "Chúng tôi không thể kiểm tra hạn mức hằng ngày của bạn. Hãy thử lại sau giây lát.",
+    "problemSheetTitle": "Một vấn đề nhỏ",
+    "changeDestination": "Đổi điểm đến",
+    "recipientUnreachableTitle": "Không thể kết nối với người nhận",
+    "recipientWrongAmountTitle": "Người nhận đã ghi sai số tiền",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Số tiền là bắt buộc",
     "cost": "Chi phí",
@@ -2425,10 +2459,11 @@
     "title": "Gửi Bitcoin",
     "failedToFetchLnurlInvoice": "Không lấy được hóa đơn lnurl",
     "lnurlInvoiceIncorrectAmount": "Máy chủ LNURL phản hồi với một hóa đơn có số tiền không chính xác.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Cảnh báo phí cao!",
-      "content": "Phí của bạn lớn hơn 50% so với số tiền gửi. Bạn có chắc muốn tiếp tục không?\n\nĐể giảm phí, hãy yêu cầu người nhận chấp nhận giao dịch qua Lightning",
-      "confirmButton": "Tôi chắc chắn 100%"
+      "body": "Phí của bạn bằng 50% trở lên so với số tiền bạn gửi. Bạn có chắc muốn tiếp tục không?",
+      "cancelPayment": "Hủy thanh toán",
+      "acceptFee": "Chấp nhận phí"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "pendingPayment": "Khoản thanh toán đã được gửi nhưng chưa được xác nhận.\n\nCó thể khoản thanh toán sẽ không được xác nhận, trong trường hợp đó tiền sẽ được trả lại tài khoản của bạn.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
     "sdkAmountTooLow": "Số tiền quá thấp cho giao dịch on-chain.",
     "sdkNetworkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
-    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
+    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác.",
+    "onchainSelfPayment": "Đây là địa chỉ ví của chính bạn. Bạn không thể gửi thanh toán on-chain cho chính mình."
   },
   "SettingsScreen": {
     "createAddress": "Tạo địa chỉ Lightning",
@@ -2988,6 +3024,7 @@
     "note": "Ghi chú",
     "notification": "Thông báo",
     "ok": "OK",
+    "okay": "Được rồi",
     "or": "or",
     "openWallet": "Mở ví",
     "onchain": "Trên chuỗi",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Xóa",
+    "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
+    "switchToWallet": "Chuyển sang {wallet: string}",
+    "copy": "Sao chép",
+    "balanceHidden": "Số dư đang ẩn",
+    "revealBalanceHint": "Hiển thị số dư của bạn trên màn hình này"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Thanh toán",
         "acceptButton": "Chấp nhận",
         "payButton": "Tiếp tục và Thanh toán",
-        "cardTitle": "Blink Riêng tư",
+        "cardTitle": "Blink Orange",
+        "free": "Miễn phí",
+        "forNow": "hiện tại",
         "perYear": "mỗi năm",
+        "freeBreakdown": {
+          "card": "Thẻ Blink",
+          "memberBenefits": "Các quyền lợi thành viên khác"
+        },
         "status": {
           "label": "Trạng thái",
           "specialOfferLabel": "Ưu đãi đặc biệt",
@@ -3695,35 +3746,53 @@
           "text": "Tôi đã xem xét và đồng ý với",
           "linkText": "Biểu Phí Blink Card"
         },
-        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng"
+        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng",
+        "freeNotice": "Tôi hiểu rằng Blink Orange hiện miễn phí và có thể áp dụng phí thành viên sau này, kèm thông báo trước"
+      },
+      "CardVerifyIdentity": {
+        "title": "Xác minh danh tính của bạn",
+        "description": "Để kích hoạt Thẻ Blink, đơn vị phát hành thẻ cần xác minh bạn là ai (KYC). Bạn sẽ cần:",
+        "requirements": {
+          "governmentId": "Giấy tờ tùy thân do chính phủ cấp",
+          "selfie": "Ảnh selfie / kiểm tra người thật",
+          "proofOfAddress": "Bằng chứng địa chỉ",
+          "questions": "Một vài câu hỏi về bạn"
+        },
+        "buttonText": "Tiếp tục"
       },
       "CardIntroducing": {
         "title": "Giới thiệu",
         "cardInfo": {
-          "bitcoinCard": "Thẻ Visa Blink",
+          "bitcoinCard": "Thẻ Blink",
           "for": "dành cho",
-          "maximalist": "Người theo chủ nghĩa Bitcoin tối đa"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Tiếp tục"
       },
       "CardDetails": {
-        "title": "Đặc quyền bổ sung",
+        "title": "Bao gồm những gì",
         "features": {
-          "accountManager": "Quản lý tài khoản chuyên trách",
-          "support": "Hỗ trợ ưu tiên",
-          "onchainDeposits": "Hoàn 50% phí giao dịch",
-          "circularEconomies": "100 $ cho kinh tế tuần hoàn"
+          "card": {
+            "title": "Thẻ Blink",
+            "subtitle": "thẻ Visa của bạn, sẵn sàng ngay hôm nay"
+          },
+          "accountManager": {
+            "title": "Quản lý tài khoản cá nhân",
+            "subtitle": "và hỗ trợ ưu tiên"
+          },
+          "onOffRamping": "Nạp và rút tiền"
         },
-        "andMore": "... và nhiều hơn nữa vào năm 2026",
+        "availableIn": "trong {months} tháng",
+        "footnote": "Một số tính năng sẽ có trong vòng {months} tháng. Thẻ đã sẵn sàng ngay hôm nay.",
         "buttonText": "Tiếp tục"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Chào mừng bạn",
-          "subtitle": "Đến Blink Riêng tư",
+          "subtitle": "Đến Blink Orange",
           "paragraphs": {
-            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Riêng tư. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
-            "body2": "Mục tiêu của chúng tôi cho năm 2026 là lấp đầy chương trình với nhiều ưu đãi đến mức việc gia hạn năm sau là điều hiển nhiên."
+            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Orange. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
+            "body2": "Blink Orange là cấp độ đầu tiên trong chương trình thành viên của Blink dành cho Bitcoiner, chỉ dành cho người được mời. Thẻ Blink và người quản lý tài khoản cá nhân của bạn là hai trong số những dịch vụ đầu tiên chúng tôi cung cấp — phần còn lại chúng tôi sẽ xây dựng đến năm 2027."
           }
         },
         "buttonText": "Bắt đầu nào"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Nghề nghiệp",
-            "placeholder": "Chọn nghề nghiệp của bạn"
+            "placeholder": "Chọn"
           },
           "annualSalaryRange": {
             "label": "Thu nhập hàng năm",
-            "placeholder": "Chọn mức thu nhập của bạn"
+            "placeholder": "Chọn mức lương"
           },
           "accountPurpose": {
             "label": "Mục đích tài khoản",
@@ -3815,7 +3884,6 @@
             "placeholder": "Chọn mức chi tiêu của bạn"
           }
         },
-        "buttonText": "Gửi đơn đăng ký",
         "select": "chọn"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", và",
           "cardTermsLinkText": "Điều khoản Thẻ Blink"
         },
-        "certifyAccuracy": "Tôi xác nhận rằng thông tin tôi đã cung cấp là chính xác và tôi sẽ tuân thủ mọi quy tắc và yêu cầu liên quan đến Thẻ Blink Visa của tôi",
-        "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink Visa không cấu thành hành vi chào mời trái phép"
+        "certifyAccuracy": "Tôi xác nhận rằng thông tin tôi đã cung cấp là chính xác và tôi sẽ tuân thủ mọi quy tắc và yêu cầu liên quan đến Thẻ Blink của tôi",
+        "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink không cấu thành hành vi chào mời trái phép"
       },
       "CardPreapproved": {
-        "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
+        "title": "Thẻ Blink của bạn đã sẵn sàng!",
+        "subtitle": "Giờ bạn có thể kích hoạt thẻ và bắt đầu sử dụng",
         "buttonText": "Đóng"
+      },
+      "CardDeclined": {
+        "title": "Chúng tôi không thể phê duyệt đơn đăng ký thẻ của bạn",
+        "subtitle": "Người quản lý tài khoản sẽ liên hệ với bạn."
       },
       "CardProcessing": {
         "title": "Đang xử lý đơn đăng ký của bạn",
-        "subtitle": "Chúng tôi sẽ thông báo cho bạn ngay khi chúng tôi sẵn sàng",
-        "buttonText": "Đóng"
+        "subtitle": "Quá trình này có thể mất tới một phút"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Hãy chuyển ngay sang tài khoản không lưu ký",
       "body": "Bạn không còn có thể nhận tiền vào tài khoản lưu ký của mình. Blink đã ngừng dịch vụ lưu ký tại khu vực của bạn và tài khoản này sẽ bị vô hiệu hóa vào cuối ngày {date}.\n\nHãy chuyển ngay sang tài khoản không lưu ký.",
+      "bodyLevelZero": "Bạn không còn có thể nhận tiền vào tài khoản dùng thử này. Blink đang đóng các tài khoản dùng thử và tài khoản này sẽ bị vô hiệu hóa vào cuối ngày {date}.\n\nHãy chuyển ngay sang tài khoản không lưu ký.",
       "migrateCta": "Chuyển ngay"
     },
     "reminderBulletin": {
       "title": "Quan trọng",
       "body": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}. Việc nhận sẽ dừng vào {receiveStopsDate}.",
+      "bodySingleDate": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date} — mọi thứ được chuyển chỉ với vài lần chạm.",
+      "bodyLevelZero": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}.",
       "bodyReceiveDisabled": "Việc nhận đã dừng. Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}.",
       "migrateCta": "Chuyển"
     },
     "offboardBulletin": {
       "title": "Quan trọng",
-      "body": "Tài khoản của bạn được đăng ký ở khu vực mà chúng tôi không thể cung cấp tài khoản. Hãy rút tiền của bạn trước ngày 31 tháng 8. Việc nhận tiền sẽ dừng vào ngày 10 tháng 8."
+      "bodyTwoDates": "Blink không thể cung cấp tài khoản lưu ký tại khu vực của bạn. Hãy rút tiền của bạn trước {date} — không mất bất kỳ khoản phí nào của Blink. Việc nhận tiền sẽ dừng vào {receiveStopsDate}. Nếu bạn cho rằng tài khoản của mình bị ảnh hưởng do nhầm lẫn, bạn có thể xác minh nơi cư trú hiện tại trong ứng dụng.",
+      "bodySingleDate": "Blink không thể cung cấp tài khoản lưu ký tại khu vực của bạn. Hãy rút tiền của bạn trước {date} — không mất bất kỳ khoản phí nào của Blink. Nếu bạn cho rằng tài khoản của mình bị ảnh hưởng do nhầm lẫn, bạn có thể xác minh nơi cư trú hiện tại trong ứng dụng.",
+      "bodyReceiveOff": "Blink không thể cung cấp tài khoản lưu ký tại khu vực của bạn. Hãy rút tiền của bạn trước {date} — không mất bất kỳ khoản phí nào của Blink. Việc nhận tiền đã tắt. Nếu bạn cho rằng tài khoản của mình bị ảnh hưởng do nhầm lẫn, bạn có thể xác minh nơi cư trú hiện tại trong ứng dụng."
     },
     "dollarBalanceModal": {
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Đã xảy ra lỗi khi tiếp tục quá trình chuyển của bạn. Vui lòng bắt đầu lại.",
     "migrationRequiredBody": "Đã đến lúc chuyển tài khoản lưu ký của bạn sang tài khoản không lưu ký.",
     "migrationRequiredForcedBody": "Đã đến lúc chuyển tài khoản lưu ký của bạn sang tài khoản không lưu ký. Điều này là bắt buộc vì lý do quy định.\n\nĐừng lo lắng, non-custodial sẽ tốt hơn cho bạn về lâu dài.",
+    "migrationRequiredForcedBodyLevelZero": "Blink đang đóng các tài khoản dùng thử. Hãy chuyển số dư của bạn sang tài khoản không lưu ký. Chỉ mất vài lần chạm.",
     "migrationGateTitle": "Không thể truy cập tài khoản",
     "migrationGateBody": "Vì lý do quy định, chúng tôi không thể cung cấp tài khoản custodial ở khu vực của bạn. Hãy chuyển tiền của bạn sang tài khoản non-custodial với Blink bằng cách làm theo các bước tiếp theo hoặc liên hệ với chúng tôi tại <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Các tài khoản dùng thử hiện đã đóng. Số dư của bạn vẫn an toàn. Hãy chuyển số dư sang tài khoản không lưu ký bằng cách làm theo các bước tiếp theo, miễn phí và không giới hạn thời gian, hoặc liên hệ với chúng tôi tại <link>{email}</link>",
     "bitcoinBalance": "Số dư Bitcoin",
     "dollarBalance": "Số dư đô la",
     "moveToNonCustodial": "Chuyển sang non-custodial",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Không thể đọc từ bộ nhớ tạm. Vui lòng nhập cụm từ sao lưu của bạn theo cách thủ công.",
     "enterWord": "Từ",
     "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không.",
+    "invalidPhrase": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không. Liên hệ <link>Bộ phận hỗ trợ</link> nếu sự cố vẫn tiếp diễn.",
+    "invalidWord": "Từ không hợp lệ, vui lòng kiểm tra chính tả",
     "restoring": "Đang khôi phục ví...",
     "restoreSuccess": "Khôi phục ví thành công",
     "restoreFailed": "Khôi phục ví thất bại. Vui lòng thử lại.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Số tiền dưới mức tối thiểu cần thiết cho khoản thanh toán này. Hãy thử số tiền lớn hơn.",
     "networkError": "Sự cố kết nối mạng. Kiểm tra kết nối và thử lại.",
     "invalidInput": "Chi tiết thanh toán có vẻ không hợp lệ. Vui lòng xem lại và thử lại.",
-    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn."
+    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn.",
+    "outcomeUnknown": "Khoản thanh toán này có thể đã được thực hiện. Hãy kiểm tra lịch sử giao dịch trước khi gửi lại.",
+    "earlierConversionPending": "Lần chuyển đổi trước của bạn vẫn đang được xác nhận. Hãy thử lại sau vài phút.",
+    "earlierPaymentFound": "Khoản thanh toán trước đó của bạn tới địa chỉ này đã được thực hiện, với số tiền khác. Hãy kiểm tra trước khi gửi lại.",
+    "earlierConversionFound": "Lần chuyển đổi trước của bạn đã được thực hiện, với số tiền khác. Hãy kiểm tra trong lịch sử giao dịch trước khi chuyển đổi lại.",
+    "convertedMeanwhile": "Một lần chuyển đổi với số tiền gần bằng vừa được thực hiện. Hãy kiểm tra số dư trước khi xác nhận lại lần này."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tài khoản này được tạo trên {network}. Chuyển sang {network} để sử dụng."

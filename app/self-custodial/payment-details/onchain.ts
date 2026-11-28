@@ -10,19 +10,28 @@ import {
   SetAmount,
   SetSendingWalletDescriptor,
   BaseCreatePaymentDetailsParams,
+  IdempotencyKeyRef,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+import { FeeTierOption } from "@app/types/fee-tiers"
 
 import { ScRail } from "../measurement"
 
-import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
+import {
+  createGetFeeOnchain,
+  createSendMutationOnchain,
+  requestedAsOf,
+  sendAllFeePolicy,
+} from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   feeTier?: FeeTierOption
+  idempotencyKeyRef?: IdempotencyKeyRef
+  /** Slid to 100%: the whole balance, with the fee taken out of it. */
+  sendMax?: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -37,7 +46,20 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     sendingWalletDescriptor,
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
+    sendMax,
   } = params
+
+  /**
+   * Same holder for every rebuild, as the LNURL detail keeps it: the send hook mints the
+   * key into it on the first attempt and reads it back on a retry, so a bitcoin send
+   * retried after a throw is refused by the SDK as a duplicate rather than paid twice.
+   * What a lost attempt leaves behind is kept by destination, apart from the detail.
+   */
+  const idempotencyKeyRef: IdempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey: CreateOnchainParams<T> = {
+    ...params,
+    idempotencyKeyRef,
+  }
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
@@ -45,10 +67,16 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     sendingWalletDescriptor.currency,
   )
 
+  const feePolicy = sendAllFeePolicy(sendMax, sendingWalletDescriptor.currency)
+  const isSendingMax = feePolicy !== undefined
+
   const prepareParams = {
     sdk,
     paymentRequest: address,
     amount: BigInt(settlementAmount.amount),
+    feePolicy,
+    quoteRef: isSendingMax ? {} : undefined,
+    quoteClockRef: {},
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -57,16 +85,22 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
         canGetFee: true,
         getFee: createGetFeeOnchain(prepareParams, feeTier),
         sendPaymentMutation: createSendMutationOnchain(prepareParams, feeTier, {
-          rail: ScRail.Onchain,
-          sendingWallet: sendingWalletDescriptor.currency,
+          telemetry: {
+            rail: ScRail.Onchain,
+            sendingWallet: sendingWalletDescriptor.currency,
+          },
+          idempotencyKeyRef,
+          requestedAs: requestedAsOf(unitOfAccountAmount, settlementAmount),
         }),
       }
     : { canSendPayment: false, canGetFee: false }
 
-  const setAmount: SetAmount<T> = (newAmount) =>
+  const setAmount: SetAmount<T> = (newAmount, newSendMax) =>
     createSelfCustodialOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
+      idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
+      sendMax: newSendMax,
     })
 
   const setMemo: PaymentDetailSetMemo<T> = destinationSpecifiedMemo
@@ -75,19 +109,21 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
         canSetMemo: true,
         setMemo: (newMemo) =>
           createSelfCustodialOnchainPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
       }
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
+      sendMax: false,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSelfCustodialOnchainPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialOnchainPaymentDetails({ ...paramsWithKey, convertMoneyAmount: fn })
 
   return {
     destination: address,
@@ -95,13 +131,18 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     convertMoneyAmount,
     setConvertMoneyAmount,
     paymentType: PaymentType.Onchain,
+    feeTier,
     settlementAmount,
     settlementAmountIsEstimated: false,
     unitOfAccountAmount,
     sendingWalletDescriptor,
     setSendingWalletDescriptor,
+    idempotencyKeyRef,
     canSetAmount: true,
     setAmount,
+    canSendMax: sendingWalletDescriptor.currency === WalletCurrency.Btc,
+    isSendingMax,
+    isFeeIncluded: isSendingMax,
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as PaymentDetail<T>

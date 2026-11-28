@@ -1,10 +1,10 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { type FeeTierInfo, type FeeTierOption } from "@app/types/fee-tiers"
 
 import { type PaymentDetail } from "../payment-details/index.types"
 
-import { type FeeTierInfo, type FeeTierOption } from "./fee-tiers.types"
 import { useCustodialOnchainFeeTiers } from "./use-custodial-onchain-fee-tiers"
 import {
   type SdkFeeError,
@@ -17,13 +17,27 @@ type LL = ReturnType<typeof useI18nContext>["LL"]
 export type FeeRail = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   errorMessage: string | undefined
-  hasQuote: boolean
   /**
-   * A self-custodial failure means the SDK could not build the transaction, so there is
-   * nothing to continue to. A custodial quote is only an estimate that the confirmation
-   * screen fetches again, so a transient failure must not strand the user.
+   * The address belongs to the sending wallet, so the payment can never go through and Next
+   * stays off. Only the custodial backend tells this apart; the SDK has no such check.
    */
-  isErrorBlocking: boolean
+  isSelfPayment: boolean
+  /**
+   * The amount is under what the rail can send on-chain, the one fee error the sender fixes
+   * on amount entry. Only the SDK reports it; every other fee error is the service's.
+   */
+  isAmountTooLow: boolean
+  hasQuote: boolean
+  isQuoting: boolean
+}
+
+export type SelfCustodialFeeRail = FeeRail & {
+  /**
+   * The only way this rail quotes: once, on Next, for the inputs on screen. Resolves to
+   * the tiers, or null when it failed (the reason lands in errorMessage) or the inputs
+   * moved on first.
+   */
+  quote: () => Promise<Record<FeeTierOption, FeeTierInfo> | null>
 }
 
 type FeeRailParams = {
@@ -44,7 +58,7 @@ const resolveSdkErrorMessage = (error: SdkFeeError, LL: LL): string => {
 export const useSelfCustodialFeeRail = ({
   paymentDetail,
   isActive,
-}: FeeRailParams): FeeRail => {
+}: FeeRailParams): SelfCustodialFeeRail => {
   const { sdk } = useSelfCustodialWallet()
   const { LL } = useI18nContext()
 
@@ -53,36 +67,56 @@ export const useSelfCustodialFeeRail = ({
     isActive && settlementAmount?.amount ? settlementAmount.amount : undefined
   const address = isActive ? paymentDetail?.destination : undefined
 
-  const { tiers, error, hasQuote } = useOnchainFeeTiers(sdk ?? null, address, amountSats)
+  const { tiers, error, hasQuote, isQuoting, quote } = useOnchainFeeTiers({
+    sdk: sdk ?? null,
+    address,
+    amountSats,
+    isFeeIncluded: Boolean(paymentDetail?.isFeeIncluded),
+  })
   const errorMessage = error ? resolveSdkErrorMessage(error, LL) : undefined
 
-  return { tiers, errorMessage, hasQuote, isErrorBlocking: Boolean(errorMessage) }
+  return {
+    tiers,
+    errorMessage,
+    isSelfPayment: false,
+    isAmountTooLow: error === FeeError.InvalidInput,
+    hasQuote,
+    isQuoting,
+    quote,
+  }
 }
 
 export const useCustodialFeeRail = ({
   paymentDetail,
   isActive,
-}: FeeRailParams): FeeRail & { isQuoting: boolean } => {
+}: FeeRailParams): FeeRail => {
   const { LL } = useI18nContext()
 
   const quotedAmount = paymentDetail?.destinationSpecifiedAmount
     ? paymentDetail.destinationSpecifiedAmount.amount
     : paymentDetail?.settlementAmount?.amount
 
-  const { tiers, hasError, hasQuote, isQuoting } = useCustodialOnchainFeeTiers({
-    walletId: isActive ? paymentDetail?.sendingWalletDescriptor.id : undefined,
-    address: isActive ? paymentDetail?.destination : undefined,
-    amount: isActive ? quotedAmount : undefined,
-    /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
-    quote: isActive ? paymentDetail?.feeQuote : undefined,
-  })
+  const { tiers, hasError, isSelfPayment, hasQuote, isQuoting } =
+    useCustodialOnchainFeeTiers({
+      walletId: isActive ? paymentDetail?.sendingWalletDescriptor.id : undefined,
+      address: isActive ? paymentDetail?.destination : undefined,
+      amount: isActive ? quotedAmount : undefined,
+      /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
+      quote: isActive ? paymentDetail?.feeQuote : undefined,
+    })
+
+  /** The generic one is shared with the confirmation screen, so neither promises an
+   *  impossible retry. */
+  const feeErrorMessage = isSelfPayment
+    ? LL.SendBitcoinScreen.onchainSelfPayment()
+    : LL.common.feeError()
 
   return {
     tiers,
-    /** Shared with the confirmation screen, so neither promises an impossible retry. */
-    errorMessage: hasError ? LL.common.feeError() : undefined,
+    errorMessage: hasError ? feeErrorMessage : undefined,
+    isSelfPayment,
+    isAmountTooLow: false,
     hasQuote,
-    isErrorBlocking: false,
     isQuoting,
   }
 }

@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderBackProps } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { fonts } from "@app/rne-theme/fonts"
+
 import { headerIconTouchArea } from "../header-no-glass"
 
 // native-stack wraps headerLeft in react-native-screens' ScreenStackHeaderLeftView,
@@ -54,7 +56,8 @@ type HeaderBackButtonWithThemeProps = React.ComponentProps<typeof HeaderBackButt
   onBack?: () => void
 }
 
-const HeaderBackButtonWithTheme = ({
+/** Also rendered inside a headerless screen that draws its own header row (send review). */
+export const HeaderBackButtonWithTheme = ({
   onBack,
   ...props
 }: HeaderBackButtonWithThemeProps): React.ReactNode => {
@@ -67,10 +70,16 @@ const HeaderBackButtonWithTheme = ({
   return (
     <HeaderBackButton
       {...props}
+      // HeaderBackButton hands its tint to the icon even when it is undefined, which
+      // overrides the icon's theme default and leaves the raw black glyph: invisible on a
+      // dark background. The native header passes headerTintColor; a bare render must not
+      // depend on that.
+      tintColor={props.tintColor ?? colors.textOnBackground}
       onPress={handleBack}
       pressColor={colors.surfaceInteractive}
       pressOpacity={1}
       style={styles.backButton}
+      labelStyle={styles.backLabel}
     />
   )
 }
@@ -126,6 +135,12 @@ const useStyles = makeStyles(() => {
     backButton: {
       marginLeft: backButtonInsetCorrection,
       ...(isAndroid && ANDROID_BACK_BUTTON_CIRCLE),
+    },
+    // The iOS label ("Back" or the previous title). HeaderBackButton draws it in the
+    // navigation theme's System font, and headerBackTitleStyle only reaches the native
+    // back item this control replaces.
+    backLabel: {
+      fontFamily: fonts.regular,
     },
   }
 })

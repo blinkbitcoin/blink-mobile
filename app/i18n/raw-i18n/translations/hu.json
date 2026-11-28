@@ -2354,15 +2354,41 @@
     "title": "Fizetés Megerősítése",
     "totalLabel": "Összesen:",
     "totalExceed": "Az összeg meghaladja az egyenleged, amely {balance: string}",
+    "feeExceedsAmount": "A hálózati díj több, mint az összeg, amit küldesz",
     "maxFeeSelected": "Ez a maximális díj, amit ezen tranzakcióért felszámíthatunk. Lehet, hogy kevesebb lesz, miután a fizetés megtörtént.",
     "invoiceAlreadyPaid": "Ez a fizetési kérelem már kifizetésre került",
     "somethingWentWrong": "Valami hiba történt",
+    "priceUpdated": "Az ár megváltozott, ezért az összegek frissültek. Küldés előtt ellenőrizd őket.",
     "paymentAlreadyAttempted": "A fizetés kisérlet már megtörtént.\n\nHa újra szeretnéd küldeni ezt a fizetést, kezdd elölről.",
-    "slideToConfirm": "Húzd el a megerősítéshez",
+    "paymentMayStillLand": "Várj egy kicsit, valószínűleg hamarosan teljesül. A pénzed biztonságban megérkezik, vagy nálad marad.",
     "slideConfirming": "Megerősítés...",
+    "slideToSend": "Húzd el a küldéshez",
+    "calculatingFee": "Díj kiszámítása…",
+    "sendProgress": {
+      "reviewing": "Ellenőrzés",
+      "signing": "Aláírás",
+      "findingRoute": "Útvonal keresése",
+      "broadcasting": "Továbbítás",
+      "checkingDelivery": "Kézbesítés ellenőrzése",
+      "almostThere": "Mindjárt kész",
+      "anyTimeNow": "Bármelyik pillanatban",
+      "hangTight": "Kis türelmet",
+      "stillOnItsWay": "Még úton van"
+    },
     "copiedDestination": "Címzett a vágólapra másolva",
-    "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
-    "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."
+    "lightningRecommended": "Magas díj. Lightning használata ajánlott.",
+    "sending": "Küldés",
+    "sent": "Elküldve",
+    "receipt": "Nyugta",
+    "sentAnnouncement": "Elküldve, {amount: string}",
+    "fromBalance": "Egyenlegről",
+    "details": "Részletek",
+    "changeAmount": "Összeg módosítása",
+    "tryAgain": "Próbáld újra",
+    "home": "Kezdőlap",
+    "dustSweepSheetTitle": "Küldés előtt",
+    "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}.",
+    "sendAnyway": "Megnéztem az előzményeimet, küldés mindenképp"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Mostantól a {bankName: string} felhasználónevek {bankName: string} címek is.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
     "amount": "Összeg",
+    "addAmount": "Összeg hozzáadása",
+    "slideToSelectAmount": "Húzd el az összeg kiválasztásához",
+    "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
+    "limitsUnavailable": "Nem tudtuk ellenőrizni a napi limitedet. Próbáld újra egy pillanat múlva.",
+    "problemSheetTitle": "Egy kis probléma",
+    "changeDestination": "Cél módosítása",
+    "recipientUnreachableTitle": "Nem sikerült elérni a címzettet",
+    "recipientWrongAmountTitle": "A címzett hibás összeget adott meg",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
     "amountIsRequired": "Az összeg kötelező",
     "cost": "Költség",
@@ -2425,10 +2459,11 @@
     "title": "Bitcoin küldése",
     "failedToFetchLnurlInvoice": "Nem sikerült lekérni az LNURL fizetési kérelmet",
     "lnurlInvoiceIncorrectAmount": "Az LNURL szerver helytelen összegű fizetési kérelemmel válaszolt.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Magas díj figyelmeztetés!",
-      "content": "A díjad több, mint 50%kal nagyobb, mint az elküldött összeg. Biztos vagy benne, hogy folytatod?\n\nA díjak csökkentése érdekében kérd meg a címzettet, hogy fogadja a tranzakciót Lightning hálózaton.",
-      "confirmButton": "Biztos vagyok benne."
+      "body": "A díj a küldött összeg 50%-a vagy több. Biztosan folytatod?",
+      "cancelPayment": "Fizetés megszakítása",
+      "acceptFee": "Díj elfogadása"
     },
     "copiedDestination": "Címzett a vágólapra másolva.",
     "pendingPayment": "A fizetés elküldve, de még nem érkezett visszaigazolás.\n\n Visszaigazolás hiányában a pénz visszakerül a számládra.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
     "sdkAmountTooLow": "Az összeg túl alacsony egy on-chain tranzakcióhoz.",
     "sdkNetworkError": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
-    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
+    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget.",
+    "onchainSelfPayment": "Ez az Ön saját tárcájának címe. Nem küldhet on-chain fizetést saját magának."
   },
   "SettingsScreen": {
     "createAddress": "Lightning cím létrehozása",
@@ -2988,6 +3024,7 @@
     "note": "Megjegyzés",
     "notification": "Értesítés",
     "ok": "OK",
+    "okay": "Rendben",
     "or": "vagy",
     "openWallet": "Pénztárca megnyitása",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
+  },
+  "Accessibility": {
+    "deleteKey": "Törlés",
+    "swapCurrencyHint": "Átváltja a pénznemet, amelyben az összeget megadja",
+    "switchToWallet": "Váltás erre: {wallet: string}",
+    "copy": "Másol",
+    "balanceHidden": "Egyenleg elrejtve",
+    "revealBalanceHint": "Megjeleníti az egyenlegét ezen a képernyőn"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Fizetés",
         "acceptButton": "Elfogadás",
         "payButton": "Folytatás és Fizetés",
-        "cardTitle": "Blink Privát",
+        "cardTitle": "Blink Orange",
+        "free": "Ingyenes",
+        "forNow": "egyelőre",
         "perYear": "évente",
+        "freeBreakdown": {
+          "card": "Blink kártya",
+          "memberBenefits": "Egyéb tagsági előnyök"
+        },
         "status": {
           "label": "Állapot",
           "specialOfferLabel": "Különleges ajánlat",
@@ -3695,35 +3746,53 @@
           "text": "Átnéztem és elfogadom a következőt:",
           "linkText": "Blink Card díjszabása"
         },
-        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul"
+        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul",
+        "freeNotice": "Tudomásul veszem, hogy a Blink Orange egyelőre ingyenes, és hogy később, előzetes értesítéssel tagsági díjat vezethetnek be"
+      },
+      "CardVerifyIdentity": {
+        "title": "Igazolja személyazonosságát",
+        "description": "Blink kártyája aktiválásához a kártyakibocsátónak ellenőriznie kell, ki Ön (KYC). Szüksége lesz:",
+        "requirements": {
+          "governmentId": "Hatósági személyazonosító igazolványra",
+          "selfie": "Szelfire / élőségvizsgálatra",
+          "proofOfAddress": "Lakcímigazolásra",
+          "questions": "Néhány Önre vonatkozó kérdésre"
+        },
+        "buttonText": "Tovább"
       },
       "CardIntroducing": {
         "title": "Bemutatjuk",
         "cardInfo": {
-          "bitcoinCard": "A Blink Visa kártya",
+          "bitcoinCard": "A Blink kártya",
           "for": "a",
-          "maximalist": "Bitcoin Maximalistáknak"
+          "bitcoiners": "Bitcoinereknek"
         },
         "buttonText": "Tovább"
       },
       "CardDetails": {
-        "title": "További előnyök",
+        "title": "Mit tartalmaz",
         "features": {
-          "accountManager": "Dedikált fiókkezelő",
-          "support": "Elsőbbségi támogatás",
-          "onchainDeposits": "50% visszatérítés a tranzakciós díjakból",
-          "circularEconomies": "100 $ körkörös gazdaságoknak"
+          "card": {
+            "title": "Blink kártya",
+            "subtitle": "a Visa kártyád, már ma kész"
+          },
+          "accountManager": {
+            "title": "Személyes ügyfélmenedzser",
+            "subtitle": "és elsőbbségi támogatás"
+          },
+          "onOffRamping": "Be- és kifizetések"
         },
-        "andMore": "... és még több jön 2026-ban",
+        "availableIn": "{months} hónap múlva",
+        "footnote": "Egyes funkciók {months} hónapon belül lesznek elérhetők. A kártya már ma kész.",
         "buttonText": "Tovább"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Üdvözöljük a fedélzeten",
-          "subtitle": "A Blink Privátban",
+          "subtitle": "A Blink Orange-ban",
           "paragraphs": {
-            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Privátba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
-            "body2": "Célunk 2026-ra az, hogy a programot annyi jósággal töltsük meg, hogy nyilvánvaló legyen jövőre megújítani."
+            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Orange-ba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
+            "body2": "A Blink Orange a Blink tagságának első szintje Bitcoinereknek, csak meghívással. A Blink kártya és a személyes ügyfélmenedzsered az első szolgáltatásaink közül kettő — a többit 2027-ig építjük."
           }
         },
         "buttonText": "Rajta"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Foglalkozás",
-            "placeholder": "Válaszd ki a foglalkozásodat"
+            "placeholder": "Válassz"
           },
           "annualSalaryRange": {
             "label": "Éves fizetés",
-            "placeholder": "Válaszd ki a fizetési sávodat"
+            "placeholder": "Válassz fizetést"
           },
           "accountPurpose": {
             "label": "Fiók célja",
@@ -3815,7 +3884,6 @@
             "placeholder": "Válaszd ki a költési sávodat"
           }
         },
-        "buttonText": "Pályázat beküldése",
         "select": "kiválaszt"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", és a",
           "cardTermsLinkText": "Blink kártya feltételeit"
         },
-        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink Visa kártyámmal kapcsolatos szabályt és követelményt",
-        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
+        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink kártyámmal kapcsolatos szabályt és követelményt",
+        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink kártya igénylése nem minősül jogosulatlan megkeresésnek"
       },
       "CardPreapproved": {
-        "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
+        "title": "Elkészült a Blink kártyája!",
+        "subtitle": "Most már aktiválhatja a kártyáját, és elkezdheti használni",
         "buttonText": "Bezárás"
+      },
+      "CardDeclined": {
+        "title": "Nem tudtuk jóváhagyni a kártyaigénylését",
+        "subtitle": "A fiókkezelője felveszi Önnel a kapcsolatot."
       },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",
-        "subtitle": "Értesítünk, amint készen állunk",
-        "buttonText": "Bezárás"
+        "subtitle": "Ez akár egy percig is eltarthat"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Költözzön át most egy nem letétkezelt fiókba",
       "body": "Már nem fogadhat pénzt a letétkezelt fiókjába. A Blink megszüntette a letétkezelési szolgáltatást az Ön régiójában, és ez a fiók {date} végéig inaktiválásra kerül.\n\nKöltözzön át most egy nem letétkezelt fiókba.",
+      "bodyLevelZero": "Erre a próbafiókra már nem fogadhat pénzt. A Blink megszünteti a próbafiókokat, és ez a fiók {date} végéig inaktiválásra kerül.\n\nKöltözzön át most egy nem letétkezelt fiókba.",
       "migrateCta": "Átköltözés most"
     },
     "reminderBulletin": {
       "title": "Fontos",
       "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
+      "bodySingleDate": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt — minden néhány koppintással átkerül.",
+      "bodyLevelZero": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt.",
       "bodyReceiveDisabled": "A fogadás megszűnt. Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt.",
       "migrateCta": "Átköltözés"
     },
     "offboardBulletin": {
       "title": "Fontos",
-      "body": "A fiókod olyan régióban van regisztrálva, ahol nem tudunk fiókokat kínálni. Vedd fel a pénzed augusztus 31. előtt. A fogadás augusztus 10-én leáll."
+      "bodyTwoDates": "A Blink nem tud letétkezelt fiókokat kínálni a régiódban. Vedd fel a pénzed {date} előtt — a Blink semmilyen díjat nem számít fel. A fogadás megszűnik: {receiveStopsDate}. Ha úgy gondolod, hogy ez tévesen érinti a fiókodat, az alkalmazásban igazolhatod a jelenlegi lakóhelyedet.",
+      "bodySingleDate": "A Blink nem tud letétkezelt fiókokat kínálni a régiódban. Vedd fel a pénzed {date} előtt — a Blink semmilyen díjat nem számít fel. Ha úgy gondolod, hogy ez tévesen érinti a fiókodat, az alkalmazásban igazolhatod a jelenlegi lakóhelyedet.",
+      "bodyReceiveOff": "A Blink nem tud letétkezelt fiókokat kínálni a régiódban. Vedd fel a pénzed {date} előtt — a Blink semmilyen díjat nem számít fel. A fogadás ki van kapcsolva. Ha úgy gondolod, hogy ez tévesen érinti a fiókodat, az alkalmazásban igazolhatod a jelenlegi lakóhelyedet."
     },
     "dollarBalanceModal": {
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Hiba történt az átköltözés folytatása közben. Kérjük, kezdje újra.",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
     "migrationRequiredForcedBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba. Ez szabályozási okokból kötelező.\n\nNe aggódj, a nem letéti mód hosszú távon jobb lesz neked.",
+    "migrationRequiredForcedBodyLevelZero": "A Blink megszünteti a próbafiókokat. Vigye át egyenlegét egy nem letétkezelt fiókba. Csak néhány koppintás.",
     "migrationGateTitle": "A fiók nem elérhető",
     "migrationGateBody": "Szabályozási okokból nem tudunk letéti fiókokat biztosítani a régiódban. Utald át a pénzed egy nem letéti fiókba a Blinknél a következő lépéseket követve, vagy lépj kapcsolatba velünk itt: <link>{email}</link>",
+    "migrationGateBodyLevelZero": "A próbafiókok mostantól megszűntek. Az egyenlege biztonságban van. Vigye át egy nem letétkezelt fiókba a következő lépéseket követve, ingyenesen és időkorlát nélkül, vagy lépjen kapcsolatba velünk itt: <link>{email}</link>",
     "bitcoinBalance": "Bitcoin-egyenleg",
     "dollarBalance": "Dollár-egyenleg",
     "moveToNonCustodial": "Áttérés önrendelkezőre",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Nem sikerült olvasni a vágólapról. Kérjük, add meg a biztonsági kifejezésed kézzel.",
     "enterWord": "Szó",
     "invalidMnemonic": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e.",
+    "invalidPhrase": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e. Ha a probléma továbbra is fennáll, fordulj az <link>ügyfélszolgálatunkhoz</link>.",
+    "invalidWord": "Érvénytelen szó, kérlek ellenőrizd a helyesírást",
     "restoring": "Tárca visszaállítása...",
     "restoreSuccess": "Tárca sikeresen visszaállítva",
     "restoreFailed": "Nem sikerült visszaállítani a tárcát. Kérjük, próbáld újra.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Az összeg az ehhez a fizetéshez szükséges minimum alatt van. Próbálj nagyobb összeget.",
     "networkError": "Hálózati kapcsolódási probléma. Ellenőrizd a kapcsolatot, és próbáld újra.",
     "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
-    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
+    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget.",
+    "outcomeUnknown": "Lehet, hogy ez a fizetés már teljesült. Mielőtt újra elküldenéd, nézd meg a tranzakcióid előzményeit.",
+    "earlierConversionPending": "A korábbi átváltásod megerősítése még folyamatban van. Próbáld újra néhány perc múlva.",
+    "earlierPaymentFound": "A korábbi fizetésed erre a címre már teljesült, de más összeggel. Nézd meg, mielőtt újra küldenél.",
+    "earlierConversionFound": "A korábbi átváltásod már teljesült, de más összeggel. Nézd meg a tranzakciós előzményeidben, mielőtt újra váltanál.",
+    "convertedMeanwhile": "Épp most teljesült egy nagyjából ekkora összegű átváltás. Nézd meg az egyenlegedet, mielőtt újra megerősítenéd ezt."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ez a fiók a(z) {network} hálózaton jött létre. Használatához váltson a(z) {network} hálózatra."

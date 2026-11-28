@@ -2354,15 +2354,41 @@
     "title": "Kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi",
     "totalLabel": "Suma:",
     "totalExceed": "Kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Chaynamanta kaniyta rikuyta munanpi, {balance: string} kawsayniyta qillqata sutichinaqinmi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
+    "feeExceedsAmount": "Llika qullqi chaninqa kachasqayki suma nisqamanta aswan hatunmi",
     "maxFeeSelected": "Chaynamanta kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Kaniytaikuyta munanpi kawsayniyta qillqata sutichinaqinmi chaypi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
     "invoiceAlreadyPaid": "Kay facturata pagasqañam",
     "somethingWentWrong": "Imapas mana allinchu kasqa",
+    "priceUpdated": "Chanin tikrakurqan, chaymi yupaykuna musuqchasqa. Manaraq kachaspa qhaway.",
     "paymentAlreadyAttempted": "Pagota ruwasqaña kanku.\n\nWatiqmanta kay pagota apachiyta munaspaykiqa, qallarimanta qallariy.",
-    "slideToConfirm": "Aysay chiqapchanapaq",
+    "paymentMayStillLand": "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     "slideConfirming": "Chiqapchashanku...",
+    "slideToSend": "Aysay kachanapaq",
+    "calculatingFee": "Chiqanakuyta yupashan…",
+    "sendProgress": {
+      "reviewing": "Qhawashan",
+      "signing": "Silq'ushan",
+      "findingRoute": "Ñanta maskhashan",
+      "broadcasting": "Willashan",
+      "checkingDelivery": "Chayasqanta qhawashan",
+      "almostThere": "Yaqañam",
+      "anyTimeNow": "Kunanpacha",
+      "hangTight": "Suyakuy",
+      "stillOnItsWay": "Ñanpiraqmi"
+    },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
-    "lightningRecommended": "¡Hatun comisión! Lightning nisqata yuyaychayku.",
-    "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}."
+    "lightningRecommended": "Hatun comisión. Lightning nisqata yuyaychayku.",
+    "sending": "Apachishaspa",
+    "sent": "Kachasqa",
+    "receipt": "Chaskisqa qillqa",
+    "sentAnnouncement": "Kachasqa, {amount: string}",
+    "fromBalance": "Saldomanta",
+    "details": "Detalles",
+    "changeAmount": "Sumata tikray",
+    "tryAgain": "Try again",
+    "home": "Ayllu",
+    "dustSweepSheetTitle": "Before you send",
+    "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}.",
+    "sendAnyway": "Willakuyniyta qhawarqanim, chaypas kachay"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} kaniyta yachanakuyta sutichinaqinmi, {bankName: string} kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Ruwaynin mempool nisqaman apachisqa kanan kachkan",
     "amount": "Suma",
+    "addAmount": "Suma yapay",
+    "slideToSelectAmount": "Aysay suma akllanapaq",
+    "lowFunds": "Mana kaniyuqchu",
     "amountExceed": "Mana kaniyta rikuchiy {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "We couldn't check your daily limit. Try again in a moment.",
+    "problemSheetTitle": "A small problem",
+    "changeDestination": "Maymanta tikray",
+    "recipientUnreachableTitle": "Couldn't reach the recipient",
+    "recipientWrongAmountTitle": "Recipient sent the wrong amount",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Kawsayniy kiti kaniyta rikuchiy",
     "cost": "Kawsayniyta qillqata sutichinaqinmi",
@@ -2425,10 +2459,11 @@
     "title": "Bitcoin kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy",
     "failedToFetchLnurlInvoice": "Lnurl kawsayniyta qillqata sutichinaqinmi chimpuyta mana kaniyta rikuchiy.",
     "lnurlInvoiceIncorrectAmount": "Lnurl serverpi kawsayniyta qillqata sutichqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta k'anchaypi mana kaniyta rikuchiy.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "¡Hatun comisión willakuy!",
-      "content": "Comisiónniyki apachisqa yupaymanta 50% aswan hatunmi. ¿Chiqaptachu qatipayta munankí?\n\nComisionkunata pisiyachinapaq, chaskiqta Lightning nisqapi chaskikunanta mañay",
-      "confirmButton": "100% seguro kashani"
+      "body": "Comisiónniyki kachanqa 50% utaq aswan kachasqayki qullqimanta. ¿Chiqachu purichiyta munanki?",
+      "cancelPayment": "Pagota t'akuy",
+      "acceptFee": "Comisiónta chaskiy"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "pendingPayment": "Pagota apachisqaña, ichaqa manaraq chiqapchasqachu.\n\nPagoqa mana chiqapchakuyta atinmanchu, chaypiqa qullqiqa cuentaykiman kutinqa.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
     "sdkAmountTooLow": "Yupayqa pisillam on-chain ruwaykunapaq.",
     "sdkNetworkError": "Llika pantay. Tinkisqaykita qhaway hinaspa watiqmanta ruway.",
-    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
+    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway.",
+    "onchainSelfPayment": "Kayqa kikiykipa billeteraykiq direccionninmi. Manam on-chain qullqita kikiykiman apachiyta atinkichu."
   },
   "SettingsScreen": {
     "createAddress": "Lightning tinkunata ruray",
@@ -2988,6 +3024,7 @@
     "note": "Willana",
     "notification": "Willanakuy",
     "ok": "Ay",
+    "okay": "Ay",
     "or": "or",
     "openWallet": "Qipi qillqayniy",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Pichay",
+    "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
+    "switchToWallet": "{wallet: string}-man tikray",
+    "copy": "Kopiay",
+    "balanceHidden": "Puchuq qullqi pakasqa",
+    "revealBalanceHint": "Kay pantallapi puchuq qullqiykita rikuchin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Pagay",
         "acceptButton": "Chaskiy",
         "payButton": "Ñawpaqman rispa Pagay",
-        "cardTitle": "Blink Sapalla",
+        "cardTitle": "Blink Orange",
+        "free": "Mana qullqiyuq",
+        "forNow": "kunanpaq",
         "perYear": "watanpi",
+        "freeBreakdown": {
+          "card": "Blink tarjeta",
+          "memberBenefits": "Huk ayllu allinkunakuna"
+        },
         "status": {
           "label": "Kayninpi",
           "specialOfferLabel": "Sapaq ofrecimiento",
@@ -3695,35 +3746,53 @@
           "text": "Qhawarini hinaspa arinini",
           "linkText": "Blink Card qullqi tabla"
         },
-        "renew": "Yachani suscripciónníy {months: number} killapi automáticamente musuqchakunanta"
+        "renew": "Yachani suscripciónníy {months: number} killapi automáticamente musuqchakunanta",
+        "freeNotice": "Hamut'ani Blink Orange kunanpaq mana qullqiyuq kasqanta, qhipamanmi ayllu qullqi churakunman, ñawpaqta willaspa"
+      },
+      "CardVerifyIdentity": {
+        "title": "Pi kasqaykita chiqaqchay",
+        "description": "Blink tarjetaykita kawsachinapaq, tarjeta qukuqmi pi kasqaykita chiqaqchanan (KYC). Kaykunatam munanki:",
+        "requirements": {
+          "governmentId": "Gobiernopa qusqan DNI",
+          "selfie": "Selfie / kawsasqa kasqayki qhawarichiy",
+          "proofOfAddress": "Maypi tiyasqaykipa pruebaqnin",
+          "questions": "Wakin tapukuykuna qammanta"
+        },
+        "buttonText": "Ñawpaqman"
       },
       "CardIntroducing": {
         "title": "Riqsichispa",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa tarjeta",
+          "bitcoinCard": "Blink tarjeta",
           "for": "kaqpaq",
-          "maximalist": "Bitcoin Maximalistakuna"
+          "bitcoiners": "Bitcoinerkuna"
         },
         "buttonText": "Ñawpaqman"
       },
       "CardDetails": {
-        "title": "Yapay allinkunakuna",
+        "title": "Ima kachkan",
         "features": {
-          "accountManager": "Sapaq kawaq akawuntapaq",
-          "support": "Ñawpaq yanapay",
-          "onchainDeposits": "50% kutichiy comisión transacciónmanta",
-          "circularEconomies": "$100 muyuq ekonomiyakunapaq"
+          "card": {
+            "title": "Blink tarjeta",
+            "subtitle": "Visa tarjetayki, kunan p'unchaw wakichisqa"
+          },
+          "accountManager": {
+            "title": "Sapan cuenta kamachiq",
+            "subtitle": "ñawpaq yanapaywan"
+          },
+          "onOffRamping": "Qullqi yaykuchiy hurquypas"
         },
-        "andMore": "... astawanraq 2026-pi hamushan",
+        "availableIn": "{months} killapi",
+        "footnote": "Wakin ruraykunaqa {months} killa ukhupi kanqa. Tarjetaqa kunan p'unchaw wakichisqa.",
         "buttonText": "Ñawpaqman"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Allin hamusqa",
-          "subtitle": "Blink Sapallaman",
+          "subtitle": "Blink Orangeman",
           "paragraphs": {
-            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Sapallaman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
-            "body2": "2026 watapaq munayninchisqa programata allin kaqkunawan huntachiymi, chayna hamuq watapi musuqyachinapaq allinmi kanqa."
+            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Orangeman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
+            "body2": "Blink Orangeqa Bitcoinerkunapaq Blink ayllupa ñawpaq patanmi, waqyasqakunallapaq. Blink tarjetapas sapan cuenta kamachiqniykipas ñawpaq llamkaykunamanta iskaymi — kaqnintaqa 2027 watakama ruraykuchkaniku."
           }
         },
         "buttonText": "Haku"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Llamk'ay",
-            "placeholder": "Llamk'ayniykita akllay"
+            "placeholder": "Akllay"
           },
           "annualSalaryRange": {
             "label": "Watantin qullqi",
-            "placeholder": "Qullqi rakinniykita akllay"
+            "placeholder": "Qullqiykita akllay"
           },
           "accountPurpose": {
             "label": "Akawunta munay",
@@ -3815,7 +3884,6 @@
             "placeholder": "Gastay rakinniykita akllay"
           }
         },
-        "buttonText": "Mañakuyta apachiy",
         "select": "akllay"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", chaymanta",
           "cardTermsLinkText": "Blink tarjeta kamachikuykuna"
         },
-        "certifyAccuracy": "Willakuni chay willayniykuna cheqaq kasqanta, Blink Visa tarjetaywan tupaq llapan kamachikuykunata hunt'anaytawan",
-        "acknowledgeSolicitation": "Riqsini Blink Visa tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
+        "certifyAccuracy": "Willakuni chay willayniykuna cheqaq kasqanta, Blink tarjetaywan tupaq llapan kamachikuykunata hunt'anaytawan",
+        "acknowledgeSolicitation": "Riqsini Blink tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
       },
       "CardPreapproved": {
-        "title": "Blink Visa tarjetapaq ñawpaqta aprobado kasqanki!",
+        "title": "Blink tarjetaykiqa listañam!",
+        "subtitle": "Kunanqa tarjetaykita activayta atinkiñam, hinaspa llamk'achiyta qallariy",
         "buttonText": "Wisq'ay"
+      },
+      "CardDeclined": {
+        "title": "Manam tarjeta mañakuyniykita chaskiyta atirqaykuchu",
+        "subtitle": "Cuentaykita kamachiqmi rimapayasunki."
       },
       "CardProcessing": {
         "title": "Mañakuyniykita rurachkanku",
-        "subtitle": "Wakichasqa kaptiyku willasqaykiku",
-        "buttonText": "Wisq'ay"
+        "subtitle": "Kayqa huk minutokama unanmanmi"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Kunan astakuy mana waqaychasqa kuentaman",
       "body": "Manañam qullqita chaskiyta atinkichu waqaychasqa kuentaykipi. Blink-qa waqaychay ruwayta tukurqun llaqtaykipi, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",
+      "bodyLevelZero": "Manañam qullqita chaskiyta atinkichu kay prueba kuentapi. Blink-qa prueba kuentakunata wichq'achkan, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",
       "migrateCta": "Kunan astakuy"
     },
     "reminderBulletin": {
       "title": "Ancha allin",
       "body": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin. Chaskiyqa {receiveStopsDate}-pi tukukunqa.",
+      "bodySingleDate": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin — llapanmi pisi llamiykunallawan astakun.",
+      "bodyLevelZero": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin.",
       "bodyReceiveDisabled": "Chaskiyqa tukukunñam. Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin.",
       "migrateCta": "Astakuy"
     },
     "offboardBulletin": {
       "title": "Ancha allin",
-      "body": "Cuentaykiqa mana cuentakunata qoyta atinayku suyupim qelqasqa kashan. Qolqeykita horqokuy 31 Agosto manaraq chayamuchkaptin. Chaskiyqa 10 Agostopi sayan."
+      "bodyTwoDates": "Blink-qa manam waqaychasqa kuentakunata suyuykipi qoyta atinchu. Qullqiykita hurquy {date} manaraq chayamuchkaptin — mana ima Blink cobroyuq. Chaskiyqa {receiveStopsDate}-pi tukukunqa. Pantaywan kuentayki chayasqa kanman nispa yuyaspaqa, app-pi kunan tiyasqaykita chiqapchayta atinki.",
+      "bodySingleDate": "Blink-qa manam waqaychasqa kuentakunata suyuykipi qoyta atinchu. Qullqiykita hurquy {date} manaraq chayamuchkaptin — mana ima Blink cobroyuq. Pantaywan kuentayki chayasqa kanman nispa yuyaspaqa, app-pi kunan tiyasqaykita chiqapchayta atinki.",
+      "bodyReceiveOff": "Blink-qa manam waqaychasqa kuentakunata suyuykipi qoyta atinchu. Qullqiykita hurquy {date} manaraq chayamuchkaptin — mana ima Blink cobroyuq. Chaskiyqa harkasqam. Pantaywan kuentayki chayasqa kanman nispa yuyaspaqa, app-pi kunan tiyasqaykita chiqapchayta atinki."
     },
     "dollarBalanceModal": {
       "title": "Manam dólar qullqiykita astayta atinikuchu",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Astakuyniykita qatichiypi imapas mana allinchu rikhurirqan. Ama hina kaspa, musuqmanta qallariy.",
     "migrationRequiredBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan.",
     "migrationRequiredForcedBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan. Kamachiykuna raykumi necesitakun.\n\nAma llakikuychu, non-custodial nisqaqa unay pachapaqmi aswan allin kanqa qanpaq.",
+    "migrationRequiredForcedBodyLevelZero": "Blink-qa prueba kuentakunata wichq'achkan. Qullqiykita mana waqaychasqa kuentaman astay. Pisi llamiykunallam.",
     "migrationGateTitle": "Cuentaqa mana haykunallachu",
     "migrationGateBody": "Kamachiykuna raykumi mana atinikuchu custodial cuentakunata qan kasqaykipi qoyta. Qullqiykikunata Blink non-custodial cuentaman apachiy kay qatiq ruwaykunata qatispa utaq ñuqaykuwan rimay <link>{email}</link> nisqapi",
+    "migrationGateBodyLevelZero": "Prueba kuentakunaqa kunanqa wichq'asqañam. Qullqiykiqa allinmi kachkan. Mana waqaychasqa kuentaman astay kay qatiq ruwaykunata qatispa, mana qullqiyuq, mana pacha tupuyuq, utaq ñuqaykuwan rimay <link>{email}</link> nisqapi",
     "bitcoinBalance": "Bitcoin saldo",
     "dollarBalance": "Dólar saldo",
     "moveToNonCustodial": "Non-custodial nisqaman kutiy",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Mana atikunchu clipboard nisqamanta ñawiriyta. Backup frase nisqaykita makiwan qillqay.",
     "enterWord": "Simi",
     "invalidMnemonic": "Mana allin waqaychana rimay. Simikunaq ñiqinta kawariy.",
+    "invalidPhrase": "Mana allin waqaychana rimay. Simikunaq ñiqinta kawariy. Sasachakuy qhipakuptin <link>Yanapaywan</link> rimay.",
+    "invalidWord": "Mana allin simi, qillqayninta kawariy",
     "restoring": "Walletniykita kutichichkani...",
     "restoreSuccess": "Wallet allinmi kutichimusqa",
     "restoreFailed": "Mana atinichu walletta kutichiy. Watiqmanta ruway.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Qullqiqa kay quypaq mañasqa ñut'u qullqi sayanmantaqa pisinmanmi. Aswan hatun qullqitaqa rikuychis.",
     "networkError": "Conexión sasachakuy. Conexión qhawariy hinaspa kaqmanta rurariy.",
     "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
-    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy."
+    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy.",
+    "outcomeUnknown": "Kay qullqi kutichiyqa ñachá rirqanña. Manaraq kaqmanta kachaspa, transaccionniykikunap willakuyninta qhaway.",
+    "earlierConversionPending": "Ñawpaq tukuyniykiqa manaraqmi takyachisqachu. Huk iskay minutomanta kaqmanta ruraykuy.",
+    "earlierPaymentFound": "Ñawpaq qullqi kachasqaykiqa kay maymanqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta kachaspa qhaway.",
+    "earlierConversionFound": "Ñawpaq tukuyniykiqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta tukuspa, rurasqaykikunapi qhaway.",
+    "convertedMeanwhile": "Kay chaninman rikchakuq tukuyqa kunallanmi rirqan. Kaykunata kaqmanta manaraq takyachispa, qullqiykita qhaway."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Kay cuentaqa {network} pi kamarisqa karqan. Llamk'achinapaq {network} man tikray."

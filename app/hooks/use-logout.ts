@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 
 import { gql } from "@apollo/client"
-import { SCHEMA_VERSION_KEY } from "@app/config"
+import { CACHE_OWNER_KEY, SCHEMA_VERSION_KEY } from "@app/config"
 import { useUserLogoutMutation } from "@app/graphql/generated"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { logLogout } from "@app/utils/analytics"
@@ -22,14 +22,14 @@ type LogoutOptions = {
   /**
    * Signs out of the active session and leaves everything the device has
    * stored alone: the saved profiles, the PIN, the biometrics flag and the
-   * schema marker. For the one case where "there is nothing left" is not
+   * cache markers. For the one case where "there is nothing left" is not
    * knowledge but ignorance — the keystore could not be read, so erasing would
    * delete sessions we never saw.
    *
    * The group cannot be split. Profiles without the PIN would leave live
    * bearer tokens behind with the lock that guarded them gone, and dropping
-   * the schema marker makes the next boot purge the persisted query cache,
-   * which is erasing all the same.
+   * the cache markers (schema version and owner) makes the next client build
+   * purge the persisted query cache, which is erasing all the same.
    *
    * Only the untokened path reads this; a call that passes a token is already
    * scoped to that one session and destroys nothing else.
@@ -147,7 +147,7 @@ const useLogout = () => {
             /** Asked before anything is erased, so that nothing sits between
              *  the erasures below for a kill to land on. */
             isLockOwed = await isAppLockStillOwed()
-            await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
+            await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY, CACHE_OWNER_KEY])
             areSavedSessionsErased = await KeyStoreWrapper.removeSessionProfiles()
           }
           const isActiveTokenErased = await clearToken()

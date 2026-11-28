@@ -7482,6 +7482,10 @@ type RootTranslation = {
 		 */
 		totalExceed: RequiredParams<'balance'>
 		/**
+		 * T​h​e​ ​n​e​t​w​o​r​k​ ​f​e​e​ ​i​s​ ​m​o​r​e​ ​t​h​a​n​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​'​r​e​ ​s​e​n​d​i​n​g
+		 */
+		feeExceedsAmount: string
+		/**
 		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​m​a​x​i​m​u​m​ ​f​e​e​ ​y​o​u​ ​w​i​l​l​ ​b​e​ ​c​h​a​r​g​e​d​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.​ ​ ​I​t​ ​m​a​y​ ​e​n​d​ ​u​p​ ​b​e​i​n​g​ ​l​e​s​s​ ​o​n​c​e​ ​t​h​e​ ​p​a​y​m​e​n​t​ ​h​a​s​ ​b​e​e​n​ ​m​a​d​e​.
 		 */
 		maxFeeSelected: string
@@ -7494,27 +7498,118 @@ type RootTranslation = {
 		 */
 		somethingWentWrong: string
 		/**
+		 * T​h​e​ ​p​r​i​c​e​ ​m​o​v​e​d​,​ ​s​o​ ​t​h​e​ ​a​m​o​u​n​t​s​ ​w​e​r​e​ ​u​p​d​a​t​e​d​.​ ​C​h​e​c​k​ ​t​h​e​m​ ​b​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d​.
+		 */
+		priceUpdated: string
+		/**
 		 * P​a​y​m​e​n​t​ ​a​l​r​e​a​d​y​ ​a​t​t​e​m​p​t​e​d​.​
 	​
 	​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​ ​a​g​a​i​n​,​ ​s​t​a​r​t​ ​f​r​o​m​ ​s​c​r​a​t​c​h​.
 		 */
 		paymentAlreadyAttempted: string
 		/**
-		 * S​l​i​d​e​ ​t​o​ ​C​o​n​f​i​r​m
+		 * W​a​i​t​ ​a​ ​m​o​m​e​n​t​,​ ​i​t​ ​w​i​l​l​ ​p​r​o​b​a​b​l​y​ ​g​o​ ​t​h​r​o​u​g​h​ ​s​o​o​n​.​ ​Y​o​u​r​ ​m​o​n​e​y​ ​w​i​l​l​ ​a​r​r​i​v​e​ ​s​a​f​e​l​y​ ​o​r​ ​s​t​a​y​ ​w​i​t​h​ ​y​o​u​.
 		 */
-		slideToConfirm: string
+		paymentMayStillLand: string
 		/**
 		 * C​o​n​f​i​r​m​i​n​g​.​.​.
 		 */
 		slideConfirming: string
 		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​n​d
+		 */
+		slideToSend: string
+		/**
+		 * C​a​l​c​u​l​a​t​i​n​g​ ​f​e​e​…
+		 */
+		calculatingFee: string
+		sendProgress: {
+			/**
+			 * R​e​v​i​e​w​i​n​g
+			 */
+			reviewing: string
+			/**
+			 * S​i​g​n​i​n​g
+			 */
+			signing: string
+			/**
+			 * F​i​n​d​i​n​g​ ​r​o​u​t​e
+			 */
+			findingRoute: string
+			/**
+			 * B​r​o​a​d​c​a​s​t​i​n​g
+			 */
+			broadcasting: string
+			/**
+			 * C​h​e​c​k​i​n​g​ ​d​e​l​i​v​e​r​y
+			 */
+			checkingDelivery: string
+			/**
+			 * A​l​m​o​s​t​ ​t​h​e​r​e
+			 */
+			almostThere: string
+			/**
+			 * A​n​y​ ​t​i​m​e​ ​n​o​w
+			 */
+			anyTimeNow: string
+			/**
+			 * H​a​n​g​ ​t​i​g​h​t
+			 */
+			hangTight: string
+			/**
+			 * S​t​i​l​l​ ​o​n​ ​i​t​s​ ​w​a​y
+			 */
+			stillOnItsWay: string
+		}
+		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedDestination: string
 		/**
-		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
+		 * H​i​g​h​ ​f​e​e​.​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * S​e​n​d​i​n​g
+		 */
+		sending: string
+		/**
+		 * S​e​n​t
+		 */
+		sent: string
+		/**
+		 * R​e​c​e​i​p​t
+		 */
+		receipt: string
+		/**
+		 * S​e​n​t​,​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		sentAnnouncement: RequiredParams<'amount'>
+		/**
+		 * F​r​o​m​ ​B​a​l​a​n​c​e
+		 */
+		fromBalance: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
+		 */
+		changeAmount: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
+		 * H​o​m​e
+		 */
+		home: string
+		/**
+		 * B​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d
+		 */
+		dustSweepSheetTitle: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -7522,6 +7617,10 @@ type RootTranslation = {
 		 * @param {string} remainingSats
 		 */
 		usdRemainderSweep: RequiredParams<'minimum' | 'remaining' | 'remainingSats'>
+		/**
+		 * I​ ​c​h​e​c​k​e​d​ ​m​y​ ​h​i​s​t​o​r​y​,​ ​s​e​n​d​ ​a​n​y​w​a​y
+		 */
+		sendAnyway: string
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -7688,6 +7787,18 @@ type RootTranslation = {
 		 */
 		amount: string
 		/**
+		 * A​d​d​ ​a​m​o​u​n​t
+		 */
+		addAmount: string
+		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​l​e​c​t​ ​a​m​o​u​n​t
+		 */
+		slideToSelectAmount: string
+		/**
+		 * L​o​w​ ​f​u​n​d​s
+		 */
+		lowFunds: string
+		/**
 		 * A​m​o​u​n​t​ ​e​x​c​e​e​d​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}
 		 * @param {string} balance
 		 */
@@ -7697,6 +7808,26 @@ type RootTranslation = {
 		 * @param {string} limit
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​d​a​i​l​y​ ​l​i​m​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		limitsUnavailable: string
+		/**
+		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
+		 */
+		problemSheetTitle: string
+		/**
+		 * C​h​a​n​g​e​ ​d​e​s​t​i​n​a​t​i​o​n
+		 */
+		changeDestination: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
+		 */
+		recipientUnreachableTitle: string
+		/**
+		 * R​e​c​i​p​i​e​n​t​ ​s​e​n​t​ ​t​h​e​ ​w​r​o​n​g​ ​a​m​o​u​n​t
+		 */
+		recipientWrongAmountTitle: string
 		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
@@ -7773,21 +7904,23 @@ type RootTranslation = {
 		 * T​h​e​ ​l​n​u​r​l​ ​s​e​r​v​e​r​ ​r​e​s​p​o​n​d​e​d​ ​w​i​t​h​ ​a​n​ ​i​n​v​o​i​c​e​ ​w​i​t​h​ ​a​n​ ​i​n​c​o​r​r​e​c​t​ ​a​m​o​u​n​t​.
 		 */
 		lnurlInvoiceIncorrectAmount: string
-		confirmFeesModal: {
+		highFeeSheet: {
 			/**
 			 * H​i​g​h​ ​f​e​e​ ​a​l​e​r​t​!
 			 */
 			title: string
 			/**
-			 * Y​o​u​r​ ​f​e​e​ ​i​s​ ​m​o​r​e​ ​t​h​a​n​ ​5​0​%​ ​b​i​g​g​e​r​ ​t​h​a​n​ ​t​h​e​ ​a​m​o​u​n​t​ ​s​e​n​t​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?​
-		​
-		​T​o​ ​r​e​d​u​c​e​ ​f​e​e​s​,​ ​a​s​k​ ​t​h​e​ ​r​e​c​e​i​v​e​r​ ​t​o​ ​a​c​c​e​p​t​ ​t​r​a​n​s​a​c​t​i​o​n​ ​v​i​a​ ​L​i​g​h​t​n​i​n​g
+			 * Y​o​u​r​ ​f​e​e​ ​i​s​ ​5​0​%​ ​o​r​ ​m​o​r​e​ ​o​f​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​'​r​e​ ​s​e​n​d​i​n​g​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?
 			 */
-			content: string
+			body: string
 			/**
-			 * I​'​m​ ​1​0​0​%​ ​s​u​r​e
+			 * C​a​n​c​e​l​ ​p​a​y​m​e​n​t
 			 */
-			confirmButton: string
+			cancelPayment: string
+			/**
+			 * A​c​c​e​p​t​ ​f​e​e
+			 */
+			acceptFee: string
 		}
 		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
@@ -7899,6 +8032,10 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
 		 */
 		sdkGenericError: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​y​o​u​r​ ​o​w​n​ ​w​a​l​l​e​t​'​s​ ​a​d​d​r​e​s​s​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​p​a​y​m​e​n​t​ ​t​o​ ​y​o​u​r​s​e​l​f​.
+		 */
+		onchainSelfPayment: string
 	}
 	ApiScreen: {
 		/**
@@ -9962,6 +10099,10 @@ type RootTranslation = {
 		 */
 		ok: string
 		/**
+		 * O​k​a​y
+		 */
+		okay: string
+		/**
 		 * o​r
 		 */
 		or: string
@@ -10499,6 +10640,33 @@ type RootTranslation = {
 		 * S​e​t​ ​a​m​o​u​n​t
 		 */
 		tapToSetAmount: string
+	}
+	Accessibility: {
+		/**
+		 * B​a​l​a​n​c​e​ ​h​i​d​d​e​n
+		 */
+		balanceHidden: string
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * D​e​l​e​t​e
+		 */
+		deleteKey: string
+		/**
+		 * S​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​n​ ​t​h​i​s​ ​s​c​r​e​e​n
+		 */
+		revealBalanceHint: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
+		 */
+		swapCurrencyHint: string
+		/**
+		 * S​w​i​t​c​h​ ​t​o​ ​{​w​a​l​l​e​t​}
+		 * @param {string} wallet
+		 */
+		switchToWallet: RequiredParams<'wallet'>
 	}
 	AppUpdate: {
 		/**
@@ -12315,7 +12483,7 @@ type RootTranslation = {
 				title: string
 				cardInfo: {
 					/**
-					 * T​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
+					 * T​h​e​ ​B​l​i​n​k​ ​C​a​r​d
 					 */
 					bitcoinCard: string
 					/**
@@ -12323,9 +12491,9 @@ type RootTranslation = {
 					 */
 					'for': string
 					/**
-					 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t​s
+					 * B​i​t​c​o​i​n​e​r​s
 					 */
-					maximalist: string
+					bitcoiners: string
 				}
 				/**
 				 * C​o​n​t​i​n​u​e
@@ -12334,31 +12502,45 @@ type RootTranslation = {
 			}
 			CardDetails: {
 				/**
-				 * A​d​d​i​t​i​o​n​a​l​ ​p​e​r​k​s
+				 * W​h​a​t​’​s​ ​i​n​c​l​u​d​e​d
 				 */
 				title: string
 				features: {
+					card: {
+						/**
+						 * B​l​i​n​k​ ​C​a​r​d
+						 */
+						title: string
+						/**
+						 * y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​,​ ​r​e​a​d​y​ ​t​o​d​a​y
+						 */
+						subtitle: string
+					}
+					accountManager: {
+						/**
+						 * P​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+						 */
+						title: string
+						/**
+						 * a​n​d​ ​p​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
+						 */
+						subtitle: string
+					}
 					/**
-					 * D​e​d​i​c​a​t​e​d​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+					 * O​n​/​O​f​f​ ​r​a​m​p​i​n​g
 					 */
-					accountManager: string
-					/**
-					 * P​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
-					 */
-					support: string
-					/**
-					 * 5​0​%​ ​b​a​c​k​ ​o​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
-					 */
-					onchainDeposits: string
-					/**
-					 * $​1​0​0​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s
-					 */
-					circularEconomies: string
+					onOffRamping: string
 				}
 				/**
-				 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
+				 * i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+				 * @param {number} months
 				 */
-				andMore: string
+				availableIn: RequiredParams<'months'>
+				/**
+				 * S​o​m​e​ ​f​e​a​t​u​r​e​s​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​w​i​t​h​i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s​.​ ​T​h​e​ ​c​a​r​d​ ​i​s​ ​r​e​a​d​y​ ​t​o​d​a​y​.
+				 * @param {number} months
+				 */
+				footnote: RequiredParams<'months'>
 				/**
 				 * C​o​n​t​i​n​u​e
 				 */
@@ -12371,16 +12553,16 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * T​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e
+					 * T​o​ ​B​l​i​n​k​ ​O​r​a​n​g​e
 					 */
 					subtitle: string
 					paragraphs: {
 						/**
-						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
+						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​O​r​a​n​g​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
 						 */
 						body1: string
 						/**
-						 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+						 * B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​t​h​e​ ​f​i​r​s​t​ ​t​i​e​r​ ​o​f​ ​B​l​i​n​k​’​s​ ​m​e​m​b​e​r​s​h​i​p​ ​f​o​r​ ​B​i​t​c​o​i​n​e​r​s​,​ ​b​y​ ​i​n​v​i​t​a​t​i​o​n​.​ ​T​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​a​n​d​ ​y​o​u​r​ ​p​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​a​r​e​ ​t​w​o​ ​o​f​ ​t​h​e​ ​f​i​r​s​t​ ​s​e​r​v​i​c​e​s​ ​w​e​ ​o​f​f​e​r​ ​—​ ​t​h​e​ ​r​e​s​t​ ​w​e​’​r​e​ ​b​u​i​l​d​i​n​g​ ​t​h​r​o​u​g​h​ ​2​0​2​7​.
 						 */
 						body2: string
 					}
@@ -12408,13 +12590,31 @@ type RootTranslation = {
 				 */
 				payButton: string
 				/**
-				 * B​l​i​n​k​ ​P​r​i​v​a​t​e
+				 * B​l​i​n​k​ ​O​r​a​n​g​e
 				 */
 				cardTitle: string
+				/**
+				 * F​r​e​e
+				 */
+				free: string
+				/**
+				 * f​o​r​ ​n​o​w
+				 */
+				forNow: string
 				/**
 				 * p​e​r​ ​y​e​a​r
 				 */
 				perYear: string
+				freeBreakdown: {
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d
+					 */
+					card: string
+					/**
+					 * O​t​h​e​r​ ​m​e​m​b​e​r​ ​b​e​n​e​f​i​t​s
+					 */
+					memberBenefits: string
+				}
 				status: {
 					/**
 					 * S​t​a​t​u​s
@@ -12476,6 +12676,42 @@ type RootTranslation = {
 				 * @param {number} months
 				 */
 				renew: RequiredParams<'months'>
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​f​r​e​e​ ​f​o​r​ ​n​o​w​,​ ​a​n​d​ ​t​h​a​t​ ​a​ ​m​e​m​b​e​r​s​h​i​p​ ​f​e​e​ ​m​a​y​ ​b​e​ ​i​n​t​r​o​d​u​c​e​d​ ​l​a​t​e​r​,​ ​w​i​t​h​ ​n​o​t​i​c​e
+				 */
+				freeNotice: string
+			}
+			CardVerifyIdentity: {
+				/**
+				 * V​e​r​i​f​y​ ​y​o​u​r​ ​i​d​e​n​t​i​t​y
+				 */
+				title: string
+				/**
+				 * T​o​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​,​ ​t​h​e​ ​c​a​r​d​ ​i​s​s​u​e​r​ ​m​u​s​t​ ​v​e​r​i​f​y​ ​w​h​o​ ​y​o​u​ ​a​r​e​ ​(​K​Y​C​)​.​ ​Y​o​u​ ​w​i​l​l​ ​n​e​e​d​:
+				 */
+				description: string
+				requirements: {
+					/**
+					 * A​ ​g​o​v​e​r​n​m​e​n​t​-​i​s​s​u​e​d​ ​I​D
+					 */
+					governmentId: string
+					/**
+					 * A​ ​s​e​l​f​i​e​ ​/​ ​l​i​v​e​n​e​s​s​ ​c​h​e​c​k
+					 */
+					selfie: string
+					/**
+					 * P​r​o​o​f​ ​o​f​ ​a​d​d​r​e​s​s
+					 */
+					proofOfAddress: string
+					/**
+					 * A​ ​f​e​w​ ​q​u​e​s​t​i​o​n​s​ ​a​b​o​u​t​ ​y​o​u
+					 */
+					questions: string
+				}
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
 			}
 			LoadingCard: {
 				/**
@@ -12671,7 +12907,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+						 * S​e​l​e​c​t
 						 */
 						placeholder: string
 					}
@@ -12681,7 +12917,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+						 * S​e​l​e​c​t​ ​s​a​l​a​r​y
 						 */
 						placeholder: string
 					}
@@ -12706,10 +12942,6 @@ type RootTranslation = {
 						placeholder: string
 					}
 				}
-				/**
-				 * S​u​b​m​i​t​ ​a​p​p​l​i​c​a​t​i​o​n
-				 */
-				buttonText: string
 				/**
 				 * S​e​l​e​c​t
 				 */
@@ -12740,7 +12972,7 @@ type RootTranslation = {
 					 */
 					text: string
 					/**
-					 * I​s​s​u​e​r​'​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+					 * I​s​s​u​e​r​’​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
 					 */
 					privacyPolicyLinkText: string
 					/**
@@ -12753,23 +12985,37 @@ type RootTranslation = {
 					cardTermsLinkText: string
 				}
 				/**
-				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​C​a​r​d
 				 */
 				certifyAccuracy: string
 				/**
-				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
+				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
 				 */
 				acknowledgeSolicitation: string
 			}
 			CardPreapproved: {
 				/**
-				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
+				 * Y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​i​s​ ​r​e​a​d​y​!
 				 */
 				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​n​o​w​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​n​d​ ​s​t​a​r​t​ ​u​s​i​n​g​ ​i​t
+				 */
+				subtitle: string
 				/**
 				 * C​l​o​s​e
 				 */
 				buttonText: string
+			}
+			CardDeclined: {
+				/**
+				 * W​e​ ​c​o​u​l​d​n​'​t​ ​a​p​p​r​o​v​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​p​p​l​i​c​a​t​i​o​n
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​w​i​l​l​ ​b​e​ ​i​n​ ​t​o​u​c​h​.
+				 */
+				subtitle: string
 			}
 			CardProcessing: {
 				/**
@@ -12777,13 +13023,9 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
+				 * T​h​i​s​ ​c​a​n​ ​t​a​k​e​ ​u​p​ ​t​o​ ​a​ ​m​i​n​u​t​e
 				 */
 				subtitle: string
-				/**
-				 * C​l​o​s​e
-				 */
-				buttonText: string
 			}
 		}
 	}
@@ -13199,6 +13441,10 @@ type RootTranslation = {
 		 */
 		migrationRequiredForcedBody: string
 		/**
+		 * B​l​i​n​k​ ​i​s​ ​c​l​o​s​i​n​g​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​s​.​ ​M​o​v​e​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​f​e​w​ ​t​a​p​s​.
+		 */
+		migrationRequiredForcedBodyLevelZero: string
+		/**
 		 * A​c​c​o​u​n​t​ ​n​o​t​ ​a​c​c​e​s​s​i​b​l​e
 		 */
 		migrationGateTitle: string
@@ -13207,6 +13453,11 @@ type RootTranslation = {
 		 * @param {unknown} email
 		 */
 		migrationGateBody: RequiredParams<'email'>
+		/**
+		 * T​r​i​a​l​ ​a​c​c​o​u​n​t​s​ ​a​r​e​ ​n​o​w​ ​c​l​o​s​e​d​.​ ​Y​o​u​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​s​a​f​e​.​ ​M​o​v​e​ ​i​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​b​y​ ​f​o​l​l​o​w​i​n​g​ ​t​h​e​ ​n​e​x​t​ ​s​t​e​p​s​,​ ​f​r​e​e​ ​a​n​d​ ​w​i​t​h​ ​n​o​ ​t​i​m​e​ ​l​i​m​i​t​,​ ​o​r​ ​c​o​n​t​a​c​t​ ​u​s​ ​a​t​ ​<​l​i​n​k​>​{​e​m​a​i​l​}​<​/​l​i​n​k​>
+		 * @param {unknown} email
+		 */
+		migrationGateBodyLevelZero: RequiredParams<'email'>
 		/**
 		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e
 		 */
@@ -13414,6 +13665,13 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date'>
 			/**
+			 * Y​o​u​ ​c​a​n​ ​n​o​ ​l​o​n​g​e​r​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​ ​t​o​ ​t​h​i​s​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​.​ ​B​l​i​n​k​ ​i​s​ ​c​l​o​s​i​n​g​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​s​ ​a​n​d​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​a​c​t​i​v​a​t​e​d​ ​b​y​ ​t​h​e​ ​e​n​d​ ​o​f​ ​{​d​a​t​e​}​.​
+		​
+		​M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+			 * @param {string} date
+			 */
+			bodyLevelZero: RequiredParams<'date'>
+			/**
 			 * M​i​g​r​a​t​e​ ​n​o​w
 			 */
 			migrateCta: string
@@ -13430,6 +13688,16 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date' | 'receiveStopsDate'>
 			/**
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​e​v​e​r​y​t​h​i​n​g​ ​m​o​v​e​s​ ​i​n​ ​a​ ​f​e​w​ ​t​a​p​s​.
+			 * @param {string} date
+			 */
+			bodySingleDate: RequiredParams<'date'>
+			/**
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
+			 * @param {string} date
+			 */
+			bodyLevelZero: RequiredParams<'date'>
+			/**
 			 * R​e​c​e​i​v​i​n​g​ ​h​a​s​ ​s​t​o​p​p​e​d​.​ ​M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
 			 * @param {string} date
 			 */
@@ -13445,9 +13713,21 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​r​e​g​i​s​t​e​r​e​d​ ​i​n​ ​a​ ​r​e​g​i​o​n​ ​w​h​e​r​e​ ​w​e​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​a​c​c​o​u​n​t​s​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​A​u​g​u​s​t​ ​3​1​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​A​u​g​u​s​t​ ​1​0​.
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​{​r​e​c​e​i​v​e​S​t​o​p​s​D​a​t​e​}​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 * @param {string} receiveStopsDate
 			 */
-			body: string
+			bodyTwoDates: RequiredParams<'date' | 'receiveStopsDate'>
+			/**
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 */
+			bodySingleDate: RequiredParams<'date'>
+			/**
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​R​e​c​e​i​v​i​n​g​ ​i​s​ ​o​f​f​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 */
+			bodyReceiveOff: RequiredParams<'date'>
 		}
 		contactSupport: {
 			/**
@@ -13691,6 +13971,14 @@ type RootTranslation = {
 		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​i​f​ ​t​h​e​ ​w​o​r​d​ ​o​r​d​e​r​ ​i​s​ ​c​o​r​r​e​c​t​.
 		 */
 		invalidMnemonic: string
+		/**
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​i​f​ ​t​h​e​ ​w​o​r​d​ ​o​r​d​e​r​ ​i​s​ ​c​o​r​r​e​c​t​.​ ​C​o​n​t​a​c​t​ ​<​l​i​n​k​>​S​u​p​p​o​r​t​<​/​l​i​n​k​>​ ​i​f​ ​p​r​o​b​l​e​m​ ​p​e​r​s​i​s​t​s​.
+		 */
+		invalidPhrase: string
+		/**
+		 * I​n​v​a​l​i​d​ ​w​o​r​d​,​ ​p​l​e​a​s​e​ ​c​h​e​c​k​ ​t​h​e​ ​s​p​e​l​l​i​n​g
+		 */
+		invalidWord: string
 		/**
 		 * R​e​s​t​o​r​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
 		 */
@@ -14172,6 +14460,26 @@ type RootTranslation = {
 		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
 		 */
 		generic: string
+		/**
+		 * T​h​i​s​ ​p​a​y​m​e​n​t​ ​m​a​y​ ​a​l​r​e​a​d​y​ ​h​a​v​e​ ​g​o​n​e​ ​t​h​r​o​u​g​h​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​b​e​f​o​r​e​ ​s​e​n​d​i​n​g​ ​i​t​ ​a​g​a​i​n​.
+		 */
+		outcomeUnknown: string
+		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​t​r​a​n​s​f​e​r​ ​i​s​ ​s​t​i​l​l​ ​b​e​i​n​g​ ​c​o​n​f​i​r​m​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​.
+		 */
+		earlierConversionPending: string
+		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​p​a​y​m​e​n​t​ ​t​o​ ​t​h​i​s​ ​d​e​s​t​i​n​a​t​i​o​n​ ​a​l​r​e​a​d​y​ ​w​e​n​t​ ​t​h​r​o​u​g​h​,​ ​f​o​r​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.​ ​C​h​e​c​k​ ​i​t​ ​b​e​f​o​r​e​ ​s​e​n​d​i​n​g​ ​a​g​a​i​n​.
+		 */
+		earlierPaymentFound: string
+		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​t​r​a​n​s​f​e​r​ ​a​l​r​e​a​d​y​ ​w​e​n​t​ ​t​h​r​o​u​g​h​,​ ​f​o​r​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.​ ​C​h​e​c​k​ ​i​t​ ​i​n​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​b​e​f​o​r​e​ ​t​r​a​n​s​f​e​r​r​i​n​g​ ​a​g​a​i​n​.
+		 */
+		earlierConversionFound: string
+		/**
+		 * A​ ​t​r​a​n​s​f​e​r​ ​o​f​ ​a​b​o​u​t​ ​t​h​i​s​ ​a​m​o​u​n​t​ ​j​u​s​t​ ​w​e​n​t​ ​t​h​r​o​u​g​h​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​b​e​f​o​r​e​ ​c​o​n​f​i​r​m​i​n​g​ ​t​h​i​s​ ​o​n​e​ ​a​g​a​i​n​.
+		 */
+		convertedMeanwhile: string
 	}
 	SelfCustodialNetworkMismatch: {
 		/**
@@ -21920,6 +22228,10 @@ export type TranslationFunctions = {
 		 */
 		totalExceed: (arg: { balance: string }) => LocalizedString
 		/**
+		 * The network fee is more than the amount you're sending
+		 */
+		feeExceedsAmount: () => LocalizedString
+		/**
 		 * This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.
 		 */
 		maxFeeSelected: () => LocalizedString
@@ -21932,31 +22244,125 @@ export type TranslationFunctions = {
 		 */
 		somethingWentWrong: () => LocalizedString
 		/**
+		 * The price moved, so the amounts were updated. Check them before you send.
+		 */
+		priceUpdated: () => LocalizedString
+		/**
 		 * Payment already attempted.
 
 	If you want to send this payment again, start from scratch.
 		 */
 		paymentAlreadyAttempted: () => LocalizedString
 		/**
-		 * Slide to Confirm
+		 * Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.
 		 */
-		slideToConfirm: () => LocalizedString
+		paymentMayStillLand: () => LocalizedString
 		/**
 		 * Confirming...
 		 */
 		slideConfirming: () => LocalizedString
 		/**
+		 * Slide to send
+		 */
+		slideToSend: () => LocalizedString
+		/**
+		 * Calculating fee…
+		 */
+		calculatingFee: () => LocalizedString
+		sendProgress: {
+			/**
+			 * Reviewing
+			 */
+			reviewing: () => LocalizedString
+			/**
+			 * Signing
+			 */
+			signing: () => LocalizedString
+			/**
+			 * Finding route
+			 */
+			findingRoute: () => LocalizedString
+			/**
+			 * Broadcasting
+			 */
+			broadcasting: () => LocalizedString
+			/**
+			 * Checking delivery
+			 */
+			checkingDelivery: () => LocalizedString
+			/**
+			 * Almost there
+			 */
+			almostThere: () => LocalizedString
+			/**
+			 * Any time now
+			 */
+			anyTimeNow: () => LocalizedString
+			/**
+			 * Hang tight
+			 */
+			hangTight: () => LocalizedString
+			/**
+			 * Still on its way
+			 */
+			stillOnItsWay: () => LocalizedString
+		}
+		/**
 		 * Copied destination to clipboard
 		 */
 		copiedDestination: () => LocalizedString
 		/**
-		 * High fee! We recommend Lightning.
+		 * High fee. We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Sending
+		 */
+		sending: () => LocalizedString
+		/**
+		 * Sent
+		 */
+		sent: () => LocalizedString
+		/**
+		 * Receipt
+		 */
+		receipt: () => LocalizedString
+		/**
+		 * Sent, {amount}
+		 */
+		sentAnnouncement: (arg: { amount: string }) => LocalizedString
+		/**
+		 * From Balance
+		 */
+		fromBalance: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Change amount
+		 */
+		changeAmount: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
+		/**
+		 * Home
+		 */
+		home: () => LocalizedString
+		/**
+		 * Before you send
+		 */
+		dustSweepSheetTitle: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
 		usdRemainderSweep: (arg: { minimum: string, remaining: string, remainingSats: string }) => LocalizedString
+		/**
+		 * I checked my history, send anyway
+		 */
+		sendAnyway: () => LocalizedString
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -22106,6 +22512,18 @@ export type TranslationFunctions = {
 		 */
 		amount: () => LocalizedString
 		/**
+		 * Add amount
+		 */
+		addAmount: () => LocalizedString
+		/**
+		 * Slide to select amount
+		 */
+		slideToSelectAmount: () => LocalizedString
+		/**
+		 * Low funds
+		 */
+		lowFunds: () => LocalizedString
+		/**
 		 * Amount exceeds your balance of {balance}
 		 */
 		amountExceed: (arg: { balance: string }) => LocalizedString
@@ -22113,6 +22531,26 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * We couldn't check your daily limit. Try again in a moment.
+		 */
+		limitsUnavailable: () => LocalizedString
+		/**
+		 * A small problem
+		 */
+		problemSheetTitle: () => LocalizedString
+		/**
+		 * Change destination
+		 */
+		changeDestination: () => LocalizedString
+		/**
+		 * Couldn't reach the recipient
+		 */
+		recipientUnreachableTitle: () => LocalizedString
+		/**
+		 * Recipient sent the wrong amount
+		 */
+		recipientWrongAmountTitle: () => LocalizedString
 		/**
 		 * Upgrade your account to increase your limit
 		 */
@@ -22189,21 +22627,23 @@ export type TranslationFunctions = {
 		 * The lnurl server responded with an invoice with an incorrect amount.
 		 */
 		lnurlInvoiceIncorrectAmount: () => LocalizedString
-		confirmFeesModal: {
+		highFeeSheet: {
 			/**
 			 * High fee alert!
 			 */
 			title: () => LocalizedString
 			/**
-			 * Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?
-	
-		To reduce fees, ask the receiver to accept transaction via Lightning
+			 * Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?
 			 */
-			content: () => LocalizedString
+			body: () => LocalizedString
 			/**
-			 * I'm 100% sure
+			 * Cancel payment
 			 */
-			confirmButton: () => LocalizedString
+			cancelPayment: () => LocalizedString
+			/**
+			 * Accept fee
+			 */
+			acceptFee: () => LocalizedString
 		}
 		/**
 		 * Copied destination to clipboard
@@ -22315,6 +22755,10 @@ export type TranslationFunctions = {
 		 * Unable to estimate fees. Please try a different amount.
 		 */
 		sdkGenericError: () => LocalizedString
+		/**
+		 * This is your own wallet's address. You can't send an on-chain payment to yourself.
+		 */
+		onchainSelfPayment: () => LocalizedString
 	}
 	ApiScreen: {
 		/**
@@ -24330,6 +24774,10 @@ export type TranslationFunctions = {
 		 */
 		ok: () => LocalizedString
 		/**
+		 * Okay
+		 */
+		okay: () => LocalizedString
+		/**
 		 * or
 		 */
 		or: () => LocalizedString
@@ -24851,6 +25299,32 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		tapToSetAmount: () => LocalizedString
+	}
+	Accessibility: {
+		/**
+		 * Balance hidden
+		 */
+		balanceHidden: () => LocalizedString
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Delete
+		 */
+		deleteKey: () => LocalizedString
+		/**
+		 * Shows your balance on this screen
+		 */
+		revealBalanceHint: () => LocalizedString
+		/**
+		 * Switches the currency you type the amount in
+		 */
+		swapCurrencyHint: () => LocalizedString
+		/**
+		 * Switch to {wallet}
+		 */
+		switchToWallet: (arg: { wallet: string }) => LocalizedString
 	}
 	AppUpdate: {
 		/**
@@ -26645,7 +27119,7 @@ export type TranslationFunctions = {
 				title: () => LocalizedString
 				cardInfo: {
 					/**
-					 * The Blink Visa card
+					 * The Blink Card
 					 */
 					bitcoinCard: () => LocalizedString
 					/**
@@ -26653,9 +27127,9 @@ export type TranslationFunctions = {
 					 */
 					'for': () => LocalizedString
 					/**
-					 * Bitcoin Maximalists
+					 * Bitcoiners
 					 */
-					maximalist: () => LocalizedString
+					bitcoiners: () => LocalizedString
 				}
 				/**
 				 * Continue
@@ -26664,31 +27138,43 @@ export type TranslationFunctions = {
 			}
 			CardDetails: {
 				/**
-				 * Additional perks
+				 * What’s included
 				 */
 				title: () => LocalizedString
 				features: {
+					card: {
+						/**
+						 * Blink Card
+						 */
+						title: () => LocalizedString
+						/**
+						 * your Visa card, ready today
+						 */
+						subtitle: () => LocalizedString
+					}
+					accountManager: {
+						/**
+						 * Personal account manager
+						 */
+						title: () => LocalizedString
+						/**
+						 * and priority support
+						 */
+						subtitle: () => LocalizedString
+					}
 					/**
-					 * Dedicated account manager
+					 * On/Off ramping
 					 */
-					accountManager: () => LocalizedString
-					/**
-					 * Priority support
-					 */
-					support: () => LocalizedString
-					/**
-					 * 50% back on transaction fees
-					 */
-					onchainDeposits: () => LocalizedString
-					/**
-					 * $100 to circular economies
-					 */
-					circularEconomies: () => LocalizedString
+					onOffRamping: () => LocalizedString
 				}
 				/**
-				 * ... and more coming in 2026
+				 * in {months} months
 				 */
-				andMore: () => LocalizedString
+				availableIn: (arg: { months: number }) => LocalizedString
+				/**
+				 * Some features will be available within {months} months. The card is ready today.
+				 */
+				footnote: (arg: { months: number }) => LocalizedString
 				/**
 				 * Continue
 				 */
@@ -26701,16 +27187,16 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * To Blink Private
+					 * To Blink Orange
 					 */
 					subtitle: () => LocalizedString
 					paragraphs: {
 						/**
-						 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.
+						 * Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.
 						 */
 						body1: () => LocalizedString
 						/**
-						 * Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.
+						 * Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.
 						 */
 						body2: () => LocalizedString
 					}
@@ -26738,13 +27224,31 @@ export type TranslationFunctions = {
 				 */
 				payButton: () => LocalizedString
 				/**
-				 * Blink Private
+				 * Blink Orange
 				 */
 				cardTitle: () => LocalizedString
+				/**
+				 * Free
+				 */
+				free: () => LocalizedString
+				/**
+				 * for now
+				 */
+				forNow: () => LocalizedString
 				/**
 				 * per year
 				 */
 				perYear: () => LocalizedString
+				freeBreakdown: {
+					/**
+					 * Blink Card
+					 */
+					card: () => LocalizedString
+					/**
+					 * Other member benefits
+					 */
+					memberBenefits: () => LocalizedString
+				}
 				status: {
 					/**
 					 * Status
@@ -26805,6 +27309,42 @@ export type TranslationFunctions = {
 				 * I understand my subscription will automatically renew in {months} months
 				 */
 				renew: (arg: { months: number }) => LocalizedString
+				/**
+				 * I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice
+				 */
+				freeNotice: () => LocalizedString
+			}
+			CardVerifyIdentity: {
+				/**
+				 * Verify your identity
+				 */
+				title: () => LocalizedString
+				/**
+				 * To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:
+				 */
+				description: () => LocalizedString
+				requirements: {
+					/**
+					 * A government-issued ID
+					 */
+					governmentId: () => LocalizedString
+					/**
+					 * A selfie / liveness check
+					 */
+					selfie: () => LocalizedString
+					/**
+					 * Proof of address
+					 */
+					proofOfAddress: () => LocalizedString
+					/**
+					 * A few questions about you
+					 */
+					questions: () => LocalizedString
+				}
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
 			}
 			LoadingCard: {
 				/**
@@ -26990,7 +27530,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your occupation
+						 * Select
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27000,7 +27540,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your salary range
+						 * Select salary
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27025,10 +27565,6 @@ export type TranslationFunctions = {
 						placeholder: () => LocalizedString
 					}
 				}
-				/**
-				 * Submit application
-				 */
-				buttonText: () => LocalizedString
 				/**
 				 * Select
 				 */
@@ -27059,7 +27595,7 @@ export type TranslationFunctions = {
 					 */
 					text: () => LocalizedString
 					/**
-					 * Issuer's Privacy Policy
+					 * Issuer’s Privacy Policy
 					 */
 					privacyPolicyLinkText: () => LocalizedString
 					/**
@@ -27072,23 +27608,37 @@ export type TranslationFunctions = {
 					cardTermsLinkText: () => LocalizedString
 				}
 				/**
-				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card
+				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card
 				 */
 				certifyAccuracy: () => LocalizedString
 				/**
-				 * I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation
+				 * I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation
 				 */
 				acknowledgeSolicitation: () => LocalizedString
 			}
 			CardPreapproved: {
 				/**
-				 * You have been pre-approved for the Blink Visa card!
+				 * Your Blink Card is ready!
 				 */
 				title: () => LocalizedString
+				/**
+				 * You can now activate your card and start using it
+				 */
+				subtitle: () => LocalizedString
 				/**
 				 * Close
 				 */
 				buttonText: () => LocalizedString
+			}
+			CardDeclined: {
+				/**
+				 * We couldn't approve your card application
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your account manager will be in touch.
+				 */
+				subtitle: () => LocalizedString
 			}
 			CardProcessing: {
 				/**
@@ -27096,13 +27646,9 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * We will notify you once we are ready
+				 * This can take up to a minute
 				 */
 				subtitle: () => LocalizedString
-				/**
-				 * Close
-				 */
-				buttonText: () => LocalizedString
 			}
 		}
 	}
@@ -27507,6 +28053,10 @@ export type TranslationFunctions = {
 		 */
 		migrationRequiredForcedBody: () => LocalizedString
 		/**
+		 * Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.
+		 */
+		migrationRequiredForcedBodyLevelZero: () => LocalizedString
+		/**
 		 * Account not accessible
 		 */
 		migrationGateTitle: () => LocalizedString
@@ -27514,6 +28064,10 @@ export type TranslationFunctions = {
 		 * For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>
 		 */
 		migrationGateBody: (arg: { email: unknown }) => LocalizedString
+		/**
+		 * Trial accounts are now closed. Your balance is safe. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at <link>{email}</link>
+		 */
+		migrationGateBodyLevelZero: (arg: { email: unknown }) => LocalizedString
 		/**
 		 * Bitcoin balance
 		 */
@@ -27718,6 +28272,12 @@ export type TranslationFunctions = {
 			 */
 			body: (arg: { date: string }) => LocalizedString
 			/**
+			 * You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of {date}.
+	
+		Migrate now to a non-custodial account.
+			 */
+			bodyLevelZero: (arg: { date: string }) => LocalizedString
+			/**
 			 * Migrate now
 			 */
 			migrateCta: () => LocalizedString
@@ -27731,6 +28291,14 @@ export type TranslationFunctions = {
 			 * Move to a non-custodial account via guided migration, or withdraw, before {date}. Receiving stops {receiveStopsDate}.
 			 */
 			body: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date} — everything moves in a few taps.
+			 */
+			bodySingleDate: (arg: { date: string }) => LocalizedString
+			/**
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date}.
+			 */
+			bodyLevelZero: (arg: { date: string }) => LocalizedString
 			/**
 			 * Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date}.
 			 */
@@ -27746,9 +28314,17 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. Receiving stops {receiveStopsDate}. If you believe your account has been affected in error, you can verify your current residence in the app.
 			 */
-			body: () => LocalizedString
+			bodyTwoDates: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. If you believe your account has been affected in error, you can verify your current residence in the app.
+			 */
+			bodySingleDate: (arg: { date: string }) => LocalizedString
+			/**
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. Receiving is off. If you believe your account has been affected in error, you can verify your current residence in the app.
+			 */
+			bodyReceiveOff: (arg: { date: string }) => LocalizedString
 		}
 		contactSupport: {
 			/**
@@ -27992,6 +28568,14 @@ export type TranslationFunctions = {
 		 * Invalid backup phrase. Please check if the word order is correct.
 		 */
 		invalidMnemonic: () => LocalizedString
+		/**
+		 * Invalid backup phrase. Please check if the word order is correct. Contact <link>Support</link> if problem persists.
+		 */
+		invalidPhrase: () => LocalizedString
+		/**
+		 * Invalid word, please check the spelling
+		 */
+		invalidWord: () => LocalizedString
 		/**
 		 * Restoring your wallet...
 		 */
@@ -28468,6 +29052,26 @@ export type TranslationFunctions = {
 		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
 		 */
 		generic: () => LocalizedString
+		/**
+		 * This payment may already have gone through. Check your transaction history before sending it again.
+		 */
+		outcomeUnknown: () => LocalizedString
+		/**
+		 * Your earlier transfer is still being confirmed. Try again in a few minutes.
+		 */
+		earlierConversionPending: () => LocalizedString
+		/**
+		 * Your earlier payment to this destination already went through, for a different amount. Check it before sending again.
+		 */
+		earlierPaymentFound: () => LocalizedString
+		/**
+		 * Your earlier transfer already went through, for a different amount. Check it in your transaction history before transferring again.
+		 */
+		earlierConversionFound: () => LocalizedString
+		/**
+		 * A transfer of about this amount just went through. Check your balance before confirming this one again.
+		 */
+		convertedMeanwhile: () => LocalizedString
 	}
 	SelfCustodialNetworkMismatch: {
 		/**

@@ -73,6 +73,10 @@ const noRetryOperations = [
   // screen reports a failed one and reads the card's controls again, so it shows what
   // the server holds.
   "cardSpendingLimitRemove",
+
+  // One application per account: a resend after a lost answer is refused even when the
+  // first attempt went through.
+  "cardConsumerApplicationCreate",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"

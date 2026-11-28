@@ -13,6 +13,7 @@ import {
   headerRightNoGlass,
   noHeaderRight,
 } from "@app/components/header-no-glass"
+import { RichText } from "@app/components/rich-text"
 import { WarningCard } from "@app/components/warning-card"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SuggestionBar } from "@app/components/suggestion-bar"
@@ -62,8 +63,9 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
     handlePasteFromClipboard,
     suggestions,
     selectSuggestion,
-    stepFilled,
-    allFilled,
+    isWordInvalid,
+    stepValid,
+    allValid,
     isValid,
     validationError,
     status,
@@ -74,8 +76,12 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
     clearFocusRequest,
   } = restore
 
-  const showInvalidMnemonic = !isStep1 && allFilled && !isValid
-  const showError = Boolean(validationError) || showInvalidMnemonic
+  /** A misspelt word is the more specific problem, so it is shown on its own. The
+   *  phrase check waits for every word to be a real one: a half-typed last word is not
+   *  a wrong phrase yet. */
+  const hasInvalidWord = stepWords.some((_, i) => isWordInvalid(offset + i))
+  const showInvalidPhrase =
+    !hasInvalidWord && (Boolean(validationError) || (!isStep1 && allValid && !isValid))
 
   const inputRefs = useRef<Array<MnemonicWordInputHandle | null>>([])
 
@@ -87,6 +93,8 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
   }, [focusRequest, clearFocusRequest, offset])
 
   const pasteLabel = LL.RestoreScreen.paste()
+
+  const openSupport = () => navigation.navigate("onboarding", { screen: "supportScreen" })
 
   // Step 1 -> step 2 updates params on this same mounted screen, so the Paste
   // button installed during step 1 has to be cleared explicitly here.
@@ -157,11 +165,12 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
   }
 
   const { subtitle, button: buttonTitle } = stepContent[step]
-  const buttonDisabled = isStep1 ? !stepFilled : !isValid
+  const buttonDisabled = isStep1 ? !stepValid : !isValid
 
   return (
     <OnboardingScreenLayout
       scrollable
+      avoidKeyboard
       keyboardShouldPersistTaps="handled"
       footer={
         <>
@@ -200,10 +209,11 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
               onChangeText={(text) => {
                 if (globalIndex === 0 && handlePaste(text)) return
                 updateWord(globalIndex, text)
+                setActiveIndex(globalIndex)
               }}
               onFocus={() => setActiveIndex(globalIndex)}
               correct={!isStep1 && isValid}
-              wrong={showError}
+              wrong={showInvalidPhrase || isWordInvalid(globalIndex)}
               testID={`restore-word-${globalIndex}`}
             />
           )
@@ -211,12 +221,20 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
       </View>
 
       <View style={styles.errorContainer}>
-        {showError && (
+        {(hasInvalidWord || showInvalidPhrase) && (
           <>
             <GaloyIcon name="warning" size={14} color={colors.error} />
-            <Text style={styles.errorText} {...testProps("restore-error")}>
-              {validationError ?? LL.RestoreScreen.invalidMnemonic()}
-            </Text>
+            {hasInvalidWord ? (
+              <Text style={styles.errorText} {...testProps("restore-error")}>
+                {LL.RestoreScreen.invalidWord()}
+              </Text>
+            ) : (
+              <RichText
+                text={validationError ?? LL.RestoreScreen.invalidPhrase()}
+                style={styles.errorText}
+                tags={{ link: { style: styles.errorLink, onPress: openSupport } }}
+              />
+            )}
           </>
         )}
       </View>
@@ -297,7 +315,6 @@ const useStyles = makeStyles(({ colors }) => ({
   errorContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     gap: 8,
     minHeight: 20,
     marginTop: 12,
@@ -307,6 +324,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     lineHeight: 20,
     flexShrink: 1,
+  },
+  errorLink: {
+    color: colors.error,
+    textDecorationLine: "underline",
   },
   centerContainer: {
     flex: 1,

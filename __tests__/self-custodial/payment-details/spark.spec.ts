@@ -1,3 +1,5 @@
+import { FeePolicy } from "@breeztech/breez-sdk-spark-react-native"
+
 import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
@@ -42,6 +44,44 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
   beforeEach(() => {
     mockCreateGetFee.mockClear()
     mockCreateSendMutation.mockClear()
+  })
+
+  it("hands the send what the sender asked for, as entered and as it leaves the wallet", () => {
+    createSelfCustodialSparkPaymentDetails(
+      createParams({
+        unitOfAccountAmount: {
+          amount: 70,
+          currency: "DisplayCurrency",
+          currencyCode: "USD",
+        },
+      }),
+    )
+
+    expect(mockCreateSendMutation).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        requestedAs: { entered: "USD:70", settlement: "BTC:1000" },
+      }),
+    )
+  })
+
+  /** The keypad codes sats `SAT`, a conversion from fiat `BTC`: the same sats leave the
+   *  wallet as the same amount either way. */
+  it("tells the amount that leaves the wallet by its currency, not the code it was entered in", () => {
+    const keypadSats = { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "SAT" }
+    createSelfCustodialSparkPaymentDetails(
+      createParams({
+        unitOfAccountAmount: keypadSats,
+        convertMoneyAmount: jest.fn().mockReturnValue(keypadSats),
+      }),
+    )
+
+    expect(mockCreateSendMutation).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        requestedAs: { entered: "SAT:1000", settlement: "BTC:1000" },
+      }),
+    )
   })
 
   it("returns Spark payment type", () => {
@@ -92,7 +132,9 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
-      { rail: "spark", sendingWallet: WalletCurrency.Usd },
+      expect.objectContaining({
+        telemetry: { rail: "spark", sendingWallet: WalletCurrency.Usd },
+      }),
     )
     expect(mockCreateGetFee).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
@@ -104,7 +146,9 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
-      { rail: "spark", sendingWallet: WalletCurrency.Btc },
+      expect.objectContaining({
+        telemetry: { rail: "spark", sendingWallet: WalletCurrency.Btc },
+      }),
     )
     expect(mockCreateGetFee).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
@@ -126,7 +170,9 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     // 70 cents ($0.70) × 10^4 = 700_000 USDB base units
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(700000) }),
-      { rail: "spark", sendingWallet: WalletCurrency.Usd },
+      expect.objectContaining({
+        telemetry: { rail: "spark", sendingWallet: WalletCurrency.Usd },
+      }),
     )
   })
 
@@ -143,7 +189,9 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
-      { rail: "spark", sendingWallet: WalletCurrency.Btc },
+      expect.objectContaining({
+        telemetry: { rail: "spark", sendingWallet: WalletCurrency.Btc },
+      }),
     )
   })
 
@@ -168,5 +216,73 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     const updated = detail.setSendingWalletDescriptor(newDescriptor)
 
     expect(updated.sendingWalletDescriptor).toEqual(newDescriptor)
+  })
+})
+
+describe("createSelfCustodialSparkPaymentDetails send-all", () => {
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
+  const lastFeeParams = () =>
+    mockCreateGetFee.mock.calls[mockCreateGetFee.mock.calls.length - 1][0]
+  const lastSendParams = () =>
+    mockCreateSendMutation.mock.calls[mockCreateSendMutation.mock.calls.length - 1][0]
+
+  beforeEach(() => {
+    mockCreateGetFee.mockClear()
+    mockCreateSendMutation.mockClear()
+  })
+
+  it("offers a send-all on the Bitcoin wallet only", () => {
+    expect(createSelfCustodialSparkPaymentDetails(createParams()).canSendMax).toBe(true)
+    expect(
+      createSelfCustodialSparkPaymentDetails(
+        createParams({
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+        }),
+      ).canSendMax,
+    ).toBe(false)
+  })
+
+  it("quotes and sends a send-all with the fee taken out", () => {
+    const sendAll = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(sendAll.isFeeIncluded).toBe(true)
+    expect(lastFeeParams().feePolicy).toBe(FeePolicy.FeesIncluded)
+    expect(lastSendParams().feePolicy).toBe(FeePolicy.FeesIncluded)
+  })
+
+  it("leaves a plain amount's fee on top", () => {
+    createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(balance)
+
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+  })
+
+  it("puts the fee back on top once an amount is typed", () => {
+    const typed = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(typed.isFeeIncluded).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+    expect(lastSendParams().feePolicy).toBeUndefined()
+  })
+
+  it("drops the send-all on a wallet switch", () => {
+    const switched = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
+
+    expect(switched.isSendingMax).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
   })
 })

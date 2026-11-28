@@ -9,7 +9,25 @@ export const SelfCustodialErrorCode = {
   NetworkError: "sc_network_error",
   InvalidInput: "sc_invalid_input",
   Generic: "sc_generic",
+  /** Not from the SDK: a send threw after dispatch and nothing can tell whether it paid,
+   *  so the app refuses to send it again until the sender has checked their history. */
+  OutcomeUnknown: "sc_outcome_unknown",
+  /** Not from the SDK: an earlier attempt to the destination turned out to have paid,
+   *  for another amount, so nothing was sent this time and the sender is shown it. */
+  EarlierPaymentFound: "sc_earlier_payment_found",
+  /** Not from the SDK: a send-all quoted again at the slide moved what arrives by the
+   *  ruled margin since review, so nothing was sent and review quotes it again
+   *  (blink-wip#2048 E4). */
+  QuoteMoved: "sc_quote_moved",
 } as const
+
+/** Thrown before a send-all goes out when its fresh quote moved since review. */
+export class QuoteMovedError extends Error {
+  constructor() {
+    super("The send-all's quote moved since review")
+    this.name = "QuoteMovedError"
+  }
+}
 
 export type SelfCustodialErrorCode =
   (typeof SelfCustodialErrorCode)[keyof typeof SelfCustodialErrorCode]
@@ -80,6 +98,7 @@ const readStringInner = (err: unknown): string | undefined => {
 }
 
 export const classifySdkError = (err: unknown): SelfCustodialErrorCode => {
+  if (err instanceof QuoteMovedError) return SelfCustodialErrorCode.QuoteMoved
   if (!SdkError.instanceOf(err)) return SelfCustodialErrorCode.Generic
   if (INNER_REFINEMENT_TAGS.has(err.tag)) {
     const inner = readStringInner(err)?.toLowerCase()

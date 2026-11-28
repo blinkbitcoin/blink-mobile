@@ -13,7 +13,9 @@ import {
   setMeasurementContext,
 } from "@app/self-custodial/measurement"
 import { AccountMode } from "@app/types/account"
+import { type PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { createSelfCustodialLnurlPaymentDetails } from "@app/self-custodial/payment-details/lnurl"
+import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 const mockPrepareLnurl = jest.fn()
@@ -28,12 +30,30 @@ jest.mock("@app/self-custodial/analytics-identity", () => ({
   onEnhancedIdentityApplied: () => () => undefined,
 }))
 
-jest.mock("@app/self-custodial/bridge", () => ({
-  prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
-  executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
-  extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
+/** The wallet's history, read by the lost-send lookup straight from the wallet bridge. */
+jest.mock("@app/self-custodial/bridge/wallet", () => ({
+  newestSentPaymentTimestamp: () => Promise.resolve(undefined),
   listSentPaymentsSince: (...args: unknown[]) => mockListSentPaymentsSince(...args),
   syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
+}))
+
+/** A dollar send converts on the way out, and the SDK's quote says so with an estimate:
+ *  what the send flow reads to leave the idempotency key off. */
+const QUOTED_CONVERSION = { amountIn: BigInt(1), amountOut: BigInt(1) }
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  prepareLnurl: async (...args: unknown[]) => {
+    const quoted = await mockPrepareLnurl(...args)
+    const options = args[1] as { conversionOptions?: unknown } | undefined
+    return options?.conversionOptions
+      ? { conversionEstimate: QUOTED_CONVERSION, ...quoted }
+      : quoted
+  },
+  hasTokenLeg: jest.requireActual("@app/self-custodial/bridge/send").hasTokenLeg,
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
+  executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
+  extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),
   resolveSendTokenIdentifier: (currency: WalletCurrency) =>
     currency === WalletCurrency.Usd ? "usdb-token-id" : undefined,
@@ -45,16 +65,30 @@ jest.mock("@app/self-custodial/bridge", () => ({
  *  have their own spec; here only when it is asked, and what is done with its answer. */
 const mockFindLostSend = jest.fn()
 
-jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
-  ...jest.requireActual("@app/self-custodial/payment-details/send-helpers"),
+jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
+  ...jest.requireActual("@app/self-custodial/payment-details/lost-send"),
   findLostSend: (...args: unknown[]) => mockFindLostSend(...args),
 }))
 
 /** The real lookup, for the tests that run it against a history shaped the way the
  *  wallet writes it. Its waits between looks are skipped. */
 const { findLostSend: actualFindLostSend } = jest.requireActual<
-  typeof import("@app/self-custodial/payment-details/send-helpers")
->("@app/self-custodial/payment-details/send-helpers")
+  typeof import("@app/self-custodial/payment-details/lost-send")
+>("@app/self-custodial/payment-details/lost-send")
+
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
+/** Lost attempts are kept for the connected wallet for as long as the app runs, which
+ *  here is the whole file: every test connects a wallet of its own, holding none. */
+let connectedWallets = 0
+beforeEach(() => {
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
+})
 
 jest.mock("@app/utils/sleep", () => ({ sleep: () => Promise.resolve() }))
 jest.mock("@app/utils/error-logging", () => ({ reportError: jest.fn() }))
@@ -81,6 +115,8 @@ jest.mock("@app/self-custodial/sdk-error", () => {
       NetworkError: "sc_network_error",
       InvalidInput: "sc_invalid_input",
       Generic: "sc_generic",
+      OutcomeUnknown: "sc_outcome_unknown",
+      EarlierPaymentFound: "sc_earlier_payment_found",
     },
     classifySdkError: (err: { tag?: string } | unknown) => {
       const t = (err as { tag?: string })?.tag
@@ -1484,6 +1520,8 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
   /** A new amount or wallet starts the key over, and with it goes the SDK's refusal of a
    *  duplicate. The attempt that threw is remembered all the same, so the send made after
    *  that looks for its payment first. */
+  /** The earlier attempt was asked for another amount: its payment is shown as the earlier
+   *  payment it is, never as this send, and nothing more goes out. */
   it("remembers a bitcoin attempt that threw, for the send made after a new amount", async () => {
     const detail = createSelfCustodialLnurlPaymentDetails(createParams())
     if (!detail.idempotencyKeyRef) throw new Error("expected idempotencyKeyRef")
@@ -1504,7 +1542,9 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
     expect(mockFindLostSend).toHaveBeenCalledTimes(1)
     expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe("sc_earlier_payment_found")
+    expect(result.extraInfo?.earlierPaymentId).toBe("found-1")
     expect(mockExecuteLnurl).not.toHaveBeenCalled()
   })
 
@@ -1576,6 +1616,34 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
+    /** SDK 0.27 finishes a Lightning send that committed funds before the SSP was asked
+     *  to pay, on a later sync. Until then the wallet records the committed swap as a send
+     *  it cannot describe: Pending, with no invoice and no hash to match. */
+    it("pays nothing again while the wallet holds a committed send it has not described", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const first = await detail.sendPaymentMutation({} as never)
+      expect(first.status).toBe(PaymentSendResult.Failure)
+
+      historyShows({
+        id: "transfer-1",
+        status: PENDING,
+        timestamp: BigInt(Math.floor(Date.now() / 1000)),
+        details: undefined,
+      })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Failure)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+
+      /** A later sync resumes the send, and its payment carries the invoice it paid. */
+      historyShows(lostSendRecord(QUOTED_HASH))
+      const later = await detail.sendPaymentMutation({} as never)
+
+      expect(later.status).toBe(PaymentSendResult.Success)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
     it("sends nothing on the retry while the wallet cannot catch up with the server", async () => {
       const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
       if (!detail.canSendPayment) throw new Error("expected canSendPayment")
@@ -1601,6 +1669,52 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails lost attempts", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  /** The identifier is the server's word, and another endpoint may give the same one:
+   *  a lost send to one must not be taken for a send to the other. */
+  it("keeps them by the lnurl the sender gave, not by the identifier it names", async () => {
+    const usd = {
+      sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      unitOfAccountAmount: {
+        amount: 100,
+        currency: WalletCurrency.Usd,
+        currencyCode: "USD",
+      },
+    }
+    const sendTo = (lnurl: string) => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          ...usd,
+          lnurl,
+          lnurlParams: baseLnurlParams({ identifier: "same@example.com" }),
+        }),
+      )
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      return detail.sendPaymentMutation({} as never)
+    }
+    mockPrepareLnurl.mockResolvedValue(quote())
+    mockExecuteLnurl
+      .mockRejectedValueOnce({ tag: "NetworkError" })
+      .mockResolvedValueOnce({
+        payment: { id: "p2", status: 0, timestamp: BigInt(1), details: undefined },
+        successAction: undefined,
+      })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
+
+    await sendTo("lnurl1first")
+    mockFindLostSend.mockClear()
+    const other = await sendTo("lnurl1second")
+
+    expect(other.status).toBe(PaymentSendResult.Success)
+    expect(mockFindLostSend).not.toHaveBeenCalled()
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -1944,5 +2058,278 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
         "sc_payment_send_failed",
       ])
     })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () => {
+  const lostResponse = { tag: "NetworkError" }
+  const detailFor = (sats: number, key: string) => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        unitOfAccountAmount: {
+          amount: sats,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+        idempotencyKeyRef: { current: key },
+      }),
+    )
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+    return detail
+  }
+  const earlierPayment = (sats: number) => ({
+    id: "p-earlier",
+    status: 0,
+    amount: BigInt(sats),
+    timestamp: BigInt(1_700_000_000),
+    details: {
+      tag: "Lightning",
+      inner: { htlcDetails: { paymentHash: QUOTED_HASH, preimage: "pre" } },
+    },
+  })
+
+  beforeEach(() => {
+    ;[mockPrepareLnurl, mockExecuteLnurl, mockFindLostSend].forEach((mock) =>
+      mock.mockReset(),
+    )
+    mockPrepareLnurl.mockResolvedValue(quote())
+  })
+
+  it("reports a send whose answer came without a payment as sent", async () => {
+    mockExecuteLnurl.mockResolvedValue({ successAction: undefined })
+
+    const result = await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    expect(result).toEqual({
+      status: PaymentSendResult.Success,
+      transaction: undefined,
+      extraInfo: { preimage: undefined, successAction: undefined },
+    })
+  })
+
+  it("reports an earlier attempt's payment for another amount as that payment", async () => {
+    mockExecuteLnurl.mockRejectedValueOnce(lostResponse)
+    await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: earlierPayment(1500),
+      failed: [],
+    })
+    const result = await detailFor(2500, "key-b").sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe("sc_earlier_payment_found")
+    expect(result.extraInfo?.earlierPaymentId).toBe("p-earlier")
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports an earlier attempt's payment for the same amount as the send", async () => {
+    mockExecuteLnurl.mockRejectedValueOnce(lostResponse)
+    await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: earlierPayment(1500),
+      failed: [],
+    })
+    const result = await detailFor(1500, "key-b").sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.preimage).toBe("pre")
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
+  const FEES_INCLUDED = 1
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    convertMoneyAmount.mockImplementation((amount, target) => ({
+      amount: amount.amount,
+      currency: target,
+      currencyCode: target,
+    }))
+    mockExtractLnurlFee.mockReturnValue(5)
+    mockPrepareLnurl.mockResolvedValue(quote())
+  })
+
+  const feePolicyOf = async <T extends WalletCurrency>(detail: PaymentDetail<T>) => {
+    if (!detail.canGetFee) throw new Error("expected canGetFee")
+    await detail.getFee({} as never)
+    return mockPrepareLnurl.mock.calls[mockPrepareLnurl.mock.calls.length - 1][1]
+      .feePolicy
+  }
+
+  it("sends all from the Bitcoin wallet with the fee taken out", async () => {
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+
+    expect(sendAll.canSendMax).toBe(true)
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(sendAll.isFeeIncluded).toBe(true)
+    expect(await feePolicyOf(sendAll)).toBe(FEES_INCLUDED)
+  })
+
+  it("sends a send-all with the fee taken out, not only quotes it", async () => {
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 0 /* PaymentStatus.Completed */ },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    await sendAll.sendPaymentMutation({} as never)
+
+    expect(mockPrepareLnurl).toHaveBeenLastCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ feePolicy: FEES_INCLUDED }),
+    )
+  })
+
+  /** blink-wip#2048 SR2: the SDK prepares the send again, so what went out can differ from
+   *  review's quote. Sent and the receipt read it from here. */
+  it("hands back what a send-all sent, for Sent and the receipt", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(99_000), fees: BigInt(1_000) },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
+  })
+
+  it("leaves the receipt to review's quote when the SDK answered without a payment", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({})
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toBeUndefined()
+  })
+
+  /** The pay request's invoice goes out through the provider, whose fee is 0 on the
+   *  payment until it names it, and what was taken for the fee never reaches the payee. */
+  it("hands back the fee taken from the balance, while the SDK's is still 0", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 1, amount: BigInt(99_000), fees: BigInt(0) },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
+  })
+
+  /** blink-wip#2048 SR3: the fee on top of the whole balance would spend more than it holds. */
+  it("sends nothing, and quotes nothing, when the SDK did not take the fee out", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: 0 /* FeesExcluded */ })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment || !sendAll.canGetFee) throw new Error("expected a send")
+
+    const fee = await sendAll.getFee({} as never)
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(fee.amount).toBeUndefined()
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockExecuteLnurl).not.toHaveBeenCalled()
+  })
+
+  /** blink-wip#2048 E4: what arrives may move under 100 sats between review and send. */
+  it.each([
+    ["sends", 99, PaymentSendResult.Success],
+    ["sends nothing", 100, PaymentSendResult.Failure],
+  ])("%s when the fee moved by %i sats since review", async (_, moved, status) => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment || !sendAll.canGetFee) throw new Error("expected a send")
+
+    mockExtractLnurlFee.mockReturnValue(5)
+    await sendAll.getFee({} as never)
+    mockExtractLnurlFee.mockReturnValue(5 + moved)
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(status)
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(
+      status === PaymentSendResult.Success ? 1 : 0,
+    )
+  })
+
+  it("puts the fee back on top once an amount is typed", async () => {
+    const typed = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(typed.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(typed)).toBeUndefined()
+  })
+
+  it("leaves a plain Bitcoin amount's fee on top", async () => {
+    const plain =
+      createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(balance)
+
+    expect(plain.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(plain)).toBeUndefined()
+  })
+
+  it("drops the send-all on a wallet switch", async () => {
+    const switched = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
+
+    expect(switched.isSendingMax).toBe(false)
+    expect(await feePolicyOf(switched)).toBeUndefined()
+  })
+
+  /** A dollar send takes its fee out on main's path, which review doesn't treat as a
+   *  send-all: the policy is FeesIncluded, the send-all flag stays off. */
+  it("keeps the Dollar wallet on FeesIncluded, with no send-all offered", async () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      }),
+    )
+
+    expect(detail.canSendMax).toBe(false)
+    expect(detail.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(detail)).toBe(FEES_INCLUDED)
   })
 })

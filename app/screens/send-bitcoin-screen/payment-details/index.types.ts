@@ -30,6 +30,7 @@ import {
 } from "@app/types/amounts"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import { WalletDescriptor } from "@app/types/wallets"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
@@ -53,20 +54,6 @@ export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
  * key minted after those rebuilds back to the intent. Do not "clean this up" into a value.
  */
 export type IdempotencyKeyRef = { current?: string }
-
-/**
- * The attempts of a send that threw after dispatch without their payment turning up: the
- * payment hash of each invoice they paid, and when the first of them was made.
- */
-export type LostSend = { startedAtMs: number; paymentHashes: string[] }
-
-/**
- * Everything an attempt leaves behind for the next one, on one holder: the idempotency
- * key above, and the lost attempts to look for before anything is sent. Shared by every
- * rebuild the same way. The key alone starts over with a new amount or wallet; the lost
- * attempts survive either, since the payment that may have gone out is as real after it.
- */
-export type SendAttemptRef = IdempotencyKeyRef & { lostSend?: LostSend }
 
 export type BaseCreatePaymentDetailsParams<T extends WalletCurrency> = {
   convertMoneyAmount: ConvertMoneyAmount
@@ -120,10 +107,25 @@ export type SendPaymentMutation = (
   extraInfo?: PaymentSendExtraInfo
 }>
 
+/** What the self-custodial SDK says went out: the amount that reached the recipient and
+ *  the fee, in sats. */
+export type PaymentSettled = { amountSats: number; feeSats: number }
+
 export type PaymentSendExtraInfo = {
   arrivalAtMempoolEstimate?: number
   preimage?: string | null
   successAction?: LNURLPaySuccessAction
+  /** A self-custodial send found that an earlier attempt to the destination paid, for
+   *  another amount: that payment's id, for the sender to look at. It is not this send. */
+  earlierPaymentId?: string
+  /** A self-custodial send whose outcome could not be checked: the sender is pointed at
+   *  their history. */
+  checkHistory?: boolean
+  /** ...and, when their history is what can answer it, lets them send to the destination
+   *  again once they have checked. */
+  sendAnyway?: () => void
+  /** Set for a send whose fee came out of the amount, where review only had a quote. */
+  settled?: PaymentSettled
 }
 
 export type SetAmount<T extends WalletCurrency> = (
@@ -146,14 +148,16 @@ export type SetPayoutSpeed<T extends WalletCurrency> = (
   payoutSpeed: PayoutSpeed,
 ) => PaymentDetail<T>
 
+export type PaymentDetailType =
+  | typeof PaymentType.Intraledger
+  | typeof PaymentType.Onchain
+  | typeof PaymentType.Lightning
+  | typeof PaymentType.Lnurl
+  | typeof SelfCustodialPaymentType.Spark
+
 type BasePaymentDetail<T extends WalletCurrency> = {
   memo?: string
-  paymentType:
-    | typeof PaymentType.Intraledger
-    | typeof PaymentType.Onchain
-    | typeof PaymentType.Lightning
-    | typeof PaymentType.Lnurl
-    | typeof SelfCustodialPaymentType.Spark
+  paymentType: PaymentDetailType
   destination: string
   sendingWalletDescriptor: WalletDescriptor<T>
   convertMoneyAmount: ConvertMoneyAmount
@@ -161,6 +165,9 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   setSendingWalletDescriptor: SetSendingWalletDescriptor<T>
   canSendMax?: boolean
   isSendingMax?: boolean
+  /** The fee comes out of the amount sent, so the recipient gets the amount less the fee:
+   *  a send-all, or a dollar send to a Lightning address. */
+  isFeeIncluded?: boolean
   setMemo?: SetMemo<T>
   canSetMemo: boolean
   setAmount?: SetAmount<T>
@@ -208,6 +215,9 @@ export type PaymentDetailSetSuccessAction<T extends WalletCurrency> = {
 export type PaymentDetailSetPayoutSpeed<T extends WalletCurrency> = {
   setPayoutSpeed?: SetPayoutSpeed<T>
   payoutSpeed?: PayoutSpeed
+  /** Self-custodial on-chain only: the tier the fee was quoted and the send is made on.
+   *  Read-only, for the review screen; changing it means rebuilding the detail. */
+  feeTier?: FeeTierOption
 }
 
 /**

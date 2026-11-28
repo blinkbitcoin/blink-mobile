@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import Svg, { Path } from "react-native-svg"
+import { useTheme } from "@rn-vui/themed"
 
 const AnimatedPath = Animated.createAnimatedComponent(Path)
 
@@ -47,27 +48,34 @@ const dashArray = (length: number) => [length, length + 2 * CAP_CLEARANCE]
 
 type SuccessBadgeProps = {
   size?: number
-  /** The badge sits on whatever ground its caller draws, so the caller picks its colour. */
-  color: string
+  color?: string
   /** Holds the drawing back, to land it after whatever leads into it. */
   delay?: number
+  /** Mounts fully drawn, with no drawing or pop. */
+  isDrawn?: boolean
 }
 
 /**
  * The success seal drawing itself in: the badge outline, then the check, then a small pop
- * once the check lands. Plays once on mount and holds fully drawn. Reanimated's default
- * reduce-motion handling jumps each step to its end.
+ * once the check lands. Plays once on mount and holds fully drawn, unless it mounts drawn.
+ * Reanimated's default reduce-motion handling jumps each step to its end.
  */
 export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
   size = VIEWBOX_SIZE,
   color,
   delay = 0,
+  isDrawn = false,
 }) => {
-  const badge = useSharedValue(0)
-  const check = useSharedValue(0)
+  const {
+    theme: { colors },
+  } = useTheme()
+
+  const badge = useSharedValue(isDrawn ? 1 : 0)
+  const check = useSharedValue(isDrawn ? 1 : 0)
   const scale = useSharedValue(1)
 
   useEffect(() => {
+    if (isDrawn) return
     badge.value = withDelay(
       delay,
       withTiming(1, { duration: BADGE_DRAW_MS, easing: Easing.inOut(Easing.cubic) }),
@@ -83,7 +91,7 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
         withTiming(1, { duration: POP_SETTLE_MS, easing: Easing.inOut(Easing.quad) }),
       ),
     )
-  }, [delay, badge, check, scale])
+  }, [delay, isDrawn, badge, check, scale])
 
   const badgeProps = useAnimatedProps(
     () => ({ strokeDashoffset: (BADGE_LENGTH + CAP_CLEARANCE) * (1 - badge.value) }),
@@ -98,6 +106,8 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
     [scale],
   )
 
+  const stroke = color ?? colors.success
+
   return (
     <Animated.View style={[{ width: size, height: size }, popStyle]}>
       <Svg
@@ -108,7 +118,7 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
       >
         <AnimatedPath
           d={BADGE_PATH}
-          stroke={color}
+          stroke={stroke}
           strokeWidth={STROKE_WIDTH}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -117,7 +127,7 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
         />
         <AnimatedPath
           d={CHECK_PATH}
-          stroke={color}
+          stroke={stroke}
           strokeWidth={STROKE_WIDTH}
           strokeLinecap="round"
           strokeLinejoin="round"

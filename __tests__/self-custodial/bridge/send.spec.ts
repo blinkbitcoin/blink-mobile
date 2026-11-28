@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { FeePolicy } from "@breeztech/breez-sdk-spark-react-native"
+
 import { WalletCurrency } from "@app/graphql/generated"
 
 import {
@@ -7,6 +9,8 @@ import {
   extractLightningFee,
   extractLnurlFee,
   extractOnchainFees,
+  identifyPreparedSend,
+  onchainQuoteExpiresAt,
   prepareLnurl,
   prepareSend,
   resolveSendTokenIdentifier,
@@ -25,6 +29,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkAddress: "SparkAddress",
+    SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
     BitcoinAddress: jest
@@ -72,6 +78,40 @@ describe("extractOnchainFees", () => {
   })
 })
 
+describe("onchainQuoteExpiresAt", () => {
+  const onchain = (feeQuote: object, extra: object = {}) => ({
+    paymentMethod: { tag: "BitcoinAddress", inner: { feeQuote } },
+    ...extra,
+  })
+
+  it("reads when the provider's quote expires, in seconds", () => {
+    const prepared = onchain({ expiresAt: BigInt(1_800_000_060), isEstimate: false })
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBe(1_800_000_060)
+  })
+
+  it("reads nothing for an estimate, which the SDK always replaces", () => {
+    const prepared = onchain({ expiresAt: BigInt(0), isEstimate: true })
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+
+  it("reads nothing for a send a conversion funds, priced after it converts", () => {
+    const prepared = onchain(
+      { expiresAt: BigInt(1_800_000_060), isEstimate: false },
+      { conversionEstimate: {} },
+    )
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+
+  it("reads nothing for a send that is not on-chain", () => {
+    const prepared = { paymentMethod: { tag: "Bolt11Invoice", inner: {} } }
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+})
+
 describe("extractLightningFee", () => {
   it("returns the Spark transfer fee when both routes are present (Spark is cheaper)", () => {
     const prepared = {
@@ -112,12 +152,64 @@ describe("extractLightningFee", () => {
     expect(extractLightningFee(prepared as never)).toBeNull()
   })
 
-  it("returns null for non-Bolt11Invoice payment", () => {
+  for (const tag of ["SparkAddress", "SparkInvoice"]) {
+    it(`returns the fee a ${tag} quotes`, () => {
+      const prepared = { paymentMethod: { tag, inner: { fee: BigInt(50) } } }
+
+      expect(extractLightningFee(prepared as never)).toBe(50)
+    })
+
+    it(`leaves out a ${tag} token transfer's fee, which is not in sats`, () => {
+      const prepared = {
+        paymentMethod: { tag, inner: { fee: BigInt(50), tokenIdentifier: "usdb" } },
+      }
+
+      expect(extractLightningFee(prepared as never)).toBeNull()
+    })
+  }
+
+  it("returns null for an on-chain payment", () => {
     const prepared = {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }
 
     expect(extractLightningFee(prepared as never)).toBeNull()
+  })
+})
+
+describe("identifyPreparedSend", () => {
+  it("finds a Lightning send by its invoice's payment hash", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+    }
+
+    expect(identifyPreparedSend(prepared as never)).toEqual({ paymentHash: "hash-1" })
+  })
+
+  it("finds a Spark invoice send by the invoice itself", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "SparkInvoice",
+        inner: { sparkInvoiceDetails: { invoice: "spark1invoice" } },
+      },
+    }
+
+    expect(identifyPreparedSend(prepared as never)).toEqual({
+      sparkInvoice: "spark1invoice",
+    })
+  })
+
+  it("has nothing to find a send to a bare address by", () => {
+    const prepared = { paymentMethod: { tag: "BitcoinAddress", inner: {} } }
+
+    expect(identifyPreparedSend(prepared as never)).toBeUndefined()
+  })
+
+  it("has nothing to find a send by when the quote names no method", () => {
+    expect(identifyPreparedSend({} as never)).toBeUndefined()
   })
 })
 
@@ -183,7 +275,7 @@ describe("executeSend", () => {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }
 
-    await executeSend(sdk, prepared as never, 0 /* Fast */)
+    await executeSend(sdk, prepared as never, { confirmationSpeed: 0 /* Fast */ })
 
     expect(sendPayment).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -207,6 +299,39 @@ describe("executeSend", () => {
     expect(sendPayment).toHaveBeenCalledWith(
       expect.objectContaining({ options: undefined }),
     )
+  })
+})
+
+describe("executeSend idempotency key", () => {
+  const KEY = "11111111-1111-4111-8111-111111111111"
+  const send = async (prepared: Record<string, unknown>) => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    await executeSend({ sendPayment } as never, prepared as never, {
+      idempotencyKey: KEY,
+    })
+    return sendPayment.mock.calls[0][0].idempotencyKey
+  }
+
+  it("forwards the key on a bitcoin send", async () => {
+    expect(await send({ paymentMethod: { tag: "SparkAddress", inner: {} } })).toBe(KEY)
+  })
+
+  it("drops it on a token transfer, which the SDK rejects a key on", async () => {
+    expect(
+      await send({
+        paymentMethod: { tag: "SparkAddress", inner: {} },
+        tokenIdentifier: "usdb-token-id",
+      }),
+    ).toBeUndefined()
+  })
+
+  it("drops it on a send that converts on the way, which is a token leg too", async () => {
+    expect(
+      await send({
+        paymentMethod: { tag: "BitcoinAddress", inner: {} },
+        conversionEstimate: { amountIn: 1n },
+      }),
+    ).toBeUndefined()
   })
 })
 
@@ -254,7 +379,21 @@ describe("prepareSend", () => {
       amount: undefined,
       tokenIdentifier: undefined,
       conversionOptions: undefined,
+      feePolicy: undefined,
     })
+  })
+
+  it("forwards the fee policy, so a send-all takes the fee out of the balance", async () => {
+    const prepareSendPayment = jest.fn().mockResolvedValue({})
+    const sdk = { prepareSendPayment } as never
+
+    await prepareSend(sdk, {
+      paymentRequest: "bc1qtest",
+      amount: BigInt(100_000),
+      feePolicy: FeePolicy.FeesIncluded,
+    })
+
+    expect(prepareSendPayment.mock.calls[0][0].feePolicy).toBe(FeePolicy.FeesIncluded)
   })
 
   it("forwards conversionOptions when provided (USDB→BTC Lightning send)", async () => {
@@ -417,6 +556,24 @@ describe("executeLnurl", () => {
         prepareResponse,
         idempotencyKey: "idemp-key-1",
       }),
+    )
+  })
+
+  /** The SDK rejects a key on a pay with a conversion as invalid input, and it adds one
+   *  to a bitcoin pay on its own when stable balance is active and sats run short. */
+  it("drops the key when the quote carries a conversion", async () => {
+    const lnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { lnurlPay } as never
+    const prepareResponse = {
+      amountSats: BigInt(100),
+      feeSats: BigInt(1),
+      conversionEstimate: { amountIn: BigInt(1) },
+    } as never
+
+    await executeLnurl(sdk, prepareResponse, "idemp-key-1")
+
+    expect(lnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: undefined }),
     )
   })
 

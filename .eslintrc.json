@@ -4,7 +4,11 @@
     "react-native/react-native": true,
     "jest/globals": true
   },
-  "ignorePatterns": ["./patches", "vendor/meawallet/", "**/GT3Captcha.bundle/resource.js"],
+  "ignorePatterns": [
+    "./patches",
+    "vendor/meawallet/",
+    "**/GT3Captcha.bundle/resource.js"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -12,7 +16,15 @@
     },
     "ecmaVersion": 12
   },
-  "plugins": ["react", "react-hooks", "react-native", "@typescript-eslint", "import", "prettier", "jest"],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "react-native",
+    "@typescript-eslint",
+    "import",
+    "prettier",
+    "jest"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -41,6 +53,35 @@
     "@typescript-eslint/no-explicit-any": "error",
 
     "import/no-extraneous-dependencies": "error",
+    // The hard boundary between the two account namespaces (see "Account namespaces" in
+    // docs/architecture.md). Checked on resolved paths, so an alias, a relative path, a
+    // type import, a re-export, a dynamic import and a require are all caught. Its own
+    // rule, so it never replaces the options of a rule other policies share.
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./app/custodial",
+            "from": [
+              "./app/self-custodial",
+              "./app/screens/self-custodial",
+              "./app/screens/settings-screen/self-custodial"
+            ],
+            "message": "Custodial code must not depend on self-custodial code."
+          },
+          {
+            "target": [
+              "./app/self-custodial",
+              "./app/screens/self-custodial",
+              "./app/screens/settings-screen/self-custodial"
+            ],
+            "from": "./app/custodial",
+            "message": "Self-custodial code must not depend on custodial code."
+          }
+        ]
+      }
+    ],
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
 
@@ -135,6 +176,10 @@
           {
             "name": "@react-native-firebase/crashlytics",
             "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
+          },
+          {
+            "name": "react-native-haptic-feedback",
+            "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
           }
         ]
       }
@@ -209,28 +254,183 @@
     //     sync with the static* keys in colors.ts (enforced by colors.spec.ts).
     "no-restricted-properties": [
       "error",
-      { "property": "staticWhite", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBlack", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticLightGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticLighterGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticDarkGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticCardPill", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrandOrange", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticSuccess", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrandYellow", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrandSunset", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticWarningBackground", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBlue", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrightBlue", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticPaleBlue", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." }
+      {
+        "property": "staticWhite",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBlack",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticLightGrey",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticLighterGrey",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticDarkGrey",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticCardPill",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticCardBackground",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrandOrange",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticSuccess",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrandYellow",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrandSunset",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticWarningBackground",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBlue",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrightBlue",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticPaleBlue",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      }
     ]
-
   },
   "overrides": [
     {
       "files": ["app/utils/storage/legacy-key-store.ts"],
       "rules": {
-        "no-restricted-imports": "off"
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
+              },
+              {
+                "name": "react-native-haptic-feedback",
+                "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/types/**"],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@app/graphql/generated",
+                  "@breeztech/*",
+                  "@app/hooks",
+                  "@app/hooks/*",
+                  "@app/screens/*",
+                  "@app/custodial/*",
+                  "@app/self-custodial/*"
+                ],
+                "message": "app/types holds the ports and the app's own types. It must not depend on GraphQL, the SDK, hooks, screens or an account namespace."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "app/utils/**",
+        "app/hooks/**",
+        "app/components/**",
+        "app/config/**",
+        "app/store/**",
+        "app/graphql/**"
+      ],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": ["@app/screens/*"],
+                "message": "Shared code must not depend on a screen. Move what both need out of the screen."
+              },
+              {
+                "group": ["@breeztech/*"],
+                "message": "The Breez SDK is only imported inside app/self-custodial."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/custodial/**", "app/self-custodial/**"],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": ["@app/screens/*"],
+                "message": "An account namespace must not depend on a screen. Move what both need to app/types or into the namespace."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/screens/**"],
+      "excludedFiles": [
+        "app/screens/self-custodial/**",
+        "app/screens/settings-screen/self-custodial/**"
+      ],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@app/custodial/*",
+                  "!@app/custodial/components",
+                  "@app/self-custodial/*",
+                  "!@app/self-custodial/components"
+                ],
+                "message": "A shared screen reads account data through the hooks in app/hooks. Only a namespace's components may be rendered here."
+              },
+              {
+                "group": ["@breeztech/*"],
+                "message": "The Breez SDK is only imported inside app/self-custodial."
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -243,6 +443,30 @@
               {
                 "name": "react-native-secure-key-store",
                 "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "react-native-haptic-feedback",
+                "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/utils/haptics.ts", "__tests__/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
               }
             ]
           }
@@ -275,7 +499,9 @@
         "app/components/map-component/pin-shape.tsx",
         "app/components/map-component/cluster-marker.tsx",
         // wallet-brand button: Apple/Google set its colours
-        "app/components/card-screen/add-to-wallet-button.tsx"
+        "app/components/card-screen/add-to-wallet-button.tsx",
+        // confetti pieces: a fixed celebration palette that reads the same in both modes
+        "app/components/confetti/**"
       ],
       "rules": {
         "no-restricted-properties": "off"
@@ -285,6 +511,12 @@
   "settings": {
     "react": {
       "version": "detect"
+    },
+    // Lets the import rules follow the @app/* alias from tsconfig.json to the file it names.
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
     }
   }
 }

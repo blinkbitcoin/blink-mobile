@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { fonts } from "@app/rne-theme/fonts"
 
 const BTC_TEXT = "BTC"
 const USD_TEXT = "USD"
@@ -107,7 +108,7 @@ const useStyles = makeStyles(
       },
       text: {
         color,
-        fontWeight: "bold",
+        fontFamily: fonts.bold,
       },
     }
   },

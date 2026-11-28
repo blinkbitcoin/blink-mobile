@@ -2,6 +2,7 @@ import React from "react"
 import { Pressable, PressableProps, StyleProp, View, ViewStyle } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
 import { fonts } from "@app/rne-theme/fonts"
 
 export type GaloyTertiaryButtonProps = {

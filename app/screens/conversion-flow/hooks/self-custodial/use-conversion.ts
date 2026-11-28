@@ -4,15 +4,41 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { type TranslationFunctions } from "@app/i18n/i18n-types"
 import { measure, ScEvent } from "@app/self-custodial/measurement"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
-import { PaymentResultStatus, type ConvertParams } from "@app/types/payment"
+import {
+  ConvertErrorCode,
+  PaymentResultStatus,
+  type ConvertParams,
+  type PaymentError,
+} from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
-import { triggerHapticFeedback } from "@app/utils/helper"
+import { haptics } from "@app/utils/haptics"
 
 import { buildConvertParams } from "../../build-convert-params"
 
 import { useConversionQuote } from "../use-conversion-quote"
+
+/** What a failed conversion tells the user: the app's own words for the outcomes the
+ *  bridge names, the SDK's message for anything else. */
+const conversionErrorMessage = (
+  LL: TranslationFunctions,
+  error: PaymentError | undefined,
+): string => {
+  const ownWords: Record<string, () => string> = {
+    [ConvertErrorCode.OutcomeUnknown]: LL.SelfCustodialError.outcomeUnknown,
+    [ConvertErrorCode.EarlierConversionPending]:
+      LL.SelfCustodialError.earlierConversionPending,
+    [ConvertErrorCode.EarlierConversionFound]:
+      LL.SelfCustodialError.earlierConversionFound,
+    [ConvertErrorCode.HistoryUnavailable]: LL.errors.generic,
+    [ConvertErrorCode.ConversionFailed]: LL.errors.generic,
+    [ConvertErrorCode.AlreadyConverted]: LL.SelfCustodialError.convertedMeanwhile,
+  }
+  const translate = error?.code === undefined ? undefined : ownWords[error.code]
+  return translate?.() ?? error?.message ?? LL.errors.generic()
+}
 
 type Params = {
   fromCurrency: WalletCurrency
@@ -43,7 +69,6 @@ export const useSelfCustodialConversion = ({
   const guard = useInFlightGuard()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | undefined>()
-
   const liveQuoteParams = useMemo(() => {
     if (!enabled || !convertMoneyAmount) return null
     const fromAmount = convertMoneyAmount(moneyAmount, fromCurrency)
@@ -95,7 +120,7 @@ export const useSelfCustodialConversion = ({
       try {
         if (!quote) {
           setErrorMessage(LL.errors.generic())
-          triggerHapticFeedback("notificationError")
+          haptics.error()
           return
         }
 
@@ -105,20 +130,20 @@ export const useSelfCustodialConversion = ({
         const isSuccess = result.status === PaymentResultStatus.Success
 
         if (isSuccess) {
-          triggerHapticFeedback("notificationSuccess")
+          haptics.success()
           await onSuccess()
           return
         }
 
         /** A failed execute invalidates the pinned quote, so the retry re-quotes. */
         requote()
-        setErrorMessage(result.errors?.[0]?.message ?? LL.errors.generic())
-        triggerHapticFeedback("notificationError")
+        setErrorMessage(conversionErrorMessage(LL, result.errors?.[0]))
+        haptics.error()
       } catch (err) {
         reportError("Self-custodial conversion execute", err)
         requote()
         setErrorMessage(err instanceof Error ? err.message : LL.errors.generic())
-        triggerHapticFeedback("notificationError")
+        haptics.error()
       } finally {
         setLoading(false)
       }

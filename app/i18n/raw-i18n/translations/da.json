@@ -2354,15 +2354,41 @@
     "title": "Bekræft betaling",
     "totalLabel": "Total:",
     "totalExceed": "Totalen overstiger din saldo på {balance: string}",
+    "feeExceedsAmount": "Netværksgebyret er højere end det beløb, du sender",
     "maxFeeSelected": "Dette er det maksimale gebyr, du vil blive opkrævet for denne transaktion. Det kan ende med at være mindre, når betalingen er foretaget.",
     "invoiceAlreadyPaid": "Denne faktura er allerede blevet betalt",
     "somethingWentWrong": "Noget gik galt",
+    "priceUpdated": "Prisen ændrede sig, så beløbene er opdateret. Tjek dem, før du sender.",
     "paymentAlreadyAttempted": "Betalingen er allerede forsøgt gennemført.\n\nHvis du ønsker at sende denne betaling igen, venligst start forfra.",
-    "slideToConfirm": "Slide to Confirm",
+    "paymentMayStillLand": "Vent et øjeblik, betalingen går sandsynligvis snart igennem. Dine penge kommer sikkert frem eller bliver hos dig.",
     "slideConfirming": "Confirming...",
+    "slideToSend": "Skub for at sende",
+    "calculatingFee": "Beregner gebyr…",
+    "sendProgress": {
+      "reviewing": "Gennemgår",
+      "signing": "Underskriver",
+      "findingRoute": "Finder rute",
+      "broadcasting": "Udsender",
+      "checkingDelivery": "Tjekker levering",
+      "almostThere": "Næsten der",
+      "anyTimeNow": "Når som helst nu",
+      "hangTight": "Hæng i",
+      "stillOnItsWay": "Stadig på vej"
+    },
     "copiedDestination": "Copied destination to clipboard",
-    "lightningRecommended": "High fee! We recommend Lightning.",
-    "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}."
+    "lightningRecommended": "Højt gebyr. Vi anbefaler Lightning.",
+    "sending": "Sender",
+    "sent": "Sendt",
+    "receipt": "Kvittering",
+    "sentAnnouncement": "Sendt, {amount: string}",
+    "fromBalance": "Fra saldo",
+    "details": "Detaljer",
+    "changeAmount": "Skift beløb",
+    "tryAgain": "Prøv igen",
+    "home": "Hjem",
+    "dustSweepSheetTitle": "Før du sender",
+    "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}.",
+    "sendAnyway": "Jeg har tjekket min historik, send alligevel"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} brugernavne er nu {bankName: string} adresser.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",
+    "addAmount": "Tilføj beløb",
+    "slideToSelectAmount": "Skub for at vælge beløb",
+    "lowFunds": "Ikke nok midler",
     "amountExceed": "Beløbet overstiger din saldo på {balance: string}",
     "amountExceedsLimit": "Beløbet overstiger din resterende daglige grænse på {limit: string}",
+    "limitsUnavailable": "Vi kunne ikke tjekke din daglige grænse. Prøv igen om et øjeblik.",
+    "problemSheetTitle": "Et lille problem",
+    "changeDestination": "Skift modtager",
+    "recipientUnreachableTitle": "Kunne ikke nå modtageren",
+    "recipientWrongAmountTitle": "Modtageren angav et forkert beløb",
     "upgradeAccountToIncreaseLimit": "Opgrader din konto for at øge din grænse",
     "amountIsRequired": "Beløb er påkrævet",
     "cost": "Omkostning",
@@ -2425,10 +2459,11 @@
     "title": "Send Bitcoin",
     "failedToFetchLnurlInvoice": "Fejl ved hentning af LNURL faktura",
     "lnurlInvoiceIncorrectAmount": "LNURL-serveren svarede med en faktura med en forkert beløbsangivelse.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Advarsel om højt gebyr!",
-      "content": "Dit gebyr er mere end 50% større end det beløb, der sendes. Er du sikker på, at du ønsker at fortsætte?\n\nFor at reducere gebyrer, bed modtageren om at acceptere betaling via Lightning.",
-      "confirmButton": "Jeg er 100% sikker"
+      "body": "Dit gebyr er 50 % eller mere af det beløb, du sender. Er du sikker på, at du vil fortsætte?",
+      "cancelPayment": "Annuller betaling",
+      "acceptFee": "Accepter gebyr"
     },
     "copiedDestination": "Copied destination to clipboard",
     "pendingPayment": "The payment has been sent, but hasn't confirmed yet.\n\nIt's possible the payment will not confirm, in which case the funds will be returned to your account.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",
     "sdkAmountTooLow": "Beløbet er for lavt til en on-chain transaktion.",
     "sdkNetworkError": "Netværksfejl. Tjek din forbindelse og prøv igen.",
-    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
+    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb.",
+    "onchainSelfPayment": "Dette er din egen wallets adresse. Du kan ikke sende en on-chain betaling til dig selv."
   },
   "SettingsScreen": {
     "createAddress": "Opret Lightning-adresse",
@@ -2988,6 +3024,7 @@
     "note": "Note",
     "notification": "Notifikation",
     "ok": "OK",
+    "okay": "Okay",
     "or": "eller",
     "openWallet": "Åben Tegnebog",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Vælg beløb"
+  },
+  "Accessibility": {
+    "deleteKey": "Slet",
+    "swapCurrencyHint": "Skifter den valuta, du skriver beløbet i",
+    "switchToWallet": "Skift til {wallet: string}",
+    "copy": "Kopier",
+    "balanceHidden": "Saldo skjult",
+    "revealBalanceHint": "Viser din saldo på denne skærm"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Jeg skal opdatere min app til den nyeste version. Jeg bruger {os: string} app med version {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Betaling",
         "acceptButton": "Acceptér",
         "payButton": "Fortsæt og Betal",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "indtil videre",
         "perYear": "per år",
+        "freeBreakdown": {
+          "card": "Blink-kort",
+          "memberBenefits": "Andre medlemsfordele"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Særtilbud",
@@ -3695,35 +3746,53 @@
           "text": "Jeg har gennemgået og accepterer",
           "linkText": "Blink Card-gebyroversigt"
         },
-        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder"
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder",
+        "freeNotice": "Jeg forstår, at Blink Orange er gratis indtil videre, og at der senere kan blive indført et medlemsgebyr med varsel"
+      },
+      "CardVerifyIdentity": {
+        "title": "Bekræft din identitet",
+        "description": "For at aktivere dit Blink-kort skal kortudstederen bekræfte, hvem du er (KYC). Du skal bruge:",
+        "requirements": {
+          "governmentId": "Et offentligt udstedt ID",
+          "selfie": "En selfie / livstjek",
+          "proofOfAddress": "Bevis for adresse",
+          "questions": "Et par spørgsmål om dig"
+        },
+        "buttonText": "Fortsæt"
       },
       "CardIntroducing": {
         "title": "Introduktion",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa-kortet",
+          "bitcoinCard": "Blink-kortet",
           "for": "til",
-          "maximalist": "Bitcoin Maksimalister"
+          "bitcoiners": "Bitcoinere"
         },
         "buttonText": "Fortsæt"
       },
       "CardDetails": {
-        "title": "Yderligere fordele",
+        "title": "Hvad er inkluderet",
         "features": {
-          "accountManager": "Dedikeret kontoadministrator",
-          "support": "Prioriteret support",
-          "onchainDeposits": "50% tilbage på transaktionsgebyrer",
-          "circularEconomies": "$100 til cirkulære økonomier"
+          "card": {
+            "title": "Blink-kort",
+            "subtitle": "dit Visa-kort, klar i dag"
+          },
+          "accountManager": {
+            "title": "Personlig kontoansvarlig",
+            "subtitle": "og prioriteret support"
+          },
+          "onOffRamping": "Penge ind og ud"
         },
-        "andMore": "... og mere kommer i 2026",
+        "availableIn": "om {months} måneder",
+        "footnote": "Nogle funktioner bliver tilgængelige inden for {months} måneder. Kortet er klar i dag.",
         "buttonText": "Fortsæt"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Velkommen ombord",
-          "subtitle": "Til Blink Privat",
+          "subtitle": "Til Blink Orange",
           "paragraphs": {
-            "body1": "Nogen tænkte på dig og foreslog, at vi skulle invitere dig til Blink Privat. Sandsynligvis fordi du er en fantastisk Bitcoiner.",
-            "body2": "Vores mål for 2026 er at fylde programmet med så mange goder, at det vil være oplagt at forny næste år."
+            "body1": "Nogen tænkte på dig og foreslog, at vi skulle invitere dig til Blink Orange. Sandsynligvis fordi du er en fantastisk Bitcoiner.",
+            "body2": "Blink Orange er det første niveau i Blinks medlemskab for Bitcoinere, kun efter invitation. Blink-kortet og din personlige kontoansvarlige er to af de første tjenester, vi tilbyder — resten bygger vi frem mod 2027."
           }
         },
         "buttonText": "Lad os gå"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Beskæftigelse",
-            "placeholder": "Vælg din beskæftigelse"
+            "placeholder": "Vælg"
           },
           "annualSalaryRange": {
             "label": "Årlig løn",
-            "placeholder": "Vælg dit løninterval"
+            "placeholder": "Vælg løn"
           },
           "accountPurpose": {
             "label": "Kontoformål",
@@ -3815,7 +3884,6 @@
             "placeholder": "Vælg dit forbrugsinterval"
           }
         },
-        "buttonText": "Indsend ansøgning",
         "select": "vælg"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", og",
           "cardTermsLinkText": "Blink-kortvilkår"
         },
-        "certifyAccuracy": "Jeg bekræfter, at de oplysninger, jeg har givet, er korrekte, og at jeg vil overholde alle regler og krav vedrørende mit Blink Visa-kort",
-        "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink Visa-kortet ikke udgør uautoriseret henvendelse"
+        "certifyAccuracy": "Jeg bekræfter, at de oplysninger, jeg har givet, er korrekte, og at jeg vil overholde alle regler og krav vedrørende mit Blink-kort",
+        "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink-kortet ikke udgør uautoriseret henvendelse"
       },
       "CardPreapproved": {
-        "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
+        "title": "Dit Blink-kort er klar!",
+        "subtitle": "Du kan nu aktivere dit kort og begynde at bruge det",
         "buttonText": "Luk"
+      },
+      "CardDeclined": {
+        "title": "Vi kunne ikke godkende din kortansøgning",
+        "subtitle": "Din kontoansvarlige kontakter dig."
       },
       "CardProcessing": {
         "title": "Behandler din ansøgning",
-        "subtitle": "Vi giver dig besked, så snart vi er klar",
-        "buttonText": "Luk"
+        "subtitle": "Det kan tage op til et minut"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Migrér nu til en ikke-depotkonto",
       "body": "Du kan ikke længere modtage midler på din depotkonto. Blink har indstillet depottjenesten i din region, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",
+      "bodyLevelZero": "Du kan ikke længere modtage midler på denne prøvekonto. Blink lukker prøvekonti, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",
       "migrateCta": "Migrér nu"
     },
     "reminderBulletin": {
       "title": "Vigtigt",
       "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
+      "bodySingleDate": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date} — alt flyttes med få tryk.",
+      "bodyLevelZero": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}.",
       "bodyReceiveDisabled": "Modtagelse er stoppet. Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}.",
       "migrateCta": "Migrér"
     },
     "offboardBulletin": {
       "title": "Vigtigt",
-      "body": "Din konto er registreret i en region, hvor vi ikke kan tilbyde konti. Hæv dine midler inden den 31. august. Modtagelse stopper den 10. august."
+      "bodyTwoDates": "Blink kan ikke tilbyde depotkonti i din region. Hæv dine midler inden {date} — uden gebyrer fra Blink. Modtagelse stopper den {receiveStopsDate}. Hvis du mener, at din konto er berørt ved en fejl, kan du bekræfte din nuværende bopæl i appen.",
+      "bodySingleDate": "Blink kan ikke tilbyde depotkonti i din region. Hæv dine midler inden {date} — uden gebyrer fra Blink. Hvis du mener, at din konto er berørt ved en fejl, kan du bekræfte din nuværende bopæl i appen.",
+      "bodyReceiveOff": "Blink kan ikke tilbyde depotkonti i din region. Hæv dine midler inden {date} — uden gebyrer fra Blink. Modtagelse er slået fra. Hvis du mener, at din konto er berørt ved en fejl, kan du bekræfte din nuværende bopæl i appen."
     },
     "dollarBalanceModal": {
       "title": "Vi kan ikke migrere din dollarsaldo",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Noget gik galt under genoptagelsen af din migrering. Start den venligst igen.",
     "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
     "migrationRequiredForcedBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager.\n\nIngen grund til bekymring, non-custodial vil være bedre for dig i det lange løb.",
+    "migrationRequiredForcedBodyLevelZero": "Blink lukker prøvekonti. Flyt din saldo til en ikke-depotkonto. Det tager kun få tryk.",
     "migrationGateTitle": "Konto ikke tilgængelig",
     "migrationGateBody": "Af regulatoriske årsager kan vi ikke tilbyde custodial konti i din region. Overfør dine midler til en non-custodial konto hos Blink ved at følge de næste trin, eller kontakt os på <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Prøvekonti er nu lukket. Din saldo er sikker. Flyt den til en ikke-depotkonto ved at følge de næste trin, gratis og uden tidsfrist, eller kontakt os på <link>{email}</link>",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollar-saldo",
     "moveToNonCustodial": "Flyt til non-custodial",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Kunne ikke læse fra udklipsholderen. Indtast venligst din sikkerhedsfrase manuelt.",
     "enterWord": "Ord",
     "invalidMnemonic": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt.",
+    "invalidPhrase": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt. Kontakt <link>Support</link>, hvis problemet fortsætter.",
+    "invalidWord": "Ugyldigt ord, kontroller venligst stavningen",
     "restoring": "Gendanner din tegnebog...",
     "restoreSuccess": "Tegnebog genoprettet",
     "restoreFailed": "Kunne ikke gendanne tegnebogen. Prøv venligst igen.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Beløbet er under minimumskravet for denne betaling. Prøv et større beløb.",
     "networkError": "Problem med netværksforbindelsen. Tjek din forbindelse og prøv igen.",
     "invalidInput": "Betalingsoplysningerne ser ugyldige ud. Tjek dem og prøv igen.",
-    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb."
+    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb.",
+    "outcomeUnknown": "Denne betaling er muligvis allerede gennemført. Tjek din transaktionshistorik, før du sender den igen.",
+    "earlierConversionPending": "Din tidligere konvertering er stadig ved at blive bekræftet. Prøv igen om et par minutter.",
+    "earlierPaymentFound": "Din tidligere betaling til denne modtager er allerede gennemført, med et andet beløb. Tjek den, før du sender igen.",
+    "earlierConversionFound": "Din tidligere konvertering er allerede gennemført, med et andet beløb. Tjek den i din transaktionshistorik, før du konverterer igen.",
+    "convertedMeanwhile": "En konvertering af omtrent dette beløb er netop gennemført. Tjek din saldo, før du bekræfter denne igen."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Denne konto blev oprettet på {network}. Skift til {network} for at bruge den."

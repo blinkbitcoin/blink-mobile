@@ -32,6 +32,18 @@ const PaymentDetails = {
   Withdraw: createInstanceOf("Withdraw"),
 }
 
+const ConversionInfo = {
+  Amm: createInstanceOf("Amm"),
+  Orchestra: createInstanceOf("Orchestra"),
+  Boltz: createInstanceOf("Boltz"),
+}
+
+const ConversionPurpose = {
+  OngoingPayment: createInstanceOf("OngoingPayment"),
+  SelfTransfer: createInstanceOf("SelfTransfer"),
+  AutoConversion: createInstanceOf("AutoConversion"),
+}
+
 const SdkError_Tags = {
   SparkError: "SparkError",
   InsufficientFunds: "InsufficientFunds",
@@ -82,6 +94,7 @@ module.exports = {
   InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
@@ -117,6 +130,7 @@ module.exports = {
     Input: jest.fn().mockImplementation((args) => ({ tag: "Input", inner: args })),
   },
   GetSparkStatusRequest: { create: (p) => p },
+  ListPaymentsRequest: { create: (p) => p },
   PrepareSendPaymentRequest: { create: (p) => p },
   RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
@@ -154,6 +168,9 @@ module.exports = {
   PaymentType: { Send: 0, Receive: 1 },
   PaymentDetails_Tags,
   PaymentDetails,
+  ConversionInfo,
+  ConversionPurpose,
+  ConversionStatus: { Pending: 0, Completed: 1, Failed: 2, RefundNeeded: 3, Refunded: 4 },
   SdkError,
   SdkError_Tags,
   ServiceStatus: {

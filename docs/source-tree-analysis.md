@@ -82,6 +82,7 @@ blink-mobile/
 │   │   └── persistent-state/     # Persistent local state
 │   ├── types/                    # TypeScript type definitions
 │   └── utils/                    # Utility functions
+│       ├── haptics.ts            # The only way to fire a haptic (see haptics.md)
 │       ├── locale-detector.ts    # Language detection
 │       ├── storage.ts            # AsyncStorage wrapper
 │       ├── testProps.ts          # E2E test helpers

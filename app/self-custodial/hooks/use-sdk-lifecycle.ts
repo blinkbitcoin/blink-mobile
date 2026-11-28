@@ -25,6 +25,8 @@ import {
   SdkStorageRetiredError,
 } from "../bridge"
 import { storageDirFor } from "../config"
+import { scopeLostAttemptsTo } from "../payment-details/lost-attempts"
+import { lostAttemptsWalletId } from "../storage/lost-attempts"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 import { measureObservedPayment } from "../measurement"
 import {
@@ -272,6 +274,8 @@ export const useSdkLifecycle = (
         return
       }
 
+      /** Before any send can see the wallet: lost attempts are its own, not another's. */
+      scopeLostAttemptsTo(lostAttemptsWalletId(accountId, network))
       sdkRef.current = connectedSdk
       setSdk(connectedSdk)
       setConnectedAccountId(accountId)

@@ -29,6 +29,7 @@ import {
   CloudIcon,
   CoinsIcon,
   CopyIcon,
+  CreditCardIcon,
   CurrencyDollarIcon,
   DotsThreeVerticalIcon,
   DownloadSimpleIcon,
@@ -83,12 +84,14 @@ import {
   XCircleIcon,
 } from "phosphor-react-native"
 
+import Alert from "@app/assets/icons-redesign/alert.svg"
 import ApplePay from "@app/assets/icons/apple-pay.svg"
 import Bitcoin from "@app/assets/icons-redesign/bitcoin.svg"
 import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import BtcBook from "@app/assets/icons-redesign/btc-book.svg"
 import Btcpay from "@app/assets/icons-redesign/btcpay.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
+import Declined from "@app/assets/icons-redesign/declined.svg"
 import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
@@ -154,6 +157,7 @@ const phosphorIconMap = {
   "book-open": BookOpenIcon,
   "calculator": CalculatorIcon,
   "calendar": CalendarIcon,
+  "card": CreditCardIcon,
   "caret-down": CaretDownIcon,
   "caret-left": CaretLeftIcon,
   "asterisk": AsteriskIcon,
@@ -229,6 +233,7 @@ const customSvgMap = {
   "blink-icon": BlinkIcon,
   "btc-book": BtcBook,
   "close-cross-with-background": CloseCrossWithBackground,
+  "declined": Declined,
   "google-pay": GooglePay,
   "lightning-address": LightningAddress,
   "payment-error": PaymentError,
@@ -244,6 +249,7 @@ const customSvgMap = {
   "upgrade": Upgrade,
   "visa-platinum": VisaPlatinum,
   "warning-with-background": WarningWithBackground,
+  "alert": Alert,
   "welcome": Welcome,
   "qr-code": QrCode,
   "btc-hand": BtcHand,

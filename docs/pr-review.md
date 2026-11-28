@@ -80,7 +80,7 @@ missing pieces as findings:
 | Check | What it runs | Hard gate? |
 |-------|--------------|-----------|
 | **Check Code** | `yarn check-code` = `tsc:check` + `eslint:check` + `check:translations` + `check:codegen` + `graphql-check` | Yes |
-| **Tests** | Jest (`yarn test`) | Yes — the gate reviewers cite |
+| **Tests** | Jest (`yarn test:ci`: two workers; `yarn test` runs in band locally) | Yes — the gate reviewers cite |
 | **Audit** | dependency advisories (`make audit`) | Yes |
 | **Conventional commits** | PR title/commit format | Yes |
 | **CodeQL / spelling / qlty** | static analysis, typos | Yes |
@@ -175,6 +175,8 @@ Before accepting new helper code, check the repo already has the utility — rev
 - The shared password `validatePassword` utility (with at most a custom regex) instead of
   ad-hoc JS validation — "custom JS password logic is almost always the wrong path"
   (#3835, the bluntest rejection in the sample).
+- `haptics.<intent>()` from `app/utils/haptics.ts` for any vibration. Importing
+  `react-native-haptic-feedback` directly is a lint error; see [Haptics](./haptics.md).
 - `useInFlightGuard` for concurrent-call protection, "same pattern as use-create-wallet /
   use-restore-wallet" (#3868).
 - **Extend existing GraphQL queries rather than adding new ones**: adding `cards { id }`
@@ -360,6 +362,13 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
       the SDK's `lnurl.rs` between the two tags, and run username register, availability
       and restore against staging before merging (#4257).
+- [ ] SDK bumps: error messages the app reads. A payment missing from the wallet is told
+      apart from a wallet that could not be read only by the SDK's message
+      (`isPaymentNotFound` in `bridge/wallet.ts`: "Query returned no rows" from
+      `persist/sqlite.rs`, "Not found" from the other backends), and its specs mock that
+      text. Diff those messages between the two tags: a reworded one makes every lookup by
+      key read as unreadable, and sends to a destination with a lost keyed attempt are
+      refused until it lapses (#4427).
 - [ ] The two routes the app signs for itself (`/recover`, `/mode`) are not the SDK's. Their
       messages live in `lnurl-server-mode.ts` and are a wire contract with
       `blink-lnurl-server`'s `signed_message.rs`, pinned by the same golden vectors on both
@@ -404,13 +413,16 @@ Deep reviews label structural findings by principle, and authors answer per-prin
 - [ ] External links go through `openExternalUrl` (#3899).
 - [ ] Route types updated in `app/navigation/stack-param-lists.ts`; watch for Android
       Fabric jank with non-native-stack navigators (#3840).
+- [ ] A new haptic uses an existing intent where one fits, fires in the press handler (not
+      an effect), and stays silent when the press changes nothing ([Haptics](./haptics.md)).
 - [ ] All states of an enum-driven UI rendered deliberately (loading / error / each status
       value) (#3899, #3824).
 
 ### Native / dependencies
 
 - [ ] patch-package changes: exact version pin, `--error-on-fail`, upstream issue filed
-      and linked in the patch (#3825).
+      and linked in the patch (#3825). `__tests__/patches/patch-policy.spec.ts` fails a
+      patch that misses the pin or the link; never add a new patch to its exceptions.
 - [ ] Audit fixes via `resolutions` (#3833); run `yarn deps:check` for RN ecosystem
       alignment.
 - [ ] New env vars: consider R8 embedding/extractability before adding secrets (#3877).

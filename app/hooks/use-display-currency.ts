@@ -149,7 +149,7 @@ const displayCurrencyHasSignificantMinorUnits = ({
 
 export const useDisplayCurrency = () => {
   const { LL } = useI18nContext()
-  const { currencyList } = useCurrencyList()
+  const { currencyList, hasPendingSource: currencyListPending } = useCurrencyList()
   const { convertMoneyAmount, displayCurrency, toDisplayMoneyAmount } =
     usePriceConversion()
 
@@ -405,6 +405,16 @@ export const useDisplayCurrency = () => {
     [displayCurrencyDictionary],
   )
 
+  /**
+   * Whether the currency list knows this code. `formatCurrency` and its siblings
+   * fall back to the bare code as the symbol for one it doesn't ("USD0.06"), which
+   * is what they render for every code until the list has loaded.
+   */
+  const hasCurrencyInfo = useCallback(
+    (currency: string) => Boolean(displayCurrencyDictionary[currency]),
+    [displayCurrencyDictionary],
+  )
+
   const getFractionDigits = useCallback(
     ({ currency }: { currency: string }) => {
       const currencyInfo = displayCurrencyDictionary[currency] || {
@@ -436,5 +446,7 @@ export const useDisplayCurrency = () => {
     formatCurrency,
     getCurrencySymbol,
     getFractionDigits,
+    hasCurrencyInfo,
+    currencyListPending,
   }
 }

@@ -6,6 +6,8 @@ import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/rest
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import theme from "@app/rne-theme/theme"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
@@ -89,6 +91,9 @@ const lastSetOptions = () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
+/** RichText draws the <link> tag as a nested Text, so the screen reads without it. */
+const invalidPhraseText = LL.RestoreScreen.invalidPhrase().replace(/<\/?link>/g, "")
+
 /** Step 2 is only usable when the first six words survived the hand-off from step 1;
  *  the last six are what the user is about to type. */
 const validStep2Words = [
@@ -105,8 +110,9 @@ const defaultHookReturn = {
   handlePasteFromClipboard: jest.fn(),
   suggestions: [],
   selectSuggestion: jest.fn(),
-  stepFilled: false,
-  allFilled: false,
+  isWordInvalid: (_index: number) => false,
+  stepValid: false,
+  allValid: false,
   isValid: false,
   validationError: null as string | null,
   status: "idle",
@@ -250,36 +256,195 @@ describe("RestorePhraseScreen", () => {
     })
   })
 
-  it("renders the inline invalidMnemonic message when step 2 is fully filled but invalid", async () => {
+  it("renders the inline invalid-phrase message when step 2 is fully filled but invalid", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
-      allFilled: true,
+      allValid: true,
       isValid: false,
     })
 
     const { getByText } = renderScreen()
     await flushEffects()
 
-    expect(getByText(LL.RestoreScreen.invalidMnemonic())).toBeTruthy()
+    expect(getByText(invalidPhraseText)).toBeTruthy()
   })
 
-  it("does not render the inline invalidMnemonic message while still typing", async () => {
+  it("opens Support from the invalid-phrase message", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
-      allFilled: false,
+      allValid: true,
+      isValid: false,
+    })
+
+    const { getByText } = renderScreen()
+    await flushEffects()
+    fireEvent.press(getByText("Support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("onboarding", { screen: "supportScreen" })
+  })
+
+  it("underlines Support in the error colour", async () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allValid: true,
+      isValid: false,
+    })
+
+    const { getByText } = renderScreen()
+    await flushEffects()
+
+    const link = StyleSheet.flatten(getByText("Support").props.style)
+    expect(link.textDecorationLine).toBe("underline")
+    expect(link.color).toBe(theme.lightColors?.error)
+  })
+
+  it("marks all six step 2 fields red on an invalid phrase", async () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allValid: true,
+      isValid: false,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    const wrong = mockMnemonicWordInput.mock.calls.slice(-6).map(([props]) => props.wrong)
+    expect(wrong).toEqual(Array(6).fill(true))
+  })
+
+  describe("the step button", () => {
+    const buttonDisabled = (screen: ReturnType<typeof renderScreen>) =>
+      screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled
+
+    it("keeps Next 6 words disabled until the step's words are all backup words", async () => {
+      mockRouteParams = { step: 1 }
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        isStep1: true,
+        offset: 0,
+        stepValid: false,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+
+      expect(buttonDisabled(screen)).toBe(true)
+    })
+
+    it("enables Next 6 words once the step's words are all backup words", async () => {
+      mockRouteParams = { step: 1 }
+      const handleContinue = jest.fn()
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        isStep1: true,
+        offset: 0,
+        stepValid: true,
+        handleContinue,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+      screen.UNSAFE_getByType(GaloyPrimaryButton).props.onPress()
+
+      expect(buttonDisabled(screen)).toBe(false)
+      expect(handleContinue).toHaveBeenCalledTimes(1)
+    })
+
+    /** Six real words on step 2 are not enough: the whole phrase must pass. */
+    it("keeps Restore wallet disabled while the phrase is invalid", async () => {
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        stepValid: true,
+        allValid: true,
+        isValid: false,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+
+      expect(buttonDisabled(screen)).toBe(true)
+    })
+
+    it("enables Restore wallet for a valid phrase", async () => {
+      const handleRestore = jest.fn()
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        stepValid: true,
+        allValid: true,
+        isValid: true,
+        handleRestore,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+      screen.UNSAFE_getByType(GaloyPrimaryButton).props.onPress()
+
+      expect(buttonDisabled(screen)).toBe(false)
+      expect(handleRestore).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("shows the suggestions as chips and picks one on tap", async () => {
+    const selectSuggestion = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      suggestions: ["hello", "helmet", "help"],
+      selectSuggestion,
+    })
+
+    const { getByLabelText } = renderScreen()
+    await flushEffects()
+
+    expect(getByLabelText("hello")).toBeTruthy()
+    expect(getByLabelText("help")).toBeTruthy()
+    fireEvent.press(getByLabelText("helmet"))
+
+    expect(selectSuggestion).toHaveBeenCalledWith("helmet")
+  })
+
+  it("does not render the inline invalid-phrase message while still typing", async () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allValid: false,
       isValid: false,
     })
 
     const { queryByText } = renderScreen()
     await flushEffects()
 
-    expect(queryByText(LL.RestoreScreen.invalidMnemonic())).toBeNull()
+    expect(queryByText(invalidPhraseText)).toBeNull()
+  })
+
+  it("flags only the invalid word and names it instead of the phrase", async () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allValid: true,
+      isValid: false,
+      isWordInvalid: (index: number) => index === 8,
+    })
+
+    const { getByText, queryByText } = renderScreen()
+    await flushEffects()
+
+    expect(getByText(LL.RestoreScreen.invalidWord())).toBeTruthy()
+    expect(queryByText(invalidPhraseText)).toBeNull()
+    const wrongByIndex = mockMnemonicWordInput.mock.calls
+      .slice(-6)
+      .map(([props]) => [props.index, props.wrong])
+    expect(wrongByIndex).toEqual([
+      [6, false],
+      [7, false],
+      [8, true],
+      [9, false],
+      [10, false],
+      [11, false],
+    ])
   })
 
   it("propagates wrong=true to MnemonicWordInput when showError is active", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
-      allFilled: true,
+      allValid: true,
       isValid: false,
     })
 
@@ -295,7 +460,7 @@ describe("RestorePhraseScreen", () => {
   it("propagates wrong=false to MnemonicWordInput when no error is active", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
-      allFilled: false,
+      allValid: false,
       isValid: false,
       validationError: null,
     })
@@ -408,6 +573,23 @@ describe("RestorePhraseScreen", () => {
     mockMnemonicWordInput.mock.calls[0][0].onChangeText?.("apple")
 
     expect(updateWord).toHaveBeenCalledWith(6, "apple")
+  })
+
+  /** Re-tapping a field the keyboard closed on fires no focus event, so typing must
+   *  bring its suggestions back on its own. */
+  it("marks the input active as the user types", async () => {
+    const setActiveIndex = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      setActiveIndex,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    mockMnemonicWordInput.mock.calls[0][0].onChangeText?.("app")
+
+    expect(setActiveIndex).toHaveBeenCalledWith(6)
   })
 
   it("lets an accepted paste on the first input swallow the change", async () => {

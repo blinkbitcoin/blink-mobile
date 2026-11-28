@@ -1,11 +1,10 @@
 import { type TranslationFunctions } from "@app/i18n/i18n-types"
-import { formatDuration } from "@app/utils/date"
-
 import {
   type FeeTierInfo,
   type FeeTierOption,
   FeeTierOption as Tier,
-} from "./hooks/fee-tiers.types"
+} from "@app/types/fee-tiers"
+import { formatDuration } from "@app/utils/date"
 
 const MINUTES_PER_HOUR = 60
 
@@ -14,7 +13,7 @@ const MINUTES_PER_HOUR = 60
  * shows "24h" rather than "1440m". The switch happens above the hour rather than at it, so
  * the existing 60-minute tiers keep the "60m" they have always displayed.
  */
-const formatEta = (etaMinutes: number, locale: string): string => {
+export const formatEta = (etaMinutes: number, locale: string): string => {
   const isWholeHours =
     etaMinutes > MINUTES_PER_HOUR && etaMinutes % MINUTES_PER_HOUR === 0
 

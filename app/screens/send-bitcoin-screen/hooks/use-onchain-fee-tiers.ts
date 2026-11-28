@@ -1,20 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 import {
+  FeePolicy,
   SdkError,
   SdkError_Tags as SdkErrorTags,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
-import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
-
+import {
+  assertFeePolicyApplied,
+  extractOnchainFees,
+  prepareSend,
+} from "@app/self-custodial/bridge"
 import {
   buildZeroTiers,
   FeeTierOption,
   FeeUnit,
   type FeeTierInfo,
-} from "./fee-tiers.types"
+} from "@app/types/fee-tiers"
+import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
+import { reportError } from "@app/utils/error-logging"
+
 import { useQuoteStatus } from "./use-quote-status"
 
 export const ETA_MINUTES: Record<FeeTierOption, number> = FEE_TIER_ETA_MINUTES
@@ -30,10 +36,16 @@ export const SdkFeeError = {
 
 export type SdkFeeError = (typeof SdkFeeError)[keyof typeof SdkFeeError]
 
+type OnchainFeeTiers = Record<FeeTierOption, FeeTierInfo>
+
 type OnchainFeeTiersResult = {
-  tiers: Record<FeeTierOption, FeeTierInfo>
+  tiers: OnchainFeeTiers
   error: SdkFeeError | null
   hasQuote: boolean
+  isQuoting: boolean
+  /** Quotes the inputs on screen once. Resolves to the tiers, or null when it failed or
+   *  the inputs moved on before it answered. */
+  quote: () => Promise<OnchainFeeTiers | null>
 }
 
 const SDK_ERROR_TAG_MAP: Partial<Record<SdkErrorTags, SdkFeeError>> = {
@@ -49,79 +61,154 @@ export const classifySdkFeeError = (err: unknown): SdkFeeError => {
   return SdkFeeError.Generic
 }
 
-export const useOnchainFeeTiers = (
-  sdk: BreezSdkInterface | null,
-  address: string | undefined,
-  amountSats: number | undefined,
-): OnchainFeeTiersResult => {
-  const [tiers, setTiers] = useState(DEFAULT_TIERS)
+/** Causes the sender fixes by changing the amount; anything else is worth a look. */
+const EXPECTED_FEE_ERRORS: ReadonlySet<SdkFeeError> = new Set([
+  SdkFeeError.InsufficientFunds,
+  SdkFeeError.InvalidInput,
+])
+
+const toTiers = (fees: {
+  fast: number
+  medium: number
+  slow: number
+}): OnchainFeeTiers => ({
+  [FeeTierOption.Fast]: {
+    feeAmount: fees.fast,
+    feeUnit: FeeUnit.Sats,
+    etaMinutes: ETA_MINUTES[FeeTierOption.Fast],
+  },
+  [FeeTierOption.Medium]: {
+    feeAmount: fees.medium,
+    feeUnit: FeeUnit.Sats,
+    etaMinutes: ETA_MINUTES[FeeTierOption.Medium],
+  },
+  [FeeTierOption.Slow]: {
+    feeAmount: fees.slow,
+    feeUnit: FeeUnit.Sats,
+    etaMinutes: ETA_MINUTES[FeeTierOption.Slow],
+  },
+})
+
+/**
+ * Quotes on request only, never as the inputs change. The SDK's quote reserves the
+ * wallet's leaves for the exact amount and may swap them with the operator first, so
+ * quoting per keystroke ran several of those at once, each holding leaves another one
+ * needed, and failed with an unclassified error on balances that could pay.
+ */
+type OnchainFeeTiersParams = {
+  sdk: BreezSdkInterface | null
+  address: string | undefined
+  amountSats: number | undefined
+  /** A send-all: the fee is quoted out of the amount rather than on top of it. */
+  isFeeIncluded?: boolean
+}
+
+export const useOnchainFeeTiers = ({
+  sdk,
+  address,
+  amountSats,
+  isFeeIncluded = false,
+}: OnchainFeeTiersParams): OnchainFeeTiersResult => {
+  const [quotedTiers, setQuotedTiers] = useState(DEFAULT_TIERS)
   /** Holds only the reason; whether it still applies is decided by the keyed failure flag. */
   const [failureReason, setFailureReason] = useState<SdkFeeError | null>(null)
+  const [quotingKey, setQuotingKey] = useState<string | null>(null)
   /** The SDK instance cannot be keyed by value, so its absence gates the quote instead. */
-  const inputsKey = sdk && address && amountSats ? `${address}|${amountSats}` : null
+  const inputsKey =
+    sdk && address && amountSats ? `${address}|${amountSats}|${isFeeIncluded}` : null
   const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
     useQuoteStatus(inputsKey)
-  // Discards stale prepareSend resolutions when deps change mid-flight.
-  const requestTokenRef = useRef(0)
+
+  /**
+   * Whatever was answered stops applying once the inputs change, even if they come back:
+   * retyping an amount that failed must not bring its error back before Next asks again.
+   * Adjusted during render, so the stale outcome is never on screen for a frame.
+   */
+  const [seenKey, setSeenKey] = useState(inputsKey)
+  if (seenKey !== inputsKey) {
+    setSeenKey(inputsKey)
+    discardQuote()
+  }
+  /** One quote at a time: a second press for the same inputs shares the first, and one
+   *  for new inputs starts only once the first has settled. */
+  const inFlightRef = useRef<{
+    key: string
+    promise: Promise<OnchainFeeTiers | null>
+  } | null>(null)
+
+  /** The inputs on screen now, so an answer for an amount since retyped is dropped. */
+  const latestKeyRef = useRef(inputsKey)
+  latestKeyRef.current = inputsKey
 
   const error = hasFailed ? failureReason : null
+  /** True while any quote is out, the inputs' own or one they have since moved on from:
+   *  that one still holds the wallet's leaves, so nothing may ask again until it settles. */
+  const isQuoting = quotingKey !== null
 
-  const fetchFees = useCallback(async () => {
-    requestTokenRef.current += 1
-    const token = requestTokenRef.current
-    /**
-     * Whatever was quoted stops applying the moment this runs, request or gate alike. The
-     * tiers go with it, so neither failure path below can leave the previous amount's fees
-     * on hand: only the success path puts numbers back, which is what the custodial rail
-     * already does and what keeps a caller reading tiers directly from reading stale ones.
-     */
-    discardQuote()
-    setTiers(DEFAULT_TIERS)
+  const quote = useCallback((): Promise<OnchainFeeTiers | null> => {
+    if (!sdk || !address || !amountSats || !inputsKey) return Promise.resolve(null)
+    if (inFlightRef.current?.key === inputsKey) return inFlightRef.current.promise
+    const previous = inFlightRef.current?.promise
 
-    if (!sdk || !address || !amountSats) return
+    const isStale = () => latestKeyRef.current !== inputsKey
 
-    try {
-      const prepared = await prepareSend(sdk, {
-        paymentRequest: address,
-        amount: BigInt(amountSats),
-      })
-      if (token !== requestTokenRef.current) return
+    const run = async (): Promise<OnchainFeeTiers | null> => {
+      try {
+        // Queued behind an earlier quote, these inputs may be gone before it is their turn.
+        if (isStale()) return null
 
-      const fees = extractOnchainFees(prepared)
-      if (!fees) {
-        setFailureReason(SdkFeeError.Generic)
+        const prepared = await prepareSend(sdk, {
+          paymentRequest: address,
+          amount: BigInt(amountSats),
+          feePolicy: isFeeIncluded ? FeePolicy.FeesIncluded : undefined,
+        })
+        if (isStale()) return null
+        assertFeePolicyApplied(
+          isFeeIncluded ? FeePolicy.FeesIncluded : undefined,
+          prepared,
+        )
+
+        const fees = extractOnchainFees(prepared)
+        if (!fees) {
+          reportError(
+            "Self-custodial onchain fee quote",
+            new Error("prepareSend returned no BitcoinAddress fee quote"),
+          )
+          setFailureReason(SdkFeeError.Generic)
+          markFailed()
+          return null
+        }
+
+        const tiers = toTiers(fees)
+        setQuotedTiers(tiers)
+        markQuoted()
+        return tiers
+      } catch (err) {
+        const reason = classifySdkFeeError(err)
+        reportError("Self-custodial onchain fee quote", err, {
+          expected: EXPECTED_FEE_ERRORS.has(reason),
+        })
+        if (isStale()) return null
+
+        setFailureReason(reason)
         markFailed()
-        return
+        return null
+      } finally {
+        // A quote for newer inputs may already be out; only this one's marks are cleared.
+        if (inFlightRef.current?.key === inputsKey) inFlightRef.current = null
+        setQuotingKey((key) => (key === inputsKey ? null : key))
       }
-
-      setTiers({
-        [FeeTierOption.Fast]: {
-          feeAmount: fees.fast,
-          feeUnit: FeeUnit.Sats,
-          etaMinutes: ETA_MINUTES[FeeTierOption.Fast],
-        },
-        [FeeTierOption.Medium]: {
-          feeAmount: fees.medium,
-          feeUnit: FeeUnit.Sats,
-          etaMinutes: ETA_MINUTES[FeeTierOption.Medium],
-        },
-        [FeeTierOption.Slow]: {
-          feeAmount: fees.slow,
-          feeUnit: FeeUnit.Sats,
-          etaMinutes: ETA_MINUTES[FeeTierOption.Slow],
-        },
-      })
-      markQuoted()
-    } catch (err) {
-      if (token !== requestTokenRef.current) return
-      setFailureReason(classifySdkFeeError(err))
-      markFailed()
     }
-  }, [sdk, address, amountSats, discardQuote, markQuoted, markFailed])
 
-  useEffect(() => {
-    fetchFees()
-  }, [fetchFees])
+    setQuotingKey(inputsKey)
+    // `run` never rejects, so the earlier quote settling is all this waits for.
+    const promise = previous ? previous.then(run) : run()
+    inFlightRef.current = { key: inputsKey, promise }
+    return promise
+  }, [sdk, address, amountSats, isFeeIncluded, inputsKey, markQuoted, markFailed])
 
-  return { tiers, error, hasQuote }
+  /** Tiers quoted for other inputs are not this payment's, so they read as unquoted. */
+  const tiers = hasQuote ? quotedTiers : DEFAULT_TIERS
+
+  return { tiers, error, hasQuote, isQuoting, quote }
 }

@@ -24,15 +24,19 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     NetworkError: "NetworkError",
     Generic: "Generic",
   },
+  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
   PrepareSendPaymentRequest: {
     create: (args: unknown) => args,
   },
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkAddress: "SparkAddress",
+    SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
     BitcoinAddress: jest.fn((args: unknown) => args),
+    Bolt11Invoice: jest.fn((args: unknown) => args),
   },
   SendPaymentRequest: {
     create: (args: unknown) => args,
@@ -62,6 +66,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   ClaimDepositRequest: {
     create: (args: unknown) => args,
   },
+}))
+
+jest.mock("react-native-securerandom", () => ({
+  generateSecureRandom: jest.fn(async (size: number) => new Uint8Array(size).fill(7)),
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -96,13 +104,38 @@ describe("self-custodial payment adapters", () => {
       const sdk = createMockSdk()
       const prepared = { amount: BigInt(1000) }
       sdk.prepareSendPayment.mockResolvedValue(prepared)
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       const result = await send({ destination: "lnbc1..." })
 
       expect(sdk.prepareSendPayment).toHaveBeenCalledTimes(1)
       expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      expect(result.status).toBe("success")
+    })
+
+    /** The SDK hands back the payment an invoice's key already made, failed or not:
+     *  a failed one is reported as failed, never as sent. */
+    it("returns failed when the SDK hands back a failed payment", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 2 } })
+
+      const send = createSendPayment(sdk as never)
+      const result = await send({ destination: "lnbc1..." })
+
+      expect(result.status).toBe("failed")
+      expect(result.errors?.[0].message).toBe("Payment p1 failed")
+    })
+
+    it("reports a send whose answer came without a payment as sent", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
+      sdk.sendPayment.mockResolvedValue({})
+
+      const send = createSendPayment(sdk as never)
+      const result = await send({ destination: "lnbc1..." })
+
       expect(result.status).toBe("success")
     })
 
@@ -120,7 +153,7 @@ describe("self-custodial payment adapters", () => {
     it("sends with tokenIdentifier + USDB-scaled amount when currency is USD", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       await send({
@@ -140,7 +173,7 @@ describe("self-custodial payment adapters", () => {
     it("sends without tokenIdentifier and amount in sats when currency is BTC", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       await send({
@@ -159,7 +192,7 @@ describe("self-custodial payment adapters", () => {
     it("sends without tokenIdentifier when amount is omitted", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(0) })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       await send({ destination: "lnbc1..." })
@@ -167,6 +200,58 @@ describe("self-custodial payment adapters", () => {
       expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
         expect.objectContaining({ tokenIdentifier: undefined }),
       )
+    })
+  })
+
+  describe("createSendPayment idempotency key", () => {
+    const invoice = (paymentHash: string) => ({
+      amount: BigInt(1000),
+      paymentMethod: { tag: "Bolt11Invoice", inner: { invoiceDetails: { paymentHash } } },
+    })
+    const keyOf = (sdk: ReturnType<typeof createMockSdk>, call: number) =>
+      sdk.sendPayment.mock.calls[call][0].idempotencyKey
+
+    it("keys every send of the same invoice alike, so the SDK pays it once", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue(invoice("hash-1"))
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+      const send = createSendPayment(sdk as never)
+
+      await send({ destination: "lnbc1..." })
+      await send({ destination: "lnbc1..." })
+
+      expect(keyOf(sdk, 0)).toMatch(/^[0-9a-f-]{36}$/)
+      expect(keyOf(sdk, 1)).toBe(keyOf(sdk, 0))
+    })
+
+    it("keys different invoices apart", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment
+        .mockResolvedValueOnce(invoice("hash-1"))
+        .mockResolvedValueOnce(invoice("hash-2"))
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+      const send = createSendPayment(sdk as never)
+
+      await send({ destination: "lnbc1..." })
+      await send({ destination: "lnbc2..." })
+
+      expect(keyOf(sdk, 1)).not.toBe(keyOf(sdk, 0))
+    })
+
+    it("carries no key on a dollar send", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({
+        ...invoice("hash-1"),
+        tokenIdentifier: "test-token-id",
+      })
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+
+      await createSendPayment(sdk as never)({
+        destination: "lnbc1...",
+        amount: { amount: 70, currency: "USD", currencyCode: "USD" },
+      })
+
+      expect(keyOf(sdk, 0)).toBeUndefined()
     })
   })
 

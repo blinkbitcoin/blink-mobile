@@ -35,7 +35,7 @@ import {
   TransactionDirection,
   TransactionStatus,
 } from "@app/types/transaction"
-import { WindDownStatus } from "@app/types/wind-down"
+import { WindDownReason, WindDownStatus } from "@app/types/wind-down"
 
 let currentMocks: MockedResponse[] = []
 
@@ -338,6 +338,7 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
   },
 }))
 
+let mockWindDownReason: WindDownReason = WindDownReason.Region
 let mockMigratePromptVisible = false
 let mockMigratePromptPending = false
 let mockCanReopen = false
@@ -351,6 +352,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => (
     canReopen: mockCanReopen,
     deadlineTimestamp: 1787003999,
     timezone: "Europe/Paris",
+    reason: mockWindDownReason,
     dismissForSession: mockDismissMigratePrompt,
     reopen: mockReopenMigratePrompt,
   }),
@@ -384,11 +386,37 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin"
   useMigrationReminderBulletin: () => ({
     isVisible: mockReminderBulletinVisible,
     phase: mockReminderBulletinPhase,
+    reason: mockWindDownReason,
     deadlineTimestamp: 1787003999,
     receiveDisabledTimestamp: 1785189600,
     timezone: "Europe/Paris",
   }),
 }))
+
+let mockOffboardBulletin = {
+  isVisible: false,
+  status: WindDownStatus.PreCutoff as WindDownStatus,
+  deadlineTimestamp: 1790100000,
+  receiveDisabledTimestamp: 1790000000,
+  timezone: "Asia/Dubai",
+}
+
+jest.mock("@app/screens/account-migration/hooks/use-offboard-only-bulletin", () => ({
+  useOffboardOnlyBulletin: () => mockOffboardBulletin,
+}))
+
+const mockOffboardOnlyBulletin = jest.fn()
+
+jest.mock("@app/components/offboard-only-bulletin", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    OffboardOnlyBulletin: (props: Record<string, unknown>) => {
+      mockOffboardOnlyBulletin(props)
+      return ReactActual.createElement(View, { testID: "offboard-only-bulletin" })
+    },
+  }
+})
 
 let mockReceiveBlocked = false
 
@@ -1062,6 +1090,8 @@ const resetHomeScreenMocks = () => {
   mockReceiveBlocked = false
   mockReminderBulletinVisible = false
   mockReminderBulletinPhase = WindDownStatus.PreCutoff
+  mockWindDownReason = WindDownReason.Region
+  mockOffboardBulletin = { ...mockOffboardBulletin, isVisible: false }
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
   mockDollarBalanceModalRegionUnknown = false
@@ -2799,6 +2829,8 @@ describe("HomeScreen wind-down states", () => {
     mockReceiveBlocked = false
     mockReminderBulletinVisible = false
     mockReminderBulletinPhase = WindDownStatus.PreCutoff
+    mockWindDownReason = WindDownReason.Region
+    mockOffboardBulletin = { ...mockOffboardBulletin, isVisible: false }
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
@@ -3127,6 +3159,63 @@ describe("HomeScreen wind-down states", () => {
 
     const { phase } = mockMigrationReminderBulletin.mock.calls[0][0]
     expect(phase).toBe(WindDownStatus.ReceiveDisabled)
+  })
+
+  it("forwards the wind-down reason so the bulletin can pick the Level 0 copy", async () => {
+    mockReminderBulletinVisible = true
+    mockWindDownReason = WindDownReason.LevelZero
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { reason } = mockMigrationReminderBulletin.mock.calls[0][0]
+    expect(reason).toBe(WindDownReason.LevelZero)
+  })
+
+  it("forwards the wind-down reason so the migrate-now modal can pick the Level 0 copy", async () => {
+    mockWindDownReason = WindDownReason.LevelZero
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].reason).toBe(
+      WindDownReason.LevelZero,
+    )
+  })
+
+  it("forwards the server's phase, dates and timezone to the offboard bulletin", async () => {
+    mockOffboardBulletin = {
+      isVisible: true,
+      status: WindDownStatus.ReceiveDisabled,
+      deadlineTimestamp: 1790100000,
+      receiveDisabledTimestamp: 1790000000,
+      timezone: "Asia/Dubai",
+    }
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockOffboardOnlyBulletin.mock.calls.at(-1)?.[0]).toEqual({
+      status: WindDownStatus.ReceiveDisabled,
+      deadlineTimestamp: 1790100000,
+      receiveDisabledTimestamp: 1790000000,
+      timezone: "Asia/Dubai",
+    })
   })
 
   it("keeps the reminder bulletin hidden in a phase that does not call for it", async () => {

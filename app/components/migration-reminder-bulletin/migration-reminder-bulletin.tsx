@@ -1,8 +1,8 @@
 import React from "react"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { WindDownStatus } from "@app/types/wind-down"
-import { formatDayAndMonth } from "@app/utils/date"
+import { WindDownReason, WindDownStatus } from "@app/types/wind-down"
+import { formatDayAndMonth, isOnOrAfterDay } from "@app/utils/date"
 
 import { NotificationCardUI } from "../notifications/notification-card-ui"
 
@@ -11,6 +11,9 @@ type MigrationReminderBulletinProps = {
   onMigrate: () => void
   /** The wind-down phase the copy speaks to: receiving still ahead, or already stopped. */
   phase: WindDownStatus
+  /** Why the account is wound down: LEVEL_ZERO gets the trial copy, anything else the
+   *  region copy. */
+  reason?: WindDownReason
   /** Wind-down final deadline as a Unix timestamp in seconds, served by the backend. */
   deadlineTimestamp: number
   /** When receiving stops, as a Unix timestamp in seconds, served by the backend. */
@@ -28,6 +31,7 @@ type MigrationReminderBulletinProps = {
 export const MigrationReminderBulletin: React.FC<MigrationReminderBulletinProps> = ({
   onMigrate,
   phase,
+  reason,
   deadlineTimestamp,
   receiveDisabledTimestamp,
   timezone,
@@ -47,14 +51,22 @@ export const MigrationReminderBulletin: React.FC<MigrationReminderBulletinProps>
   })
 
   /** Announcing when receiving stops is only informative while it still has not: past the
-   *  cutoff the same sentence reads as a future event, dated before the day it is read. */
-  const isReceiveDisabled = phase === WindDownStatus.ReceiveDisabled
-  const bulletinBody = isReceiveDisabled
-    ? LL.AccountMigration.reminderBulletin.bodyReceiveDisabled({ date: deadlineDate })
-    : LL.AccountMigration.reminderBulletin.body({
-        date: deadlineDate,
-        receiveStopsDate,
-      })
+   *  cutoff the same sentence reads as a future event, dated before the day it is read.
+   *  Before it, Level 0 gets its own single-date copy, and a region cutoff on or after the
+   *  deadline day would only repeat the deadline, so one date is shown. */
+  const bulletinBody = (() => {
+    const copy = LL.AccountMigration.reminderBulletin
+    if (phase === WindDownStatus.ReceiveDisabled) {
+      return copy.bodyReceiveDisabled({ date: deadlineDate })
+    }
+    if (reason === WindDownReason.LevelZero) {
+      return copy.bodyLevelZero({ date: deadlineDate })
+    }
+    if (isOnOrAfterDay({ a: receiveDisabledTimestamp, b: deadlineTimestamp, timezone })) {
+      return copy.bodySingleDate({ date: deadlineDate })
+    }
+    return copy.body({ date: deadlineDate, receiveStopsDate })
+  })()
 
   const handleMigrate = async () => onMigrate()
 

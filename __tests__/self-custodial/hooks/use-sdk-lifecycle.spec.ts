@@ -36,6 +36,18 @@ jest.mock("react-native-fs", () => ({
   default: { exists: (...args: unknown[]) => mockStorageExists(...args) },
 }))
 
+const mockScopeLostAttemptsTo = jest.fn()
+jest.mock("@app/self-custodial/payment-details/lost-attempts", () => {
+  const actual = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+  return {
+    ...actual,
+    scopeLostAttemptsTo: (...args: Parameters<typeof actual.scopeLostAttemptsTo>) => {
+      mockScopeLostAttemptsTo(...args)
+      return actual.scopeLostAttemptsTo(...args)
+    },
+  }
+})
+
 const mockReadMnemonicWithStatus = jest.fn()
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -277,6 +289,23 @@ describe("useSdkLifecycle", () => {
   })
 
   describe("happy path", () => {
+    /** Not by the storage directory, whose absolute path can move with an app update:
+     *  the lost attempts are kept across launches under this name. */
+    it("scopes the lost attempts to the wallet by network and account", async () => {
+      const sdk = buildSdk("sdk-1")
+      mockInitSdk.mockResolvedValue(sdk)
+      captureListener()
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(result.current.sdk).toBe(sdk)
+      })
+      expect(mockScopeLostAttemptsTo).toHaveBeenCalledWith(
+        `${mockSparkNetwork.Regtest}:acct-1`,
+      )
+    })
+
     it("loads the mnemonic, validates the network, initializes the SDK, and reaches Ready after the Synced event", async () => {
       const sdk = buildSdk("sdk-1")
       mockInitSdk.mockResolvedValue(sdk)

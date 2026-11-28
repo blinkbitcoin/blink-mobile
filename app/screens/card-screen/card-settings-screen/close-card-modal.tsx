@@ -1,10 +1,12 @@
 import React, { useState } from "react"
 import { Alert, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 type CloseCardModalProps = {
   isVisible: boolean
@@ -67,6 +69,7 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
             })}
           </Text>
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             autoCapitalize="none"
             style={styles.textInput}
             onChangeText={setConfirmText}
@@ -101,6 +104,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textPrimary,
   },
   textInput: {
+    fontFamily: fonts.regular,
     fontSize: 16,
     backgroundColor: colors.neutral,
     padding: 12,

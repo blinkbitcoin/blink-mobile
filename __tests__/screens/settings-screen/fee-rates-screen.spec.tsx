@@ -13,6 +13,7 @@ import { FeeRatesDocument } from "@app/graphql/generated"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { light } from "@app/rne-theme/colors"
+import { fonts } from "@app/rne-theme/fonts"
 import theme from "@app/rne-theme/theme"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
@@ -105,7 +106,7 @@ describe("FeeRatesScreen", () => {
       expect(StyleSheet.flatten(getByText(name).props.style)).toMatchObject({
         color: light.textSecondary,
         fontSize: 16,
-        fontWeight: "400",
+        fontFamily: fonts.regular,
       })
     }
   })

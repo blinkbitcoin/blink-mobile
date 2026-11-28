@@ -1,6 +1,7 @@
 import React from "react"
-import { View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type InfoRowProps = {
   label: string
@@ -9,6 +10,10 @@ type InfoRowProps = {
   valueColor?: string
   isValueMuted?: boolean
   isLabelRegular?: boolean
+  /** Swaps the value for a spinner that keeps the row's height, so it doesn't jump when the
+   *  value lands. */
+  loading?: boolean
+  valueTestId?: string
 }
 
 export const InfoRow: React.FC<InfoRowProps> = ({
@@ -18,6 +23,8 @@ export const InfoRow: React.FC<InfoRowProps> = ({
   valueColor,
   isValueMuted,
   isLabelRegular,
+  loading = false,
+  valueTestId,
 }) => {
   const styles = useStyles()
   const {
@@ -30,14 +37,35 @@ export const InfoRow: React.FC<InfoRowProps> = ({
     : [styles.value, { color: valueColor ?? colors.textOnBackground }]
 
   return (
-    <View style={styles.container}>
+    // One element for a screen reader, label and value together, as a row of a list reads.
+    <View
+      style={styles.container}
+      accessible
+      accessibilityLabel={
+        loading ? label : [label, value, secondaryValue].filter(Boolean).join(", ")
+      }
+      accessibilityState={{ busy: loading }}
+    >
       <Text style={labelStyle}>{label}</Text>
-      <Text style={valueStyle}>
-        {value}
-        {secondaryValue ? (
-          <Text style={styles.secondaryValue}>{secondaryValue}</Text>
-        ) : null}
-      </Text>
+      {loading ? (
+        <View style={styles.loadingSlot}>
+          {/* An invisible line holds the height the value will take, at any text size. */}
+          <Text style={[styles.value, styles.hidden]}> </Text>
+          <ActivityIndicator
+            size="small"
+            color={colors.textMuted}
+            style={styles.spinner}
+            testID={`${label} loading`}
+          />
+        </View>
+      ) : (
+        <Text style={valueStyle} testID={valueTestId}>
+          {value}
+          {secondaryValue ? (
+            <Text style={styles.secondaryValue}>{secondaryValue}</Text>
+          ) : null}
+        </Text>
+      )}
     </View>
   )
 }
@@ -47,32 +75,46 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    columnGap: 12,
   },
+  /** The label keeps its own width (up to half the row) and the value takes the rest, so a
+   *  short label like "Note" doesn't squeeze an address in the value until it breaks. */
   label: {
-    flex: 1,
+    flexShrink: 0,
+    maxWidth: "50%",
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
   regularLabel: {
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   value: {
     flex: 1,
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
     textAlign: "right",
   },
   mutedValue: {
     color: colors.textMuted,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   secondaryValue: {
-    fontWeight: "400",
+    fontFamily: fonts.regular,
+  },
+  loadingSlot: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  hidden: {
+    opacity: 0,
+  },
+  spinner: {
+    position: "absolute",
+    right: 0,
+    transform: [{ scale: 0.8 }],
   },
 }))

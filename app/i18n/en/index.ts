@@ -2379,18 +2379,47 @@ const en: BaseTranslation = {
     title: "Confirm Payment",
     totalLabel: "Total:",
     totalExceed: "Total exceeds your balance of {balance: string}",
+    feeExceedsAmount: "The network fee is more than the amount you're sending",
     maxFeeSelected:
       "This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.",
     invoiceAlreadyPaid: "This invoice has already been paid",
     somethingWentWrong: "Something went wrong",
+    priceUpdated: "The price moved, so the amounts were updated. Check them before you send.",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
-    slideToConfirm: "Slide to Confirm",
+    paymentMayStillLand:
+      "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     slideConfirming: "Confirming...",
+    slideToSend: "Slide to send",
+    calculatingFee: "Calculating fee…",
+    sendProgress: {
+      reviewing: "Reviewing",
+      signing: "Signing",
+      findingRoute: "Finding route",
+      broadcasting: "Broadcasting",
+      checkingDelivery: "Checking delivery",
+      almostThere: "Almost there",
+      anyTimeNow: "Any time now",
+      hangTight: "Hang tight",
+      stillOnItsWay: "Still on its way",
+    },
     copiedDestination: "Copied destination to clipboard",
-    lightningRecommended: "High fee! We recommend Lightning.",
+    lightningRecommended: "High fee. We recommend Lightning.",
+    sending: "Sending",
+    sent: "Sent",
+    receipt: "Receipt",
+    /** Spoken once Sent plays, since review turns into it in place with no new screen
+     *  for a screen reader to land on. */
+    sentAnnouncement: "Sent, {amount: string}",
+    fromBalance: "From Balance",
+    details: "Details",
+    changeAmount: "Change amount",
+    tryAgain: "Try again",
+    home: "Home",
+    dustSweepSheetTitle: "Before you send",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
+    sendAnyway: "I checked my history, send anyway",
   },
   SendBitcoinDestinationScreen: {
     usernameNowAddress:
@@ -2449,8 +2478,16 @@ const en: BaseTranslation = {
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
+    addAmount: "Add amount",
+    slideToSelectAmount: "Slide to select amount",
+    lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
+    limitsUnavailable: "We couldn't check your daily limit. Try again in a moment.",
+    problemSheetTitle: "A small problem",
+    changeDestination: "Change destination",
+    recipientUnreachableTitle: "Couldn't reach the recipient",
+    recipientWrongAmountTitle: "Recipient sent the wrong amount",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
     amountIsRequired: "Amount is required",
     cost: "Cost",
@@ -2472,11 +2509,11 @@ const en: BaseTranslation = {
     failedToFetchLnurlInvoice: "Failed to fetch lnurl invoice",
     lnurlInvoiceIncorrectAmount:
       "The lnurl server responded with an invoice with an incorrect amount.",
-    confirmFeesModal: {
+    highFeeSheet: {
       title: "High fee alert!",
-      content:
-        "Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?\n\nTo reduce fees, ask the receiver to accept transaction via Lightning",
-      confirmButton: "I'm 100% sure",
+      body: "Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?",
+      cancelPayment: "Cancel payment",
+      acceptFee: "Accept fee",
     },
     copiedDestination: "Copied destination to clipboard",
     pendingPayment:
@@ -2502,9 +2539,7 @@ const en: BaseTranslation = {
      * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
      * rates (10m / 30m / 60m, FEE_TIER_ETA_MINUTES). They name the relative speed within a
      * rail, not an absolute time — don't tune either one for a single rail's window without
-     * splitting the keys per domain first. The feeTier heading above reads "Transaction
-     * priority" directly over the "Priority" option; that repetition is known and left for
-     * design to settle.
+     * splitting the keys per domain first.
      */
     fast: "Priority",
     medium: "Standard",
@@ -2515,6 +2550,8 @@ const en: BaseTranslation = {
     sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
     sdkNetworkError: "Network error. Please check your connection and try again.",
     sdkGenericError: "Unable to estimate fees. Please try a different amount.",
+    onchainSelfPayment:
+      "This is your own wallet's address. You can't send an on-chain payment to yourself.",
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
@@ -3134,6 +3171,7 @@ const en: BaseTranslation = {
     note: "Note",
     notification: "Notification",
     ok: "OK",
+    okay: "Okay",
     or: "or",
     openWallet: "Open Wallet",
     onchain: "Onchain",
@@ -3290,6 +3328,14 @@ const en: BaseTranslation = {
   },
   AmountInputButton: {
     tapToSetAmount: "Set amount",
+  },
+  Accessibility: {
+    balanceHidden: "Balance hidden",
+    copy: "Copy",
+    deleteKey: "Delete",
+    revealBalanceHint: "Shows your balance on this screen",
+    swapCurrencyHint: "Switches the currency you type the amount in",
+    switchToWallet: "Switch to {wallet: string}",
   },
   AppUpdate: {
     needToUpdateSupportMessage:
@@ -3855,30 +3901,36 @@ const en: BaseTranslation = {
       CardIntroducing: {
         title: "Introducing",
         cardInfo: {
-          bitcoinCard: "The Blink Visa card",
+          bitcoinCard: "The Blink Card",
           for: "for",
-          maximalist: "Bitcoin Maximalists",
+          bitcoiners: "Bitcoiners",
         },
         buttonText: "Continue",
       },
       CardDetails: {
-        title: "Additional perks",
+        title: "What’s included",
         features: {
-          accountManager: "Dedicated account manager",
-          support: "Priority support",
-          onchainDeposits: "50% back on transaction fees",
-          circularEconomies: "$100 to circular economies",
+          card: {
+            title: "Blink Card",
+            subtitle: "your Visa card, ready today",
+          },
+          accountManager: {
+            title: "Personal account manager",
+            subtitle: "and priority support",
+          },
+          onOffRamping: "On/Off ramping",
         },
-        andMore: "... and more coming in 2026",
+        availableIn: "in {months:number} months",
+        footnote: "Some features will be available within {months:number} months. The card is ready today.",
         buttonText: "Continue",
       },
       WelcomeOnboard: {
         welcomeMessage: {
           title: "Welcome onboard",
-          subtitle: "To Blink Private",
+          subtitle: "To Blink Orange",
           paragraphs: {
-            body1: "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
-            body2: "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.",
+            body1: "Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.",
+            body2: "Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.",
           },
         },
         buttonText: "Let's go",
@@ -3888,8 +3940,14 @@ const en: BaseTranslation = {
         paymentTitle: "Payment",
         acceptButton: "Accept",
         payButton: "Continue & Pay",
-        cardTitle: "Blink Private",
+        cardTitle: "Blink Orange",
+        free: "Free",
+        forNow: "for now",
         perYear: "per year",
+        freeBreakdown: {
+          card: "Blink Card",
+          memberBenefits: "Other member benefits",
+        },
         status: {
           label: "Status",
           specialOfferLabel: "Special offer",
@@ -3911,6 +3969,18 @@ const en: BaseTranslation = {
           linkText: "Blink Card Fee Schedule",
         },
         renew: "I understand my subscription will automatically renew in {months: number} months",
+        freeNotice: "I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice",
+      },
+      CardVerifyIdentity: {
+        title: "Verify your identity",
+        description: "To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:",
+        requirements: {
+          governmentId: "A government-issued ID",
+          selfie: "A selfie / liveness check",
+          proofOfAddress: "Proof of address",
+          questions: "A few questions about you",
+        },
+        buttonText: "Continue",
       },
       LoadingCard: {
         title: "We're working on your card",
@@ -3984,11 +4054,11 @@ const en: BaseTranslation = {
         fields: {
           occupation: {
             label: "Occupation",
-            placeholder: "Select your occupation",
+            placeholder: "Select",
           },
           annualSalaryRange: {
             label: "Annual salary",
-            placeholder: "Select your salary range",
+            placeholder: "Select salary",
           },
           accountPurpose: {
             label: "Account purpose",
@@ -3999,7 +4069,6 @@ const en: BaseTranslation = {
             placeholder: "Select your spending range",
           },
         },
-        buttonText: "Submit application",
         select: "Select",
       },
       Acknowledgement: {
@@ -4011,23 +4080,27 @@ const en: BaseTranslation = {
         },
         privacyAndTerms: {
           text: "I accept the",
-          privacyPolicyLinkText: "Issuer's Privacy Policy",
+          privacyPolicyLinkText: "Issuer’s Privacy Policy",
           and: ", and",
           cardTermsLinkText: "Blink Card Terms",
         },
         certifyAccuracy:
-          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card",
+          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card",
         acknowledgeSolicitation:
-          "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
+          "I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation",
       },
       CardPreapproved: {
-        title: "You have been pre-approved for the Blink Visa card!",
+        title: "Your Blink Card is ready!",
+        subtitle: "You can now activate your card and start using it",
         buttonText: "Close",
+      },
+      CardDeclined: {
+        title: "We couldn't approve your card application",
+        subtitle: "Your account manager will be in touch.",
       },
       CardProcessing: {
         title: "Processing your application",
-        subtitle: "We will notify you once we are ready",
-        buttonText: "Close",
+        subtitle: "This can take up to a minute",
       },
     },
   },
@@ -4172,9 +4245,13 @@ const en: BaseTranslation = {
       "It's time to migrate your custodial account to a non-custodial account.",
     migrationRequiredForcedBody:
       "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.\n\nNo need to worry, non-custodial will be better for you in the long term.",
+    migrationRequiredForcedBodyLevelZero:
+      "Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.",
     migrationGateTitle: "Account not accessible",
     migrationGateBody:
       "For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>",
+    migrationGateBodyLevelZero:
+      "Trial accounts are now closed. Your balance is safe. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at <link>{email}</link>",
     bitcoinBalance: "Bitcoin balance",
     dollarBalance: "Dollar balance",
     keepReceivingTitle: "Keep receiving as usual",
@@ -4235,18 +4312,29 @@ const en: BaseTranslation = {
     migrateNowModal: {
       title: "Migrate now to a non-custodial account",
       body: "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
+      bodyLevelZero:
+        "You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
       migrateCta: "Migrate now",
     },
     reminderBulletin: {
       title: "Important",
       body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+      bodySingleDate:
+        "Move to a non-custodial account via guided migration, or withdraw, before {date: string} — everything moves in a few taps.",
+      bodyLevelZero:
+        "Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       bodyReceiveDisabled:
         "Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       migrateCta: "Migrate",
     },
     offboardBulletin: {
       title: "Important",
-      body: "Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.",
+      bodyTwoDates:
+        "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. Receiving stops {receiveStopsDate: string}. If you believe your account has been affected in error, you can verify your current residence in the app.",
+      bodySingleDate:
+        "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. If you believe your account has been affected in error, you can verify your current residence in the app.",
+      bodyReceiveOff:
+        "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. Receiving is off. If you believe your account has been affected in error, you can verify your current residence in the app.",
     },
     contactSupport: {
       title: "Contact support",
@@ -4322,6 +4410,10 @@ const en: BaseTranslation = {
     pasteFailed: "Couldn't read from clipboard. Please enter your backup phrase manually.",
     enterWord: "Word",
     invalidMnemonic: "Invalid backup phrase. Please check if the word order is correct.",
+    // Inline under the phrase fields; <link> opens Support.
+    invalidPhrase:
+      "Invalid backup phrase. Please check if the word order is correct. Contact <link>Support</link> if problem persists.",
+    invalidWord: "Invalid word, please check the spelling",
     restoring: "Restoring your wallet...",
     restoreSuccess: "Wallet restored successfully",
     restoreFailed: "Failed to restore wallet. Please try again.",
@@ -4486,6 +4578,16 @@ const en: BaseTranslation = {
     invalidInput: "The payment details look invalid. Please review and try again.",
     generic:
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
+    outcomeUnknown:
+      "This payment may already have gone through. Check your transaction history before sending it again.",
+    earlierConversionPending:
+      "Your earlier transfer is still being confirmed. Try again in a few minutes.",
+    earlierPaymentFound:
+      "Your earlier payment to this destination already went through, for a different amount. Check it before sending again.",
+    earlierConversionFound:
+      "Your earlier transfer already went through, for a different amount. Check it in your transaction history before transferring again.",
+    convertedMeanwhile:
+      "A transfer of about this amount just went through. Check your balance before confirming this one again.",
   },
   SelfCustodialNetworkMismatch: {
     toast:

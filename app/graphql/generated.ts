@@ -266,6 +266,7 @@ export type AccountWindDown = {
   readonly __typename: 'AccountWindDown';
   readonly finalDeadline: Scalars['Timestamp']['output'];
   readonly gateArmsAt: Scalars['Timestamp']['output'];
+  readonly reason: WindDownReason;
   readonly receiveDisabledAt: Scalars['Timestamp']['output'];
   readonly status: WindDownStatus;
   readonly timezone: Scalars['String']['output'];
@@ -3295,6 +3296,12 @@ export const WelcomeRange = {
 } as const;
 
 export type WelcomeRange = typeof WelcomeRange[keyof typeof WelcomeRange];
+export const WindDownReason = {
+  LevelZero: 'LEVEL_ZERO',
+  Region: 'REGION'
+} as const;
+
+export type WindDownReason = typeof WindDownReason[keyof typeof WindDownReason];
 export const WindDownStatus = {
   GatedClosed: 'GATED_CLOSED',
   PreCutoff: 'PRE_CUTOFF',
@@ -3597,7 +3604,7 @@ export type MigrationCommitMutation = { readonly __typename: 'Mutation', readonl
 export type WindDownQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WindDownQuery = { readonly __typename: 'Query', readonly windDown?: { readonly __typename: 'AccountWindDown', readonly status: WindDownStatus, readonly receiveDisabledAt: number, readonly finalDeadline: number, readonly gateArmsAt: number, readonly timezone: string } | null };
+export type WindDownQuery = { readonly __typename: 'Query', readonly windDown?: { readonly __typename: 'AccountWindDown', readonly status: WindDownStatus, readonly reason: WindDownReason, readonly receiveDisabledAt: number, readonly finalDeadline: number, readonly gateArmsAt: number, readonly timezone: string } | null };
 
 export type CardUpdateMutationVariables = Exact<{
   input: CardUpdateInput;
@@ -3669,6 +3676,23 @@ export type CardSecretsEncryptedQueryVariables = Exact<{
 
 
 export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
+
+export type CardApplicationStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardApplicationStatusQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cardConsumerApplications: ReadonlyArray<{ readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus }> } } | null };
+
+export type CardConsumerApplicationCreateMutationVariables = Exact<{
+  input: CardConsumerApplicationCreateInput;
+}>;
+
+
+export type CardConsumerApplicationCreateMutation = { readonly __typename: 'Mutation', readonly cardConsumerApplicationCreate: { readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus } };
+
+export type CardKycStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardKycStatusQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly onboardingStatus?: OnboardingStatus | null, readonly flowType?: KycFlowType | null } } | null };
 
 export type LnInvoiceCreateOnBehalfOfRecipientMutationVariables = Exact<{
   input: LnInvoiceCreateOnBehalfOfRecipientInput;
@@ -6504,6 +6528,7 @@ export const WindDownDocument = gql`
     query windDown {
   windDown {
     status
+    reason
     receiveDisabledAt
     finalDeadline
     gateArmsAt
@@ -6978,6 +7003,134 @@ export type CardSecretsEncryptedQueryHookResult = ReturnType<typeof useCardSecre
 export type CardSecretsEncryptedLazyQueryHookResult = ReturnType<typeof useCardSecretsEncryptedLazyQuery>;
 export type CardSecretsEncryptedSuspenseQueryHookResult = ReturnType<typeof useCardSecretsEncryptedSuspenseQuery>;
 export type CardSecretsEncryptedQueryResult = Apollo.QueryResult<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>;
+export const CardApplicationStatusDocument = gql`
+    query cardApplicationStatus {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cardConsumerApplications {
+          id
+          applicationStatus
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardApplicationStatusQuery__
+ *
+ * To run a query within a React component, call `useCardApplicationStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardApplicationStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardApplicationStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardApplicationStatusQuery(baseOptions?: Apollo.QueryHookOptions<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>(CardApplicationStatusDocument, options);
+      }
+export function useCardApplicationStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>(CardApplicationStatusDocument, options);
+        }
+export function useCardApplicationStatusSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>(CardApplicationStatusDocument, options);
+        }
+export type CardApplicationStatusQueryHookResult = ReturnType<typeof useCardApplicationStatusQuery>;
+export type CardApplicationStatusLazyQueryHookResult = ReturnType<typeof useCardApplicationStatusLazyQuery>;
+export type CardApplicationStatusSuspenseQueryHookResult = ReturnType<typeof useCardApplicationStatusSuspenseQuery>;
+export type CardApplicationStatusQueryResult = Apollo.QueryResult<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>;
+export const CardConsumerApplicationCreateDocument = gql`
+    mutation cardConsumerApplicationCreate($input: CardConsumerApplicationCreateInput!) {
+  cardConsumerApplicationCreate(input: $input) {
+    id
+    applicationStatus
+  }
+}
+    `;
+export type CardConsumerApplicationCreateMutationFn = Apollo.MutationFunction<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>;
+
+/**
+ * __useCardConsumerApplicationCreateMutation__
+ *
+ * To run a mutation, you first call `useCardConsumerApplicationCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardConsumerApplicationCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardConsumerApplicationCreateMutation, { data, loading, error }] = useCardConsumerApplicationCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardConsumerApplicationCreateMutation(baseOptions?: Apollo.MutationHookOptions<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>(CardConsumerApplicationCreateDocument, options);
+      }
+export type CardConsumerApplicationCreateMutationHookResult = ReturnType<typeof useCardConsumerApplicationCreateMutation>;
+export type CardConsumerApplicationCreateMutationResult = Apollo.MutationResult<CardConsumerApplicationCreateMutation>;
+export type CardConsumerApplicationCreateMutationOptions = Apollo.BaseMutationOptions<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>;
+export const CardKycStatusDocument = gql`
+    query cardKycStatus {
+  me {
+    id
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        onboardingStatus
+        flowType
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardKycStatusQuery__
+ *
+ * To run a query within a React component, call `useCardKycStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardKycStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardKycStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardKycStatusQuery(baseOptions?: Apollo.QueryHookOptions<CardKycStatusQuery, CardKycStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardKycStatusQuery, CardKycStatusQueryVariables>(CardKycStatusDocument, options);
+      }
+export function useCardKycStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardKycStatusQuery, CardKycStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardKycStatusQuery, CardKycStatusQueryVariables>(CardKycStatusDocument, options);
+        }
+export function useCardKycStatusSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardKycStatusQuery, CardKycStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardKycStatusQuery, CardKycStatusQueryVariables>(CardKycStatusDocument, options);
+        }
+export type CardKycStatusQueryHookResult = ReturnType<typeof useCardKycStatusQuery>;
+export type CardKycStatusLazyQueryHookResult = ReturnType<typeof useCardKycStatusLazyQuery>;
+export type CardKycStatusSuspenseQueryHookResult = ReturnType<typeof useCardKycStatusSuspenseQuery>;
+export type CardKycStatusQueryResult = Apollo.QueryResult<CardKycStatusQuery, CardKycStatusQueryVariables>;
 export const LnInvoiceCreateOnBehalfOfRecipientDocument = gql`
     mutation lnInvoiceCreateOnBehalfOfRecipient($input: LnInvoiceCreateOnBehalfOfRecipientInput!) {
   lnInvoiceCreateOnBehalfOfRecipient(input: $input) {
@@ -11450,6 +11603,7 @@ export type ResolversTypes = {
   WelcomeLeaderboardInput: WelcomeLeaderboardInput;
   WelcomeProfile: ResolverTypeWrapper<WelcomeProfile>;
   WelcomeRange: WelcomeRange;
+  WindDownReason: WindDownReason;
   WindDownStatus: WindDownStatus;
 };
 
@@ -11834,6 +11988,7 @@ export type AccountUpdateNotificationSettingsPayloadResolvers<ContextType = any,
 export type AccountWindDownResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountWindDown'] = ResolversParentTypes['AccountWindDown']> = {
   finalDeadline?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   gateArmsAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  reason?: Resolver<ResolversTypes['WindDownReason'], ParentType, ContextType>;
   receiveDisabledAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['WindDownStatus'], ParentType, ContextType>;
   timezone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

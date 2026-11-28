@@ -9,9 +9,11 @@ import { PressableCard } from "@app/components/pressable-card"
 import { useCirclesQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
+import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CirclesCardPeopleHome = () => {
   const styles = useStyles()
@@ -146,12 +148,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   pointsNumber: {
     color: colors.textOnBackground,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     fontSize: 50,
   },
   pointsText: {
     paddingBottom: 8,
-    maxWidth: 80,
+    /** Wide enough for the label at the default text size; it grows with the text so the
+     *  same words keep wrapping the same way instead of breaking mid-word. */
+    maxWidth: 80 * cappedFontScale(),
   },
   backdropCircle: {
     position: "absolute",

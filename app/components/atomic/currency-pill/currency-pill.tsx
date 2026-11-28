@@ -5,13 +5,14 @@ import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 import { WalletCurrency } from "@app/graphql/generated"
 import { CARD, CardCurrency } from "@app/types/amounts"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CURRENCY_PILL_PADDING_HORIZONTAL = 8
 export const CURRENCY_PILL_BORDER_WIDTH = 1
 
 export const CURRENCY_PILL_TEXT_STYLE = {
   fontSize: 14,
-  fontWeight: "bold",
+  fontFamily: fonts.bold,
 } as const
 
 export const CurrencyPill = ({
@@ -165,7 +166,7 @@ const useStyles = makeStyles(
     },
     outlinedText: {
       fontSize: 16,
-      fontWeight: "700",
+      fontFamily: fonts.bold,
       lineHeight: 22,
     },
   }),

@@ -2354,15 +2354,41 @@
     "title": "تأكيد الدفع",
     "totalLabel": "المجموع :",
     "totalExceed": "الإجمالي أكبر من ميزانيتك التي تبلغ {balance: string}",
+    "feeExceedsAmount": "عمولة الشبكة أكبر من المبلغ الذي ترسله",
     "maxFeeSelected": "هذا هو الحد الأقصى للرسوم التي ستُقتضى منك لهذه المعاملة. قد تكون أقل من ذلك عند إتمام الدفع.",
     "invoiceAlreadyPaid": "تم دفع هذه الفاتورة بالفعل",
     "somethingWentWrong": "حدث خطأ ما",
+    "priceUpdated": "تغيّر السعر، لذلك تم تحديث المبالغ. راجعها قبل الإرسال.",
     "paymentAlreadyAttempted": "تمت محاولة الدفع بالفعل.\n\nإذا أردت إرسال هذه الدفعة مرة أخرى، ابدأ من جديد.",
-    "slideToConfirm": "اسحب للتأكيد",
+    "paymentMayStillLand": "انتظر قليلاً، من المرجح أن تتم الدفعة قريباً. ستصل أموالك بأمان أو ستبقى معك.",
     "slideConfirming": "جارٍ التأكيد...",
+    "slideToSend": "اسحب للإرسال",
+    "calculatingFee": "جارٍ حساب العمولة…",
+    "sendProgress": {
+      "reviewing": "جارٍ المراجعة",
+      "signing": "جارٍ التوقيع",
+      "findingRoute": "جارٍ البحث عن مسار",
+      "broadcasting": "جارٍ البث",
+      "checkingDelivery": "جارٍ التحقق من التسليم",
+      "almostThere": "أوشكنا على الانتهاء",
+      "anyTimeNow": "في أي لحظة الآن",
+      "hangTight": "انتظر قليلاً",
+      "stillOnItsWay": "لا تزال في الطريق"
+    },
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
-    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
-    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
+    "lightningRecommended": "رسوم مرتفعة. نوصي باستخدام Lightning.",
+    "sending": "جارٍ الإرسال",
+    "sent": "تم الإرسال",
+    "receipt": "الإيصال",
+    "sentAnnouncement": "تم الإرسال، {amount: string}",
+    "fromBalance": "من الرصيد",
+    "details": "التفاصيل",
+    "changeAmount": "تغيير المبلغ",
+    "tryAgain": "حاول مرة أخرى",
+    "home": "الرئيسية",
+    "dustSweepSheetTitle": "قبل أن ترسل",
+    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}.",
+    "sendAnyway": "تحققت من سجلي، أرسل على أي حال"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "أسماء المستخدمين في {bankName: string} أصبحت عناوين في {bankName: string}",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
     "amount": "الكمية",
+    "addAmount": "أضف المبلغ",
+    "slideToSelectAmount": "اسحب لاختيار المبلغ",
+    "lowFunds": "أموال غير كافية",
     "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "تعذّر علينا التحقق من حدك اليومي. حاول مرة أخرى بعد قليل.",
+    "problemSheetTitle": "مشكلة صغيرة",
+    "changeDestination": "تغيير الوجهة",
+    "recipientUnreachableTitle": "تعذّر الوصول إلى المستلم",
+    "recipientWrongAmountTitle": "حدّد المستلم مبلغاً خاطئاً",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "المبلغ مطلوب",
     "cost": "التكلفة",
@@ -2425,10 +2459,11 @@
     "title": "أرسل بيتكوين",
     "failedToFetchLnurlInvoice": "فشل في جلب فاتورة lnurl",
     "lnurlInvoiceIncorrectAmount": "استجاب الخادم بفاتورة ذات مقدار غير صحيح.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "تنبيه رسوم مرتفعة!",
-      "content": "الرسوم أكثر من 50% من المبلغ المُرسل. هل أنت متأكد أنك تريد المتابعة؟\n\nلتقليل الرسوم، اطلب من المستلم قبول المعاملة عبر Lightning",
-      "confirmButton": "أنا متأكد 100%"
+      "body": "رسومك تساوي 50% أو أكثر من المبلغ الذي ترسله. هل أنت متأكد أنك تريد المتابعة؟",
+      "cancelPayment": "إلغاء الدفع",
+      "acceptFee": "قبول الرسوم"
     },
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
     "pendingPayment": "تم إرسال الدفعة، لكنها لم تُؤكَّد بعد.\n\nمن الممكن ألا تتم الموافقة على الدفعة، وفي هذه الحالة ستُعاد الأموال إلى حسابك.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
     "sdkAmountTooLow": "المبلغ منخفض جدًا لمعاملة على السلسلة.",
     "sdkNetworkError": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
-    "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
+    "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف.",
+    "onchainSelfPayment": "هذا عنوان محفظتك الخاصة. لا يمكنك إرسال دفعة على السلسلة إلى نفسك."
   },
   "SettingsScreen": {
     "createAddress": "إنشاء عنوان Lightning",
@@ -2988,6 +3024,7 @@
     "note": "ملاحظة ",
     "notification": "إشعار",
     "ok": "كل شيء على مايرام 👍",
+    "okay": "حسنًا",
     "or": "or",
     "openWallet": "افتح المحفظة",
     "onchain": "على السلسلة",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "حذف",
+    "swapCurrencyHint": "يبدّل العملة التي تكتب بها المبلغ",
+    "switchToWallet": "التبديل إلى {wallet: string}",
+    "copy": "نسخ",
+    "balanceHidden": "الرصيد مخفي",
+    "revealBalanceHint": "يعرض رصيدك في هذه الشاشة"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "أحتاج إلى تحديث تطبيقي إلى أحدث إصدار. أنا أستخدم تطبيق {os: string} مع الإصدار {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "الدفع",
         "acceptButton": "قبول",
         "payButton": "متابعة والدفع",
-        "cardTitle": "بلينك الخاصة",
+        "cardTitle": "Blink Orange",
+        "free": "مجاني",
+        "forNow": "حاليًا",
         "perYear": "سنوياً",
+        "freeBreakdown": {
+          "card": "بطاقة Blink",
+          "memberBenefits": "مزايا العضوية الأخرى"
+        },
         "status": {
           "label": "الحالة",
           "specialOfferLabel": "عرض خاص",
@@ -3695,35 +3746,53 @@
           "text": "لقد راجعتُ وأوافق على",
           "linkText": "جدول رسوم Blink Card"
         },
-        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا"
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا",
+        "freeNotice": "أفهم أن Blink Orange مجاني حاليًا، وأنه قد تُفرض رسوم عضوية لاحقًا مع إشعار مسبق"
+      },
+      "CardVerifyIdentity": {
+        "title": "تحقق من هويتك",
+        "description": "لتفعيل بطاقة Blink، يجب على جهة إصدار البطاقة التحقق من هويتك (KYC). ستحتاج إلى:",
+        "requirements": {
+          "governmentId": "هوية صادرة عن جهة حكومية",
+          "selfie": "صورة سيلفي / فحص الحيوية",
+          "proofOfAddress": "إثبات العنوان",
+          "questions": "بعض الأسئلة عنك"
+        },
+        "buttonText": "متابعة"
       },
       "CardIntroducing": {
         "title": "تقديم",
         "cardInfo": {
-          "bitcoinCard": "بطاقة Blink Visa",
+          "bitcoinCard": "بطاقة Blink",
           "for": "لـ",
-          "maximalist": "أنصار البيتكوين"
+          "bitcoiners": "مستخدمي البيتكوين"
         },
         "buttonText": "متابعة"
       },
       "CardDetails": {
-        "title": "مزايا إضافية",
+        "title": "ما الذي يتضمنه",
         "features": {
-          "accountManager": "مدير حساب مخصص",
-          "support": "دعم ذو أولوية",
-          "onchainDeposits": "استرداد 50% على رسوم المعاملات",
-          "circularEconomies": "100$ للاقتصادات الدائرية"
+          "card": {
+            "title": "بطاقة Blink",
+            "subtitle": "بطاقة Visa الخاصة بك، جاهزة اليوم"
+          },
+          "accountManager": {
+            "title": "مدير حساب شخصي",
+            "subtitle": "ودعم ذو أولوية"
+          },
+          "onOffRamping": "إدخال الأموال وإخراجها"
         },
-        "andMore": "... والمزيد قادم في 2026",
+        "availableIn": "خلال {months} شهرًا",
+        "footnote": "ستتوفر بعض الميزات خلال {months} شهرًا. البطاقة جاهزة اليوم.",
         "buttonText": "متابعة"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "مرحباً بك على متن",
-          "subtitle": "إلى Blink الخاصة",
+          "subtitle": "إلى Blink Orange",
           "paragraphs": {
-            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink الخاصة. ربما لأنك بيتكويني رائع.",
-            "body2": "هدفنا لعام 2026 هو ملء البرنامج بالكثير من المزايا بحيث سيكون من الواضح التجديد في العام القادم."
+            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink Orange. ربما لأنك بيتكويني رائع.",
+            "body2": "Blink Orange هي المستوى الأول من عضوية Blink لمستخدمي البيتكوين، بالدعوة فقط. بطاقة Blink ومدير حسابك الشخصي هما من أولى الخدمات التي نقدمها — والباقي نبنيه حتى عام 2027."
           }
         },
         "buttonText": "هيا بنا"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "المهنة",
-            "placeholder": "اختر مهنتك"
+            "placeholder": "اختر"
           },
           "annualSalaryRange": {
             "label": "الراتب السنوي",
-            "placeholder": "اختر نطاق راتبك"
+            "placeholder": "اختر الراتب"
           },
           "accountPurpose": {
             "label": "غرض الحساب",
@@ -3815,7 +3884,6 @@
             "placeholder": "اختر نطاق إنفاقك"
           }
         },
-        "buttonText": "تقديم الطلب",
         "select": "اختر"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": "، و",
           "cardTermsLinkText": "شروط بطاقة Blink"
         },
-        "certifyAccuracy": "أُقر بأن المعلومات التي قدمتها دقيقة وأنني سألتزم بجميع القواعد والمتطلبات المتعلقة ببطاقة Blink Visa الخاصة بي",
-        "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink Visa لا يشكل التماسًا غير مصرح به"
+        "certifyAccuracy": "أُقر بأن المعلومات التي قدمتها دقيقة وأنني سألتزم بجميع القواعد والمتطلبات المتعلقة ببطاقة Blink الخاصة بي",
+        "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink لا يشكل التماسًا غير مصرح به"
       },
       "CardPreapproved": {
-        "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
+        "title": "بطاقة Blink الخاصة بك جاهزة!",
+        "subtitle": "يمكنك الآن تفعيل بطاقتك والبدء في استخدامها",
         "buttonText": "إغلاق"
+      },
+      "CardDeclined": {
+        "title": "لم نتمكن من الموافقة على طلب بطاقتك",
+        "subtitle": "سيتواصل معك مدير حسابك."
       },
       "CardProcessing": {
         "title": "جارٍ معالجة طلبك",
-        "subtitle": "سنُعلمك بمجرد أن نكون جاهزين",
-        "buttonText": "إغلاق"
+        "subtitle": "قد يستغرق هذا ما يصل إلى دقيقة"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "رحّل الآن إلى حساب غير حافظ",
       "body": "لم يعد بإمكانك استقبال الأموال في حسابك الحافظ. أوقفت Blink خدمة الحفظ في منطقتك وسيتم تعطيل هذا الحساب بحلول نهاية {date}.\n\nرحّل الآن إلى حساب غير حافظ.",
+      "bodyLevelZero": "لم يعد بإمكانك استقبال الأموال في هذا الحساب التجريبي. تُغلق Blink الحسابات التجريبية وسيتم تعطيل هذا الحساب بحلول نهاية {date}.\n\nرحّل الآن إلى حساب غير حافظ.",
       "migrateCta": "رحّل الآن"
     },
     "reminderBulletin": {
       "title": "مهم",
       "body": "انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}. يتوقف الاستلام في {receiveStopsDate}.",
+      "bodySingleDate": "انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date} — كل شيء ينتقل ببضع نقرات.",
+      "bodyLevelZero": "انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}.",
       "bodyReceiveDisabled": "توقف الاستلام. انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}.",
       "migrateCta": "رحّل"
     },
     "offboardBulletin": {
       "title": "مهم",
-      "body": "حسابك مُسجَّل في منطقة لا يمكننا تقديم الحسابات فيها. اسحب أموالك قبل 31 أغسطس. يتوقف الاستلام في 10 أغسطس."
+      "bodyTwoDates": "لا يمكن لـ Blink تقديم حسابات حافظة في منطقتك. اسحب أموالك قبل {date} — دون أي رسوم من Blink. يتوقف الاستلام في {receiveStopsDate}. إذا كنت تعتقد أن حسابك تأثر عن طريق الخطأ، يمكنك التحقق من مكان إقامتك الحالي في التطبيق.",
+      "bodySingleDate": "لا يمكن لـ Blink تقديم حسابات حافظة في منطقتك. اسحب أموالك قبل {date} — دون أي رسوم من Blink. إذا كنت تعتقد أن حسابك تأثر عن طريق الخطأ، يمكنك التحقق من مكان إقامتك الحالي في التطبيق.",
+      "bodyReceiveOff": "لا يمكن لـ Blink تقديم حسابات حافظة في منطقتك. اسحب أموالك قبل {date} — دون أي رسوم من Blink. الاستلام متوقف. إذا كنت تعتقد أن حسابك تأثر عن طريق الخطأ، يمكنك التحقق من مكان إقامتك الحالي في التطبيق."
     },
     "dollarBalanceModal": {
       "title": "لا يمكننا ترحيل رصيدك بالدولار",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "حدث خطأ ما أثناء استئناف ترحيلك. يرجى البدء من جديد.",
     "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ.",
     "migrationRequiredForcedBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ. هذا مطلوب لأسباب تنظيمية.\n\nلا داعي للقلق، سيكون الوضع غير الحفظي أفضل لك على المدى الطويل.",
+    "migrationRequiredForcedBodyLevelZero": "تُغلق Blink الحسابات التجريبية. انقل رصيدك إلى حساب غير حافظ. لا يستغرق الأمر سوى بضع نقرات.",
     "migrationGateTitle": "الحساب غير متاح",
     "migrationGateBody": "لأسباب تنظيمية لا يمكننا توفير حسابات حفظية في منطقتك. حوّل أموالك إلى حساب غير حفظي مع Blink باتباع الخطوات التالية أو تواصل معنا على <link>{email}</link>",
+    "migrationGateBodyLevelZero": "تم إغلاق الحسابات التجريبية. رصيدك في أمان. انقله إلى حساب غير حافظ باتباع الخطوات التالية، مجانًا ودون أي مهلة زمنية، أو تواصل معنا على <link>{email}</link>",
     "bitcoinBalance": "رصيد البيتكوين",
     "dollarBalance": "رصيد الدولار",
     "moveToNonCustodial": "الانتقال إلى غير حفظي",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "تعذّرت القراءة من الحافظة. يرجى إدخال عبارة النسخ الاحتياطي يدويًا.",
     "enterWord": "كلمة",
     "invalidMnemonic": "عبارة نسخ احتياطي غير صحيحة. يرجى التحقق من صحة ترتيب الكلمات.",
+    "invalidPhrase": "عبارة نسخ احتياطي غير صحيحة. يرجى التحقق من صحة ترتيب الكلمات. تواصل مع <link>الدعم</link> إذا استمرت المشكلة.",
+    "invalidWord": "كلمة غير صالحة، يرجى التحقق من الإملاء",
     "restoring": "جاري استعادة محفظتك...",
     "restoreSuccess": "تمت استعادة المحفظة بنجاح",
     "restoreFailed": "فشل في استعادة المحفظة. يرجى المحاولة مرة أخرى.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "المبلغ أقل من الحد الأدنى المطلوب لهذه الدفعة. حاول بمبلغ أكبر.",
     "networkError": "مشكلة في اتصال الشبكة. تحقق من اتصالك وحاول مرة أخرى.",
     "invalidInput": "تبدو تفاصيل الدفع غير صالحة. يرجى المراجعة والمحاولة مرة أخرى.",
-    "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر."
+    "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر.",
+    "outcomeUnknown": "ربما تمت هذه الدفعة بالفعل. تحقق من سجل معاملاتك قبل إرسالها مرة أخرى.",
+    "earlierConversionPending": "لا يزال تحويلك السابق قيد التأكيد. حاول مرة أخرى بعد بضع دقائق.",
+    "earlierPaymentFound": "تمت دفعتك السابقة إلى هذه الوجهة بالفعل، بمبلغ مختلف. تحقق منها قبل الإرسال مرة أخرى.",
+    "earlierConversionFound": "تم التحويل السابق بالفعل، بمبلغ مختلف. تحقق منه في سجل معاملاتك قبل التحويل مرة أخرى.",
+    "convertedMeanwhile": "تم للتو تحويل بمبلغ قريب من هذا المبلغ. تحقق من رصيدك قبل تأكيد هذا التحويل مرة أخرى."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "تم إنشاء هذا الحساب على {network}. بدّل إلى {network} لاستخدامه."

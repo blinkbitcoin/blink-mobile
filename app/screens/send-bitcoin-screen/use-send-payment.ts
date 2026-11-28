@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import Crypto from "react-native-quick-crypto"
 
 import { gql } from "@apollo/client"
@@ -40,12 +40,20 @@ type UseSendPaymentResult = {
     | null
   /**
    * A send attempt reached the network, so money may already have moved. Sticky for the
-   * life of the mount: it stays true even after a failure, because the caller uses it to
-   * stop validating against a balance the backend may already have debited. It does NOT
+   * life of the mount, short of `forgetAttempt`: it stays true even after a failure,
+   * because the caller uses it to stop validating against a balance the backend may
+   * already have debited. It does NOT
    * mean "the send is spent" — whether another attempt is allowed is expressed by
    * sendPayment being defined.
    */
   hasAttemptedSend: boolean
+  /**
+   * Clears `hasAttemptedSend` after a send the mutation itself says went nowhere: it was
+   * refused before anything reached the network, so the balance and back behave as before
+   * the slide. Only for that case; any other failure may have moved money. The key stays
+   * on the payment's ref, since nothing went out under it.
+   */
+  forgetAttempt: () => void
 }
 
 /**
@@ -365,8 +373,11 @@ export const useSendPayment = (
     onChainUsdPaymentSendAsBtcDenominated,
   ])
 
+  const forgetAttempt = useCallback(() => setHasAttemptedSend(false), [])
+
   return {
     hasAttemptedSend,
+    forgetAttempt,
     loading,
     sendPayment,
   }

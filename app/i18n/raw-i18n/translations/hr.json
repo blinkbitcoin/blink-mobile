@@ -2354,15 +2354,41 @@
     "title": "Potvrdi plaćanje",
     "totalLabel": "Ukupno:",
     "totalExceed": "Ukupno premašuje vaš saldo od {balance: string}",
+    "feeExceedsAmount": "Mrežna naknada veća je od iznosa koji šaljete",
     "maxFeeSelected": "Ovo je najveća naknada koja će vam biti naplaćena za ovu transakciju. Nakon izvršenja plaćanja može ispasti manje.",
     "invoiceAlreadyPaid": "Ovaj račun je već plaćen",
     "somethingWentWrong": "Nešto je pošlo po zlu",
+    "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
-    "slideToConfirm": "Povucite za potvrdu",
+    "paymentMayStillLand": "Pričekajte trenutak, uplata će vjerojatno uskoro proći. Vaš novac će sigurno stići ili ostati kod vas.",
     "slideConfirming": "Potvrđivanje...",
+    "slideToSend": "Povucite za slanje",
+    "calculatingFee": "Izračun naknade…",
+    "sendProgress": {
+      "reviewing": "Provjera",
+      "signing": "Potpisivanje",
+      "findingRoute": "Traženje rute",
+      "broadcasting": "Emitiranje",
+      "checkingDelivery": "Provjera isporuke",
+      "almostThere": "Skoro gotovo",
+      "anyTimeNow": "Svakog trena",
+      "hangTight": "Samo malo",
+      "stillOnItsWay": "Još je na putu"
+    },
     "copiedDestination": "Odredište kopirano u međuspremnik",
-    "lightningRecommended": "Visoka naknada! Preporučujemo Lightning.",
-    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}."
+    "lightningRecommended": "Visoka naknada. Preporučujemo Lightning.",
+    "sending": "Slanje",
+    "sent": "Poslano",
+    "receipt": "Potvrda",
+    "sentAnnouncement": "Poslano, {amount: string}",
+    "fromBalance": "Sa salda",
+    "details": "Detalji",
+    "changeAmount": "Promijeni iznos",
+    "tryAgain": "Pokušajte ponovno",
+    "home": "Doma",
+    "dustSweepSheetTitle": "Prije slanja",
+    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}.",
+    "sendAnyway": "Povijest je provjerena, svejedno pošalji"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} korisnička imena sada su {bankName: string} adrese.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
+    "addAmount": "Dodaj iznos",
+    "slideToSelectAmount": "Povucite za odabir iznosa",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
+    "limitsUnavailable": "Nismo mogli provjeriti vaše dnevno ograničenje. Pokušajte ponovno za trenutak.",
+    "problemSheetTitle": "Mali problem",
+    "changeDestination": "Promijeni odredište",
+    "recipientUnreachableTitle": "Nije moguće doći do primatelja",
+    "recipientWrongAmountTitle": "Primatelj je naveo pogrešan iznos",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
     "amountIsRequired": "Potreban je iznos",
     "cost": "Trošak",
@@ -2425,10 +2459,11 @@
     "title": "Šalji Bitcoin",
     "failedToFetchLnurlInvoice": "Nije uspjelo dohvaćanje lnurl fakture",
     "lnurlInvoiceIncorrectAmount": "lnurl poslužitelj je odgovorio fakturom s netočnim iznosom.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozorenje o visokoj naknadi!",
-      "content": "Vaša naknada je više od 50% veća od poslanog iznosa. Jeste li sigurni da želite nastaviti?\n\nZa smanjenje naknada, zamolite primatelja da prihvati transakciju putem Lightninga",
-      "confirmButton": "100% sam siguran/na"
+      "body": "Vaša naknada iznosi 50 % ili više iznosa koji šaljete. Jeste li sigurni da želite nastaviti?",
+      "cancelPayment": "Otkaži plaćanje",
+      "acceptFee": "Prihvati naknadu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "pendingPayment": "Plaćanje je poslano, ali još nije potvrđeno.\n\nMoguće je da plaćanje neće biti potvrđeno, u tom slučaju sredstva će biti vraćena na vaš račun.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Mrežna greška. Provjerite vezu i pokušajte ponovo.",
-    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
+    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom.",
+    "onchainSelfPayment": "Ovo je adresa vašeg vlastitog novčanika. Ne možete poslati on-chain uplatu sami sebi."
   },
   "SettingsScreen": {
     "createAddress": "Stvori Lightning adresu",
@@ -2988,6 +3024,7 @@
     "note": "Bilješka",
     "notification": "Obavijest",
     "ok": "OK",
+    "okay": "U redu",
     "or": "ili",
     "openWallet": "Otvori Novčanik",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Postavite iznos"
+  },
+  "Accessibility": {
+    "deleteKey": "Izbriši",
+    "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
+    "switchToWallet": "Prebaci na {wallet: string}",
+    "copy": "Kopiraj",
+    "balanceHidden": "Stanje skriveno",
+    "revealBalanceHint": "Prikazuje vaše stanje na ovom zaslonu"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Plaćanje",
         "acceptButton": "Prihvati",
         "payButton": "Nastavi i Plati",
-        "cardTitle": "Blink Privatni",
+        "cardTitle": "Blink Orange",
+        "free": "Besplatno",
+        "forNow": "za sada",
         "perYear": "godišnje",
+        "freeBreakdown": {
+          "card": "Blink kartica",
+          "memberBenefits": "Ostale članske pogodnosti"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Posebna ponuda",
@@ -3695,35 +3746,53 @@
           "text": "Pregledao sam i slažem se s dokumentom",
           "linkText": "Cjenik naknada za Blink Card"
         },
-        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci"
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci",
+        "freeNotice": "Razumijem da je Blink Orange za sada besplatan te da se članarina može uvesti kasnije, uz prethodnu obavijest"
+      },
+      "CardVerifyIdentity": {
+        "title": "Potvrdite svoj identitet",
+        "description": "Da biste aktivirali svoju Blink karticu, izdavatelj kartice mora potvrditi tko ste (KYC). Trebat će vam:",
+        "requirements": {
+          "governmentId": "Službeni identifikacijski dokument",
+          "selfie": "Selfie / provjera živosti",
+          "proofOfAddress": "Dokaz o adresi",
+          "questions": "Nekoliko pitanja o vama"
+        },
+        "buttonText": "Nastavi"
       },
       "CardIntroducing": {
         "title": "Predstavljamo",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa kartica",
+          "bitcoinCard": "Blink kartica",
           "for": "za",
-          "maximalist": "Bitcoin Maksimaliste"
+          "bitcoiners": "Bitcoinere"
         },
         "buttonText": "Nastavi"
       },
       "CardDetails": {
-        "title": "Dodatne pogodnosti",
+        "title": "Što je uključeno",
         "features": {
-          "accountManager": "Posvećeni upravitelj računa",
-          "support": "Prioritetna podrška",
-          "onchainDeposits": "50% povrata na naknade za transakcije",
-          "circularEconomies": "100 $ za kružne ekonomije"
+          "card": {
+            "title": "Blink kartica",
+            "subtitle": "vaša Visa kartica, spremna već danas"
+          },
+          "accountManager": {
+            "title": "Osobni upravitelj računa",
+            "subtitle": "i prioritetna podrška"
+          },
+          "onOffRamping": "Uplate i isplate novca"
         },
-        "andMore": "... i još toga dolazi 2026.",
+        "availableIn": "za {months} mjeseci",
+        "footnote": "Neke značajke bit će dostupne u roku od {months} mjeseci. Kartica je spremna već danas.",
         "buttonText": "Nastavi"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Dobrodošli na brod",
-          "subtitle": "U Blink Privatni",
+          "subtitle": "U Blink Orange",
           "paragraphs": {
-            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Privatni. Vjerojatno zato što ste sjajan Bitcoiner.",
-            "body2": "Naš cilj za 2026. je napuniti program s toliko pogodnosti da će biti očito da se isplati obnoviti sljedeće godine."
+            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Orange. Vjerojatno zato što ste sjajan Bitcoiner.",
+            "body2": "Blink Orange je prva razina Blink članstva za Bitcoinere, samo uz pozivnicu. Blink kartica i vaš osobni upravitelj računa dvije su od prvih usluga koje nudimo — ostatak gradimo do 2027."
           }
         },
         "buttonText": "Idemo"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Zanimanje",
-            "placeholder": "Odaberite svoje zanimanje"
+            "placeholder": "Odaberite"
           },
           "annualSalaryRange": {
             "label": "Godišnja plaća",
-            "placeholder": "Odaberite svoj raspon plaće"
+            "placeholder": "Odaberite plaću"
           },
           "accountPurpose": {
             "label": "Svrha računa",
@@ -3815,7 +3884,6 @@
             "placeholder": "Odaberite svoj raspon potrošnje"
           }
         },
-        "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", i",
           "cardTermsLinkText": "Uvjete kartice Blink"
         },
-        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink Visa",
-        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
+        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink",
+        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink ne predstavlja neovlašteno oglašavanje"
       },
       "CardPreapproved": {
-        "title": "Unaprijed ste odobreni za Blink Visa karticu!",
+        "title": "Vaša Blink kartica je spremna!",
+        "subtitle": "Sada možete aktivirati svoju karticu i početi je koristiti",
         "buttonText": "Zatvori"
+      },
+      "CardDeclined": {
+        "title": "Nismo mogli odobriti vaš zahtjev za karticu",
+        "subtitle": "Vaš upravitelj računa javit će vam se."
       },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
-        "subtitle": "Obavijestit ćemo te čim budemo spremni",
-        "buttonText": "Zatvori"
+        "subtitle": "Ovo može potrajati do jedne minute"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Migrirajte sada na račun bez skrbništva",
       "body": "Više ne možete primati sredstva na svoj skrbnički račun. Blink je ukinuo skrbničku uslugu u vašoj regiji i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
+      "bodyLevelZero": "Više ne možete primati sredstva na ovaj probni račun. Blink zatvara probne račune i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
       "migrateCta": "Migriraj sada"
     },
     "reminderBulletin": {
       "title": "Važno",
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
+      "bodySingleDate": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date} — sve se prenosi u nekoliko dodira.",
+      "bodyLevelZero": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "bodyReceiveDisabled": "Primanje je prestalo. Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "migrateCta": "Migriraj"
     },
     "offboardBulletin": {
       "title": "Važno",
-      "body": "Vaš račun registriran je u regiji u kojoj ne možemo nuditi račune. Podignite svoja sredstva prije 31. kolovoza. Primanje prestaje 10. kolovoza."
+      "bodyTwoDates": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Primanje prestaje {receiveStopsDate}. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji.",
+      "bodySingleDate": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji.",
+      "bodyReceiveOff": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Primanje je isključeno. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji."
     },
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Nešto je pošlo po zlu pri nastavku migracije. Molimo započnite je ponovno.",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "migrationRequiredForcedBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva. To je obavezno iz regulatornih razloga.\n\nBez brige, non-custodial će ti dugoročno biti bolji.",
+    "migrationRequiredForcedBodyLevelZero": "Blink zatvara probne račune. Prenesite svoj saldo na račun bez skrbništva. Potrebno je samo nekoliko dodira.",
     "migrationGateTitle": "Račun nije dostupan",
     "migrationGateBody": "Iz regulatornih razloga ne možemo pružati custodial račune u tvojoj regiji. Prenesi svoja sredstva na non-custodial račun uz Blink slijedeći sljedeće korake ili nas kontaktiraj na <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Probni računi sada su zatvoreni. Vaš saldo je siguran. Prenesite ga na račun bez skrbništva slijedeći sljedeće korake, besplatno i bez vremenskog ograničenja, ili nas kontaktirajte na <link>{email}</link>",
     "bitcoinBalance": "Stanje Bitcoina",
     "dollarBalance": "Stanje u dolarima",
     "moveToNonCustodial": "Prebaci na ne-skrbnički",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Čitanje iz međuspremnika nije uspjelo. Unesite svoju sigurnosnu frazu ručno.",
     "enterWord": "Riječ",
     "invalidMnemonic": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan.",
+    "invalidPhrase": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan. Ako se problem nastavi, kontaktirajte <link>podršku</link>.",
+    "invalidWord": "Neispravna riječ, provjerite pravopis",
     "restoring": "Obnavljanje vašeg novčanika...",
     "restoreSuccess": "Novčanik uspješno obnovljen",
     "restoreFailed": "Obnova novčanika nije uspjela. Pokušajte ponovo.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Iznos je ispod minimuma potrebnog za ovo plaćanje. Pokušajte s većim iznosom.",
     "networkError": "Problem s mrežnom vezom. Provjerite vezu i pokušajte ponovno.",
     "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
-    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
+    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos.",
+    "outcomeUnknown": "Ovo plaćanje je možda već izvršeno. Provjerite povijest transakcija prije ponovnog slanja.",
+    "earlierConversionPending": "Vaša prethodna konverzija još se potvrđuje. Pokušajte ponovno za nekoliko minuta.",
+    "earlierPaymentFound": "Vaše prethodno plaćanje na ovo odredište već je izvršeno, na drugi iznos. Provjerite ga prije ponovnog slanja.",
+    "earlierConversionFound": "Vaša prethodna konverzija već je izvršena, na drugi iznos. Provjerite je u povijesti transakcija prije ponovne konverzije.",
+    "convertedMeanwhile": "Upravo je izvršena konverzija približno ovog iznosa. Provjerite stanje prije nego što ponovno potvrdite ovu."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ovaj račun je stvoren na mreži {network}. Prebacite se na {network} kako biste ga koristili."

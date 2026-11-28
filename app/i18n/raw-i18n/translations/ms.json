@@ -2354,15 +2354,41 @@
     "title": "Pastikan bayaran anda",
     "totalLabel": "Jumlah:",
     "totalExceed": "Jumlah yang melebihi baki anda {balance: string}",
+    "feeExceedsAmount": "Cas rangkaian melebihi amaun yang anda hantar",
     "maxFeeSelected": "Ini adalah cas bayaran maksimum yang akan dikenakan untuk transaksi ini. Tapi cas ni mungkin akan lagi rendah bila bayaran telah dibuat.",
     "invoiceAlreadyPaid": "Invois ini telah pun dibayar",
     "somethingWentWrong": "Sesuatu tidak kena",
+    "priceUpdated": "Harga berubah, jadi jumlah telah dikemas kini. Semak sebelum anda hantar.",
     "paymentAlreadyAttempted": "Bayaran telah pun dicuba.\n\nJika anda mahu menghantar bayaran ini semula, mulakan dari awal.",
-    "slideToConfirm": "Leret untuk Sahkan",
+    "paymentMayStillLand": "Tunggu sebentar, ia mungkin akan berjaya tidak lama lagi. Wang anda akan sampai dengan selamat atau kekal bersama anda.",
     "slideConfirming": "Mengesahkan...",
+    "slideToSend": "Leret untuk Hantar",
+    "calculatingFee": "Mengira cas…",
+    "sendProgress": {
+      "reviewing": "Menyemak",
+      "signing": "Menandatangani",
+      "findingRoute": "Mencari laluan",
+      "broadcasting": "Menyiarkan",
+      "checkingDelivery": "Menyemak penghantaran",
+      "almostThere": "Hampir siap",
+      "anyTimeNow": "Bila-bila masa sekarang",
+      "hangTight": "Tunggu sekejap",
+      "stillOnItsWay": "Masih dalam perjalanan"
+    },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
-    "lightningRecommended": "Yuran tinggi! Kami mengesyorkan Lightning.",
-    "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}."
+    "lightningRecommended": "Yuran tinggi. Kami mengesyorkan Lightning.",
+    "sending": "Menghantar",
+    "sent": "Dihantar",
+    "receipt": "Resit",
+    "sentAnnouncement": "Dihantar, {amount: string}",
+    "fromBalance": "Daripada Baki",
+    "details": "Butiran",
+    "changeAmount": "Tukar amaun",
+    "tryAgain": "Cuba lagi",
+    "home": "Rumah",
+    "dustSweepSheetTitle": "Sebelum anda menghantar",
+    "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}.",
+    "sendAnyway": "Saya telah menyemak sejarah, hantar juga"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} id pengguna sekarang adalah {bankName: string} alamatnya.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
+    "addAmount": "Tambah amaun",
+    "slideToSelectAmount": "Leret untuk memilih amaun",
+    "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
+    "limitsUnavailable": "Kami tidak dapat menyemak had harian anda. Cuba lagi sebentar lagi.",
+    "problemSheetTitle": "Masalah kecil",
+    "changeDestination": "Tukar destinasi",
+    "recipientUnreachableTitle": "Tidak dapat menghubungi penerima",
+    "recipientWrongAmountTitle": "Penerima menyatakan jumlah yang salah",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
     "amountIsRequired": "Jumlah diperlukan",
     "cost": "Kos",
@@ -2425,10 +2459,11 @@
     "title": "Hantar bitcoin",
     "failedToFetchLnurlInvoice": "Gagal untuk dapatkan invois lnurl ",
     "lnurlInvoiceIncorrectAmount": "Server lnurl telah beri respon invois tersebut salah amaunnya",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Amaran yuran tinggi!",
-      "content": "Yuran anda melebihi 50% daripada jumlah yang dihantar. Adakah anda pasti mahu meneruskan?\n\nUntuk mengurangkan yuran, minta penerima menerima transaksi melalui Lightning",
-      "confirmButton": "Saya 100% pasti"
+      "body": "Cas anda ialah 50% atau lebih daripada jumlah yang anda hantar. Adakah anda pasti mahu meneruskan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima cas"
     },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
     "pendingPayment": "Bayaran telah dihantar, tetapi belum disahkan lagi.\n\nKemungkinan bayaran tidak akan disahkan, dan dalam kes itu dana akan dikembalikan ke akaun anda.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Dana tidak mencukupi untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Ralat rangkaian. Sila semak sambungan anda dan cuba lagi.",
-    "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza."
+    "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza.",
+    "onchainSelfPayment": "Ini ialah alamat dompet anda sendiri. Anda tidak boleh menghantar pembayaran on-chain kepada diri sendiri."
   },
   "SettingsScreen": {
     "createAddress": "Cipta alamat Lightning",
@@ -2988,6 +3024,7 @@
     "note": "Nota",
     "notification": "Pemberitahuan",
     "ok": "Baiklah",
+    "okay": "Baiklah",
     "or": "atau",
     "openWallet": "Buka Dompet",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan amaun"
+  },
+  "Accessibility": {
+    "deleteKey": "Padam",
+    "swapCurrencyHint": "Menukar mata wang untuk menaip amaun",
+    "switchToWallet": "Tukar kepada {wallet: string}",
+    "copy": "Salin",
+    "balanceHidden": "Baki disembunyikan",
+    "revealBalanceHint": "Menunjukkan baki anda pada skrin ini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {version: string}",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Pembayaran",
         "acceptButton": "Terima",
         "payButton": "Teruskan dan Bayar",
-        "cardTitle": "Blink Peribadi",
+        "cardTitle": "Blink Orange",
+        "free": "Percuma",
+        "forNow": "buat masa ini",
         "perYear": "setahun",
+        "freeBreakdown": {
+          "card": "Kad Blink",
+          "memberBenefits": "Faedah ahli lain"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Tawaran istimewa",
@@ -3695,35 +3746,53 @@
           "text": "Saya telah menyemak dan bersetuju dengan",
           "linkText": "Jadual Fi Blink Card"
         },
-        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan"
+        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan",
+        "freeNotice": "Saya faham bahawa Blink Orange percuma buat masa ini, dan yuran keahlian mungkin diperkenalkan kemudian, dengan notis"
+      },
+      "CardVerifyIdentity": {
+        "title": "Sahkan identiti anda",
+        "description": "Untuk mengaktifkan Kad Blink anda, pengeluar kad perlu mengesahkan siapa anda (KYC). Anda akan memerlukan:",
+        "requirements": {
+          "governmentId": "ID yang dikeluarkan kerajaan",
+          "selfie": "Swafoto / semakan keaktifan",
+          "proofOfAddress": "Bukti alamat",
+          "questions": "Beberapa soalan tentang anda"
+        },
+        "buttonText": "Teruskan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",
         "cardInfo": {
-          "bitcoinCard": "Kad Visa Blink",
+          "bitcoinCard": "Kad Blink",
           "for": "untuk",
-          "maximalist": "Maximalis Bitcoin"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Teruskan"
       },
       "CardDetails": {
-        "title": "Faedah tambahan",
+        "title": "Apa yang disertakan",
         "features": {
-          "accountManager": "Pengurus akaun khusus",
-          "support": "Sokongan keutamaan",
-          "onchainDeposits": "50% pulangan yuran transaksi",
-          "circularEconomies": "$100 untuk ekonomi pekeliling"
+          "card": {
+            "title": "Kad Blink",
+            "subtitle": "kad Visa anda, sedia hari ini"
+          },
+          "accountManager": {
+            "title": "Pengurus akaun peribadi",
+            "subtitle": "dan sokongan keutamaan"
+          },
+          "onOffRamping": "Wang masuk dan keluar"
         },
-        "andMore": "... dan lagi akan datang pada 2026",
+        "availableIn": "dalam {months} bulan",
+        "footnote": "Sesetengah ciri akan tersedia dalam tempoh {months} bulan. Kad sedia hari ini.",
         "buttonText": "Teruskan"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Selamat datang",
-          "subtitle": "Di Blink Peribadi",
+          "subtitle": "Di Blink Orange",
           "paragraphs": {
-            "body1": "Seseorang memikirkan anda dan mencadangkan agar kami menjemput anda ke Blink Peribadi. Mungkin kerana anda seorang Bitcoiner yang hebat.",
-            "body2": "Matlamat kami untuk 2026 adalah mengisi program dengan begitu banyak kebaikan sehingga jelas untuk memperbaharui tahun depan."
+            "body1": "Seseorang memikirkan anda dan mencadangkan agar kami menjemput anda ke Blink Orange. Mungkin kerana anda seorang Bitcoiner yang hebat.",
+            "body2": "Blink Orange ialah peringkat pertama keahlian Blink untuk Bitcoiner, melalui jemputan sahaja. Kad Blink dan pengurus akaun peribadi anda ialah dua daripada perkhidmatan pertama yang kami tawarkan — selebihnya sedang kami bina sehingga 2027."
           }
         },
         "buttonText": "Jom mulakan"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Pekerjaan",
-            "placeholder": "Pilih pekerjaan anda"
+            "placeholder": "Pilih"
           },
           "annualSalaryRange": {
             "label": "Gaji tahunan",
-            "placeholder": "Pilih julat gaji anda"
+            "placeholder": "Pilih gaji"
           },
           "accountPurpose": {
             "label": "Tujuan akaun",
@@ -3815,7 +3884,6 @@
             "placeholder": "Pilih julat perbelanjaan anda"
           }
         },
-        "buttonText": "Hantar permohonan",
         "select": "pilih"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", dan",
           "cardTermsLinkText": "Terma Kad Blink"
         },
-        "certifyAccuracy": "Saya mengesahkan bahawa maklumat yang saya berikan adalah tepat dan bahawa saya akan mematuhi semua peraturan dan keperluan berkaitan Kad Blink Visa saya",
-        "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink Visa bukan merupakan permohonan yang tidak dibenarkan"
+        "certifyAccuracy": "Saya mengesahkan bahawa maklumat yang saya berikan adalah tepat dan bahawa saya akan mematuhi semua peraturan dan keperluan berkaitan Kad Blink saya",
+        "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink bukan merupakan permohonan yang tidak dibenarkan"
       },
       "CardPreapproved": {
-        "title": "Anda telah dipra-luluskan untuk kad Blink Visa!",
+        "title": "Kad Blink anda sudah sedia!",
+        "subtitle": "Anda kini boleh mengaktifkan kad anda dan mula menggunakannya",
         "buttonText": "Tutup"
+      },
+      "CardDeclined": {
+        "title": "Kami tidak dapat meluluskan permohonan kad anda",
+        "subtitle": "Pengurus akaun anda akan menghubungi anda."
       },
       "CardProcessing": {
         "title": "Memproses permohonan anda",
-        "subtitle": "Kami akan memberitahu anda sebaik sahaja kami bersedia",
-        "buttonText": "Tutup"
+        "subtitle": "Ini boleh mengambil masa sehingga satu minit"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Berpindah sekarang ke akaun bukan kustodial",
       "body": "Anda tidak lagi boleh menerima dana ke akaun kustodial anda. Blink telah menghentikan perkhidmatan kustodial di wilayah anda dan akaun ini akan dinyahaktifkan menjelang akhir {date}.\n\nBerpindah sekarang ke akaun bukan kustodial.",
+      "bodyLevelZero": "Anda tidak lagi boleh menerima dana ke akaun percubaan ini. Blink sedang menutup akaun percubaan dan akaun ini akan dinyahaktifkan menjelang akhir {date}.\n\nBerpindah sekarang ke akaun bukan kustodial.",
       "migrateCta": "Pindah sekarang"
     },
     "reminderBulletin": {
       "title": "Penting",
       "body": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
+      "bodySingleDate": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date} — semuanya berpindah dengan beberapa ketikan sahaja.",
+      "bodyLevelZero": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}.",
       "bodyReceiveDisabled": "Penerimaan telah berhenti. Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}.",
       "migrateCta": "Pindah"
     },
     "offboardBulletin": {
       "title": "Penting",
-      "body": "Akaun anda didaftarkan di wilayah yang kami tidak dapat menawarkan akaun. Keluarkan dana anda sebelum 31 Ogos. Penerimaan berhenti pada 10 Ogos."
+      "bodyTwoDates": "Blink tidak dapat menawarkan akaun kustodial di wilayah anda. Keluarkan dana anda sebelum {date} — tanpa sebarang caj daripada Blink. Penerimaan berhenti pada {receiveStopsDate}. Jika anda percaya akaun anda terjejas secara silap, anda boleh mengesahkan tempat tinggal semasa anda dalam aplikasi.",
+      "bodySingleDate": "Blink tidak dapat menawarkan akaun kustodial di wilayah anda. Keluarkan dana anda sebelum {date} — tanpa sebarang caj daripada Blink. Jika anda percaya akaun anda terjejas secara silap, anda boleh mengesahkan tempat tinggal semasa anda dalam aplikasi.",
+      "bodyReceiveOff": "Blink tidak dapat menawarkan akaun kustodial di wilayah anda. Keluarkan dana anda sebelum {date} — tanpa sebarang caj daripada Blink. Penerimaan dimatikan. Jika anda percaya akaun anda terjejas secara silap, anda boleh mengesahkan tempat tinggal semasa anda dalam aplikasi."
     },
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memindahkan Baki Dolar anda",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Sesuatu telah berlaku semasa menyambung semula pemindahan anda. Sila mulakannya semula.",
     "migrationRequiredBody": "Sudah tiba masanya untuk memindahkan akaun kustodial anda ke akaun bukan kustodial.",
     "migrationRequiredForcedBody": "Sudah tiba masanya untuk memindahkan akaun kustodial anda ke akaun bukan kustodial. Ini diperlukan atas sebab kawal selia.\n\nJangan risau, non-custodial akan lebih baik untuk anda dalam jangka panjang.",
+    "migrationRequiredForcedBodyLevelZero": "Blink sedang menutup akaun percubaan. Pindahkan baki anda ke akaun bukan kustodial. Hanya perlu beberapa ketikan.",
     "migrationGateTitle": "Akaun tidak boleh diakses",
     "migrationGateBody": "Atas sebab kawal selia, kami tidak dapat menyediakan akaun custodial di wilayah anda. Pindahkan dana anda ke akaun non-custodial dengan Blink dengan mengikuti langkah seterusnya atau hubungi kami di <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Akaun percubaan kini telah ditutup. Baki anda selamat. Pindahkannya ke akaun bukan kustodial dengan mengikuti langkah seterusnya, percuma dan tanpa had masa, atau hubungi kami di <link>{email}</link>",
     "bitcoinBalance": "Baki Bitcoin",
     "dollarBalance": "Baki dolar",
     "moveToNonCustodial": "Beralih ke non-custodial",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Tidak dapat membaca daripada clipboard. Sila masukkan frasa sandaran anda secara manual.",
     "enterWord": "Perkataan",
     "invalidMnemonic": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul.",
+    "invalidPhrase": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul. Hubungi <link>Sokongan</link> jika masalah berterusan.",
+    "invalidWord": "Perkataan tidak sah, sila semak ejaan",
     "restoring": "Memulihkan dompet anda...",
     "restoreSuccess": "Dompet berjaya dipulihkan",
     "restoreFailed": "Gagal memulihkan dompet. Sila cuba lagi.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Jumlah berada di bawah minimum yang diperlukan untuk pembayaran ini. Cuba jumlah yang lebih besar.",
     "networkError": "Masalah sambungan rangkaian. Semak sambungan anda dan cuba lagi.",
     "invalidInput": "Butiran pembayaran kelihatan tidak sah. Sila semak dan cuba lagi.",
-    "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil."
+    "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil.",
+    "outcomeUnknown": "Pembayaran ini mungkin sudah berjaya. Semak sejarah transaksi anda sebelum menghantarnya semula.",
+    "earlierConversionPending": "Penukaran anda yang terdahulu masih disahkan. Cuba lagi dalam beberapa minit.",
+    "earlierPaymentFound": "Pembayaran anda yang terdahulu ke destinasi ini sudah berjaya, dengan jumlah yang berbeza. Semaknya sebelum menghantar semula.",
+    "earlierConversionFound": "Penukaran anda yang terdahulu sudah berjaya, dengan jumlah yang berbeza. Semaknya dalam sejarah transaksi anda sebelum menukar semula.",
+    "convertedMeanwhile": "Penukaran dengan jumlah yang hampir sama baru sahaja berjaya. Semak baki anda sebelum mengesahkan penukaran ini semula."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akaun ini dicipta pada {network}. Tukar ke {network} untuk menggunakannya."

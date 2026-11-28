@@ -6,12 +6,16 @@ import { it } from "@jest/globals"
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 
 import {
+  assertSendAllQuoteHolds,
   createGetFee,
   createGetFeeOnchain,
   createSendMutation,
   createSendMutationOnchain,
-  findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import {
+  findLostSend,
+  findPaymentUnderKey,
+} from "@app/self-custodial/payment-details/lost-send"
 import {
   measureObservedPayment,
   resetMeasuredOnceKeys,
@@ -19,6 +23,7 @@ import {
   resetSettlementTracking,
   setMeasurementContext,
 } from "@app/self-custodial/measurement"
+import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { AccountMode } from "@app/types/account"
 import { ConvertAmountAdjustment } from "@app/types/payment"
@@ -56,15 +61,19 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       IncreasedToAvoidDust: "IncreasedToAvoidDust",
     },
     BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+    FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
     InputType_Tags: { SparkAddress: "SparkAddress" },
     Network: { Mainnet: 0, Regtest: 1 },
     SendPaymentMethod_Tags: {
       BitcoinAddress: "BitcoinAddress",
       Bolt11Invoice: "Bolt11Invoice",
+      SparkAddress: "SparkAddress",
+      SparkInvoice: "SparkInvoice",
     },
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
     PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
     SyncWalletRequest: { create: (request: unknown) => request },
+    GetPaymentRequest: { create: (request: unknown) => request },
     PaymentType: { Send: 0, Receive: 1 },
     Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
     StableBalanceActiveLabel: {
@@ -114,15 +123,31 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 
 const mockListPayments = jest.fn()
 const mockSyncWallet = jest.fn()
+const mockGetPayment = jest.fn()
 
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
   listPayments: (...args: unknown[]) => mockListPayments(...args),
   syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
+  getPayment: (...args: unknown[]) => mockGetPayment(...args),
 } as never
 
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
+
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
+/** Lost attempts are kept for the connected wallet for as long as the app runs, which
+ *  here is the whole file: every test connects a wallet of its own, holding none. */
+let connectedWallets = 0
+beforeEach(() => {
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
+})
 
 describe("createGetFee", () => {
   beforeEach(() => {
@@ -389,7 +414,10 @@ describe("createGetFee", () => {
 
   it("forwards amount and tokenIdentifier on the prepare call", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFee({
@@ -410,7 +438,10 @@ describe("createGetFee", () => {
 
   it("forwards conversionOptions on the prepare call (USDB→BTC Lightning)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
     const conversionOptions = {
       conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
@@ -478,7 +509,10 @@ describe("createGetFeeOnchain", () => {
   it("returns undefined amount when extractOnchainFees returns null (regression)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFeeOnchain(
@@ -494,7 +528,10 @@ describe("createGetFeeOnchain", () => {
   it("reports the Generic code when extractOnchainFees returns null", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFeeOnchain(
@@ -570,9 +607,12 @@ describe("createSendMutation", () => {
 
   it("returns success on a successful send", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutation(
       {
@@ -580,7 +620,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -596,7 +636,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -617,7 +657,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -633,7 +673,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -651,7 +691,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -670,7 +710,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -685,9 +725,12 @@ describe("createSendMutation", () => {
 
   it("forwards tokenIdentifier on the prepare call", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutation(
       {
@@ -696,7 +739,7 @@ describe("createSendMutation", () => {
         amount: BigInt(1500),
         tokenIdentifier: "usdb-token-id",
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -707,9 +750,12 @@ describe("createSendMutation", () => {
 
   it("forwards conversionOptions on the prepare call (USDB→BTC Lightning)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
     const conversionOptions = {
       conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
       maxSlippageBps: undefined,
@@ -723,7 +769,7 @@ describe("createSendMutation", () => {
         amount: undefined,
         conversionOptions,
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -742,12 +788,12 @@ describe("createSendMutationOnchain", () => {
     mockPrepareSendPayment.mockResolvedValue({
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
-      telemetryOnchain,
+      { telemetry: telemetryOnchain },
     )
     const result = await send()
 
@@ -765,7 +811,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "fast",
-      telemetryOnchain,
+      { telemetry: telemetryOnchain },
     )
     const result = await send()
 
@@ -804,7 +850,12 @@ describe("findLostSend", () => {
    *  sync a test leaves pending must not be handed to the next one. */
   let lookupSdk = mockSdk
   const lookup = () =>
-    findLostSend({ sdk: lookupSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+    findLostSend({
+      sdk: lookupSdk,
+      startedAtMs: STARTED_AT_MS,
+      walletClockSec: STARTED_AT_MS / 1000,
+      matches: toFriend,
+    })
 
   /** Runs the lookup to its end, releasing each wait between looks. */
   const settle = async <T>(pending: Promise<T>): Promise<T> => {
@@ -833,6 +884,62 @@ describe("findLostSend", () => {
    *  a day before the attempt's own clock, because the wallet stamps a payment with the
    *  server's clock and a phone's can be set well ahead of it. Only what was sent from
    *  this wallet is asked for. */
+  /** A phone clock days ahead puts the attempt's own time after the payment's, which
+   *  the wallet stamps by the server's clock: the wallet's newest send then, stamped the
+   *  same way, still reaches it. */
+  it("reaches back from the wallet's own clock when it is earlier than the phone's", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+    const twoDaysEarlier = STARTED_AT_MS / 1000 - 2 * 24 * 60 * 60
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: twoDaysEarlier,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(twoDaysEarlier - 24 * 60 * 60) }),
+    )
+  })
+
+  /** A phone clock behind the server's: its own time is the earlier, and is used. */
+  it("reaches back from the phone's clock when it is the earlier", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: STARTED_AT_MS / 1000 + 2 * 24 * 60 * 60,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(1_747_691_078 - 24 * 60 * 60) }),
+    )
+  })
+
+  it("reads the whole history when the wallet held no send to go by", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: 0,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(0) }),
+    )
+  })
+
   it("asks for outgoing payments from a day before the attempt", async () => {
     walletAnswers([sent("p1", COMPLETED)])
 
@@ -1331,7 +1438,7 @@ describe("send telemetry", () => {
   const sendBolt11 = () =>
     createSendMutation(
       { sdk: mockSdk, paymentRequest: "lnbc1...", amount: undefined },
-      telemetry,
+      { telemetry },
     )()
 
   beforeEach(() => {
@@ -1344,7 +1451,10 @@ describe("send telemetry", () => {
       network: "mainnet",
     })
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
   })
 
@@ -1424,15 +1534,27 @@ describe("send telemetry", () => {
     ])
   })
 
-  it("reports a thrown send as failed with its classified code", async () => {
-    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+  it("reports a send the SDK refused on the way in as failed with its classified code", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
 
     await sendBolt11()
 
     expect(mockLogEvent).toHaveBeenLastCalledWith(
       "sc_payment_send_failed",
-      expect.objectContaining({ error_code: SelfCustodialErrorCode.NetworkError }),
+      expect.objectContaining({ error_code: SelfCustodialErrorCode.InsufficientFunds }),
     )
+  })
+
+  /** A throw after dispatch leaves the outcome unknown: the payment may have gone out, and
+   *  is looked for. Telemetry waits for the SDK's word rather than count a send that may
+   *  yet settle as failed. */
+  it("waits on a send whose outcome a throw left unknown, reporting nothing yet", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 
   it("does not count a broadcast onchain send as settled", async () => {
@@ -1444,7 +1566,7 @@ describe("send telemetry", () => {
     await createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
-      telemetryOnchain,
+      { telemetry: telemetryOnchain },
     )()
 
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
@@ -1472,10 +1594,12 @@ describe("send telemetry", () => {
       )
 
       const pending = sendBolt11()
-      await Promise.resolve()
-      await Promise.resolve()
+      for (let tick = 0; tick < 50 && mockSendPayment.mock.calls.length === 0; tick += 1)
+        await Promise.resolve()
       setMeasurementContext(next)
-      rejectSend(sdkError("NetworkError"))
+      /** Refused on the way in, so it would be reported as failed in the context the send
+       *  began in: the one thing that must not reach the context that followed. */
+      rejectSend(sdkError("InsufficientFunds"))
       const result = await pending
 
       expect(result.status).toBe(PaymentSendResult.Failure)
@@ -1490,5 +1614,498 @@ describe("send telemetry", () => {
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+})
+
+describe("findPaymentUnderKey", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const KEY = "11111111-1111-4111-8111-111111111111"
+  /** What the SDK's SQLite storage answers an id it holds no payment for. */
+  const notFound = () =>
+    sdkError("StorageError", ["Underlying implementation error: Query returned no rows"])
+  const lookup = () => findPaymentUnderKey({ sdk: mockSdk, key: KEY.toUpperCase() })
+
+  /** Runs the lookup to its end, releasing each wait between looks. */
+  const settle = async <T>(pending: Promise<T>): Promise<T> => {
+    for (let i = 0; i < 3; i += 1) {
+      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    return pending
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    mockSyncWallet.mockResolvedValue(undefined)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** Exact, with no window: a phone clock days ahead cannot leave the payment out. */
+  it("asks the caught-up wallet for the payment by its id, the key", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: COMPLETED } })
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({
+      status: "found",
+      payment: { id: KEY, status: COMPLETED },
+      failed: [],
+    })
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+    expect(mockGetPayment).toHaveBeenCalledWith({ paymentId: KEY })
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  it("finds a payment still in flight", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: PENDING } })
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("found")
+  })
+
+  it("finds one that lands on a later look", async () => {
+    mockGetPayment
+      .mockRejectedValueOnce(notFound())
+      .mockResolvedValueOnce({ payment: { id: KEY, status: COMPLETED } })
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("found")
+    expect(mockGetPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("answers not-found once every look shows no payment under the key", async () => {
+    mockGetPayment.mockRejectedValue(notFound())
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "not-found", failed: [] })
+    expect(mockGetPayment).toHaveBeenCalledTimes(3)
+  })
+
+  it("does not take a failed payment under the key for the attempt landing", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: FAILED } })
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({
+      status: "not-found",
+      failed: [{ id: KEY, status: FAILED }],
+    })
+  })
+
+  /** The SDK's other storage backends answer a missing id this way. */
+  it('takes InvalidInput("Not found") for no payment under the key as well', async () => {
+    mockGetPayment.mockRejectedValue(sdkError("InvalidInput", ["Not found"]))
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "not-found", failed: [] })
+  })
+
+  it("is unreadable when the wallet cannot be read", async () => {
+    mockGetPayment.mockRejectedValue(
+      sdkError("StorageError", ["Connection error: database is locked"]),
+    )
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+
+  it("is unreadable when the wallet throws an error that is not the SDK's", async () => {
+    mockGetPayment.mockRejectedValue(new Error("bridge torn down"))
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+
+  it("is unreadable when the wallet cannot catch up with the server", async () => {
+    mockSyncWallet.mockRejectedValue(sdkError("NetworkError"))
+    mockGetPayment.mockRejectedValue(notFound())
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+})
+
+/** blink-wip#2048: a send-all asks the SDK to take the fee out of the balance. */
+describe("a send-all", () => {
+  const FEES_EXCLUDED = 0
+  const FEES_INCLUDED = 1
+  const sendAll = {
+    sdk: mockSdk,
+    paymentRequest: "lnbc1...",
+    amount: BigInt(100_000),
+    feePolicy: FEES_INCLUDED,
+  }
+
+  const onchainPrepared = {
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: {
+          speedFast: { userFeeSat: BigInt(500), l1BroadcastFeeSat: BigInt(300) },
+          speedMedium: { userFeeSat: BigInt(250), l1BroadcastFeeSat: BigInt(150) },
+          speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(60) },
+        },
+      },
+    },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  /** SR2: the SDK prepares the send again, so what went out can differ from review. */
+  it("reports what the SDK says went out, for Sent and the receipt", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_INCLUDED,
+    })
+    mockSendPayment.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(99_120), fees: BigInt(880) },
+    })
+
+    const result = await createSendMutation(sendAll as never, { telemetry })()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo).toEqual({ settled: { amountSats: 99_120, feeSats: 880 } })
+  })
+
+  /** A Lightning send comes back before the provider names its fee, at 0 until then. */
+  it("reports the fee as what of the amount did not go out, while the SDK's is still 0", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_INCLUDED,
+    })
+    mockSendPayment.mockResolvedValue({
+      payment: { id: "p1", status: 1, amount: BigInt(99_120), fees: BigInt(0) },
+    })
+
+    const result = await createSendMutation(sendAll as never, { telemetry })()
+
+    expect(result.extraInfo).toEqual({ settled: { amountSats: 99_120, feeSats: 880 } })
+  })
+
+  it("reports nothing extra for a plain amount, whose figures review already had", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_EXCLUDED,
+    })
+    mockSendPayment.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(100_000), fees: BigInt(880) },
+    })
+
+    const result = await createSendMutation(
+      { ...sendAll, feePolicy: undefined } as never,
+      { telemetry },
+    )()
+
+    expect(result.extraInfo).toBeUndefined()
+  })
+
+  /** SR3: the fee on top of the whole balance would spend more than the wallet holds. */
+  it("sends nothing when the SDK did not take the fee out of the amount", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_EXCLUDED,
+    })
+
+    const result = await createSendMutation(sendAll as never, { telemetry })()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends nothing on-chain either when the SDK did not take the fee out", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      ...onchainPrepared,
+      feePolicy: FEES_EXCLUDED,
+    })
+
+    const result = await createSendMutationOnchain(
+      { ...sendAll, paymentRequest: "bc1q..." } as never,
+      "medium",
+      { telemetry: telemetryOnchain },
+    )()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("fails the quote rather than show a fee the SDK would put on top", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      ...onchainPrepared,
+      feePolicy: FEES_EXCLUDED,
+    })
+
+    const result = await createGetFeeOnchain(
+      { ...sendAll, paymentRequest: "bc1q..." } as never,
+      "medium",
+    )()
+
+    expect(result.amount).toBeUndefined()
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+  })
+})
+
+/** blink-wip#2048 E4, ruled 2026-11-07: a send-all is prepared again at the slide, and
+ *  when what arrives moved by 100 sats or more since review, nothing is sent. */
+describe("a send-all whose quote moved since review", () => {
+  const FEES_INCLUDED = 1
+
+  const lightningQuote = (feeSats: number) => ({
+    paymentMethod: {
+      tag: "Bolt11Invoice",
+      inner: {
+        invoiceDetails: { paymentHash: "hash-1" },
+        lightningFeeSats: BigInt(feeSats),
+      },
+    },
+    feePolicy: FEES_INCLUDED,
+  })
+
+  const onchainQuote = (mediumFeeSats: number, fastFeeSats = 800) => ({
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: {
+          speedFast: { userFeeSat: BigInt(fastFeeSats), l1BroadcastFeeSat: BigInt(0) },
+          speedMedium: {
+            userFeeSat: BigInt(mediumFeeSats),
+            l1BroadcastFeeSat: BigInt(0),
+          },
+          speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(0) },
+        },
+      },
+    },
+    feePolicy: FEES_INCLUDED,
+  })
+
+  const sendAll = () => ({
+    sdk: mockSdk,
+    paymentRequest: "lnbc1...",
+    amount: BigInt(100_000),
+    feePolicy: FEES_INCLUDED,
+    quoteRef: {},
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+  })
+
+  /** Quotes review's fee, then sends against a fresh one. */
+  const sendAfterReview = async (reviewFee: number, sendFee: number) => {
+    const params = sendAll()
+    mockPrepareSendPayment.mockResolvedValueOnce(lightningQuote(reviewFee))
+    await createGetFee(params as never)()
+    mockPrepareSendPayment.mockResolvedValueOnce(lightningQuote(sendFee))
+    return createSendMutation(params as never, { telemetry })()
+  }
+
+  it.each([
+    ["up", 300],
+    ["down", 100],
+  ])("sends nothing when the fee moved %s by 100 sats", async (_, sendFee) => {
+    const result = await sendAfterReview(200, sendFee)
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends when the fee moved by less than 100 sats", async () => {
+    const result = await sendAfterReview(200, 299)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** SDK 0.27.1 quotes a Spark transfer at 0; one that charges is held to review's fee
+   *  as Lightning is. */
+  it("holds a Spark send-all to the Spark fee review quoted", async () => {
+    const sparkQuote = (feeSats: number) => ({
+      paymentMethod: {
+        tag: "SparkAddress",
+        inner: { address: "sp1...", fee: BigInt(feeSats), tokenIdentifier: undefined },
+      },
+      feePolicy: FEES_INCLUDED,
+    })
+    const params = { ...sendAll(), paymentRequest: "sp1..." }
+    mockPrepareSendPayment.mockResolvedValueOnce(sparkQuote(50))
+    const review = await createGetFee(params as never)()
+    mockPrepareSendPayment.mockResolvedValueOnce(sparkQuote(150))
+
+    const result = await createSendMutation(params as never, { telemetry })()
+
+    expect(review.amount?.amount).toBe(50)
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("checks only the priority it sends at on-chain", async () => {
+    const params = { ...sendAll(), paymentRequest: "bc1q..." }
+    mockPrepareSendPayment.mockResolvedValueOnce(onchainQuote(400))
+    await createGetFeeOnchain(params as never, "medium" as never)()
+
+    mockPrepareSendPayment.mockResolvedValueOnce(onchainQuote(450, 2_000))
+    const held = await createSendMutationOnchain(params as never, "medium" as never, {
+      telemetry: telemetryOnchain,
+    })()
+    mockPrepareSendPayment.mockResolvedValueOnce(onchainQuote(500))
+    const moved = await createSendMutationOnchain(params as never, "medium" as never, {
+      telemetry: telemetryOnchain,
+    })()
+
+    expect(held.status).toBe(PaymentSendResult.Success)
+    expect(moved.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+  })
+
+  it("has nothing to hold a fresh quote to when it names no fee", () => {
+    expect(() => assertSendAllQuoteHolds({ feeSats: 200 }, undefined)).not.toThrow()
+  })
+
+  it("never holds a plain send, whose fee is paid on top", async () => {
+    const plain = { ...sendAll(), feePolicy: undefined, quoteRef: undefined }
+    mockPrepareSendPayment.mockResolvedValueOnce({ ...lightningQuote(200), feePolicy: 0 })
+    await createGetFee(plain as never)()
+    mockPrepareSendPayment.mockResolvedValueOnce({ ...lightningQuote(900), feePolicy: 0 })
+
+    const result = await createSendMutation(plain as never, { telemetry })()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+})
+
+/** blink-wip#2048 step-down: the SDK replaces an on-chain quote near expiry at send, and
+ *  can then send at a slower speed than the sender chose. */
+describe("an on-chain send whose quote the SDK would replace at send", () => {
+  const NOW_SEC = 1_800_000_000
+  let nowSpy: jest.SpyInstance
+
+  const quoteLasting = (secondsLeft: number, extra: object = {}) => ({
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: {
+          expiresAt: BigInt(NOW_SEC + secondsLeft),
+          isEstimate: false,
+          speedFast: { userFeeSat: BigInt(800), l1BroadcastFeeSat: BigInt(0) },
+          speedMedium: { userFeeSat: BigInt(400), l1BroadcastFeeSat: BigInt(0) },
+          speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(0) },
+        },
+      },
+    },
+    ...extra,
+  })
+  const estimate = {
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: { ...quoteLasting(0).paymentMethod.inner.feeQuote, isEstimate: true },
+      },
+    },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    nowSpy = jest.spyOn(Date, "now").mockReturnValue(NOW_SEC * 1000)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+  })
+
+  afterEach(() => {
+    nowSpy.mockRestore()
+  })
+
+  const onchainSend = () => ({
+    sdk: mockSdk,
+    paymentRequest: "bc1q...",
+    amount: BigInt(50_000),
+    quoteClockRef: {},
+  })
+  const quoteReview = (params: object, quote: object) => {
+    mockPrepareSendPayment.mockResolvedValueOnce(quote)
+    return createGetFeeOnchain(params as never, "medium" as never)()
+  }
+  const slide = (params: object, quote: object) => {
+    mockPrepareSendPayment.mockResolvedValueOnce(quote)
+    return createSendMutationOnchain(params as never, "medium" as never, {
+      telemetry: telemetryOnchain,
+    })()
+  }
+
+  it("sends nothing, and asks for a new quote, on one with 20 seconds or less left", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(60))
+
+    const result = await slide(params, quoteLasting(20))
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends on a quote with more than 20 seconds left", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(60))
+
+    const result = await slide(params, quoteLasting(21))
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+
+  /** A clock running ahead of the provider's makes every fresh quote look this close, so
+   *  refusing would refuse every slide. */
+  it("sends as before when review's own fresh quote looked as close", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(5))
+
+    const result = await slide(params, quoteLasting(5))
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+
+  it("holds the send again once review's new quote reads right on the clock", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(5))
+    await quoteReview(params, quoteLasting(60))
+
+    const result = await slide(params, quoteLasting(10))
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+  })
+
+  it.each([
+    ["an estimate, which the SDK always replaces", estimate],
+    ["a quote a conversion funds", quoteLasting(5, { conversionEstimate: {} })],
+  ])("leaves %s to the SDK", async (_, quote) => {
+    const params = onchainSend()
+    await quoteReview(params, quote)
+
+    const result = await slide(params, quote)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
   })
 })

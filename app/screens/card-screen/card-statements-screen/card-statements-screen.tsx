@@ -11,6 +11,7 @@ import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useStatementsData } from "./hooks"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CardStatementsScreen: React.FC = () => {
   const styles = useStyles()
@@ -202,8 +203,7 @@ const useStyles = makeStyles(({ colors }) => ({
   sectionLabel: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   currentStatementCard: {
@@ -222,15 +222,13 @@ const useStyles = makeStyles(({ colors }) => ({
   currentStatementLabel: {
     color: colors.textMuted,
     fontSize: 12,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 18,
   },
   currentStatementValue: {
     color: colors.textOnBackground,
     fontSize: 18,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
   },
   statementsContainer: {

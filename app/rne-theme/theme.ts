@@ -4,13 +4,26 @@ import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
 import { fonts } from "./fonts"
+import { MAX_FONT_SIZE_MULTIPLIER } from "./text-scaling"
 
 const theme = createTheme({
   lightColors: light,
   darkColors: dark,
   mode: "light",
+  /**
+   * The components below draw their text with React Native's own `Text` or `TextInput`, not
+   * the themed `Text`, so without a face they draw the platform font (the Button title even
+   * names Android's `sans-serif-medium`). The theme's style comes first, so a caller's own
+   * face still wins.
+   */
   components: {
     Button: {
+      /** A button draws its title with rn-vui's own Text, which the theme's Text entry
+       *  never reaches, so the ceiling travels through the props that Text receives.
+       *  Without it the primary action is the one label that keeps growing. */
+      titleProps: {
+        maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
+      },
       containerStyle: {
         borderRadius: 50,
       },
@@ -18,6 +31,35 @@ const theme = createTheme({
         paddingHorizontal: 32,
         paddingVertical: 8,
         borderRadius: 50,
+      },
+      titleStyle: {
+        fontFamily: fonts.bold,
+      },
+    },
+    /** rn-vui's Input forwards what it does not consume to the TextInput underneath, so
+     *  the ceiling reaches typed text and placeholders the same way it reaches labels. */
+    Input: {
+      maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
+      inputStyle: {
+        fontFamily: fonts.regular,
+      },
+      errorStyle: {
+        fontFamily: fonts.regular,
+      },
+    },
+    SearchBar: {
+      inputStyle: {
+        fontFamily: fonts.regular,
+      },
+    },
+    ListItemTitle: {
+      style: {
+        fontFamily: fonts.regular,
+      },
+    },
+    ListItemSubtitle: {
+      style: {
+        fontFamily: fonts.regular,
       },
     },
     Text: (props, { colors }) => {
@@ -66,6 +108,7 @@ const theme = createTheme({
         : {}
 
       return {
+        maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
         style: {
           ...universalStyle,
           ...sizeStyle,

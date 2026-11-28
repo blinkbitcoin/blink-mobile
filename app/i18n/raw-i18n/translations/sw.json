@@ -2354,15 +2354,41 @@
     "title": "Thibitisha malipo.",
     "totalLabel": "Jumla:",
     "totalExceed": "Jumla imezidi baki lako la {balance: string}",
+    "feeExceedsAmount": "Ada ya mtandao ni kubwa kuliko kiasi unachotuma",
     "maxFeeSelected": "Hii ndio ada ya juu zaidi ambayo unawezalipishwa kwa malipo haya. Inaweza kuishia kuwa kidogo malipo yatakapofanyika.",
     "invoiceAlreadyPaid": "Laini ya malipo imekwisha kulipiwa",
     "somethingWentWrong": "Kitu kimeenda vibaya",
+    "priceUpdated": "Bei imebadilika, kwa hivyo kiasi kimesasishwa. Kikague kabla ya kutuma.",
     "paymentAlreadyAttempted": "Malipo tayari yamejaribiwa.\n\nIkiwa unataka kutuma malipo haya tena, anza upya.",
-    "slideToConfirm": "Telezesha kidole ili Kuthibitisha",
+    "paymentMayStillLand": "Subiri kidogo, huenda itafanikiwa hivi karibuni. Pesa zako zitafika salama au zitabaki kwako.",
     "slideConfirming": "Inathibitisha...",
+    "slideToSend": "Telezesha ili Kutuma",
+    "calculatingFee": "Inakokotoa ada…",
+    "sendProgress": {
+      "reviewing": "Inakagua",
+      "signing": "Inatia sahihi",
+      "findingRoute": "Inatafuta njia",
+      "broadcasting": "Inatangaza",
+      "checkingDelivery": "Inakagua uwasilishaji",
+      "almostThere": "Karibu tumefika",
+      "anyTimeNow": "Wakati wowote sasa",
+      "hangTight": "Subiri kidogo",
+      "stillOnItsWay": "Bado iko njiani"
+    },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
-    "lightningRecommended": "Ada kubwa! Tunapendekeza Umeme.",
-    "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}."
+    "lightningRecommended": "Ada kubwa. Tunapendekeza Umeme.",
+    "sending": "Inatuma",
+    "sent": "Imetumwa",
+    "receipt": "Risiti",
+    "sentAnnouncement": "Imetumwa, {amount: string}",
+    "fromBalance": "Kutoka Salio",
+    "details": "Maelezo",
+    "changeAmount": "Badilisha kiasi",
+    "tryAgain": "Jaribu tena",
+    "home": "Nyumbani",
+    "dustSweepSheetTitle": "Kabla ya kutuma",
+    "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}.",
+    "sendAnyway": "Nimeangalia historia yangu, tuma hata hivyo"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} majina ya watumiaji sasa ni anwani za {bankName: string} ",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",
+    "addAmount": "Ongeza kiasi",
+    "slideToSelectAmount": "Telezesha ili kuchagua kiasi",
+    "lowFunds": "Fedha hazitoshi",
     "amountExceed": "Kiasi kimepitisha baki yako ya {balance: string}",
     "amountExceedsLimit": "Kiasi kinazidi kikomo chako cha kila siku kilichobaki cha {limit: string}",
+    "limitsUnavailable": "Hatukuweza kuangalia kikomo chako cha kila siku. Jaribu tena baada ya muda mfupi.",
+    "problemSheetTitle": "Tatizo dogo",
+    "changeDestination": "Badilisha mpokeaji",
+    "recipientUnreachableTitle": "Imeshindwa kumfikia mpokeaji",
+    "recipientWrongAmountTitle": "Mpokeaji ameweka kiasi kisicho sahihi",
     "upgradeAccountToIncreaseLimit": "Boresha akaunti yako ili kuongeza kikomo chako",
     "amountIsRequired": "Kiasi kinahitajika",
     "cost": "Gharama",
@@ -2425,10 +2459,11 @@
     "title": "Tuma Bitcoin",
     "failedToFetchLnurlInvoice": "Imeshindwa kupata ankara ya malipo ya lnurl",
     "lnurlInvoiceIncorrectAmount": "Seva ya lnurl ilijibu na ankara ya malipo yenye kiasi batili",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Onyo la ada kubwa!",
-      "content": "Ada yako ni zaidi ya 50% zaidi ya kiasi kilichotumwa. Una uhakika unataka kuendelea?\n\nIli kupunguza ada, omba mpokeaji akubali muamala kupitia Lightning",
-      "confirmButton": "Nina uhakika 100%"
+      "body": "Ada yako ni 50% au zaidi ya kiasi unachotuma. Una uhakika unataka kuendelea?",
+      "cancelPayment": "Ghairi malipo",
+      "acceptFee": "Kubali ada"
     },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "pendingPayment": "Ada kubwa! Tunapendekeza Umeme.\n\nInawezekana malipo hayatathibitisha, katika hali ambayo pesa zitarejeshwa kwenye akaunti yako.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Fedha hazitoshi kwa muamala huu.",
     "sdkAmountTooLow": "Kiasi ni kidogo sana kwa muamala wa on-chain.",
     "sdkNetworkError": "Hitilafu ya mtandao. Angalia muunganisho wako na ujaribu tena.",
-    "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti."
+    "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti.",
+    "onchainSelfPayment": "Hii ni anwani ya pochi yako mwenyewe. Huwezi kujitumia malipo ya on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Unda anwani ya Lightning",
@@ -2988,6 +3024,7 @@
     "note": "Dokezo",
     "notification": "Taarifa",
     "ok": "Sawa",
+    "okay": "Sawa",
     "or": "au",
     "openWallet": "Fungua pochi",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Weka kiasi"
+  },
+  "Accessibility": {
+    "deleteKey": "Futa",
+    "swapCurrencyHint": "Hubadilisha sarafu unayoandikia kiasi",
+    "switchToWallet": "Badilisha kwenda {wallet: string}",
+    "copy": "Nakili",
+    "balanceHidden": "Salio limefichwa",
+    "revealBalanceHint": "Huonyesha salio lako kwenye skrini hii"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ninahitaji kusasisha programu yangu hadi toleo jipya zaidi. Ninatumia programu ya {os: string} yenye toleo la {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Malipo",
         "acceptButton": "Kubali",
         "payButton": "Endelea na Kulipa",
-        "cardTitle": "Blink Binafsi",
+        "cardTitle": "Blink Orange",
+        "free": "Bure",
+        "forNow": "kwa sasa",
         "perYear": "kwa mwaka",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Manufaa mengine ya uanachama"
+        },
         "status": {
           "label": "Hali",
           "specialOfferLabel": "Ofa maalum",
@@ -3695,35 +3746,53 @@
           "text": "Nimekagua na ninakubali",
           "linkText": "Ratiba ya Ada ya Blink Card"
         },
-        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}"
+        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}",
+        "freeNotice": "Ninaelewa kuwa Blink Orange ni bure kwa sasa, na kwamba ada ya uanachama inaweza kuanzishwa baadaye, kwa taarifa"
+      },
+      "CardVerifyIdentity": {
+        "title": "Thibitisha utambulisho wako",
+        "description": "Ili kuwezesha Blink Card yako, mtoaji wa kadi lazima athibitishe wewe ni nani (KYC). Utahitaji:",
+        "requirements": {
+          "governmentId": "Kitambulisho kilichotolewa na serikali",
+          "selfie": "Picha ya selfie / ukaguzi wa uhai",
+          "proofOfAddress": "Uthibitisho wa anwani",
+          "questions": "Maswali machache kukuhusu"
+        },
+        "buttonText": "Endelea"
       },
       "CardIntroducing": {
         "title": "Kuanzisha",
         "cardInfo": {
-          "bitcoinCard": "Kadi ya Blink Visa",
+          "bitcoinCard": "Blink Card",
           "for": "kwa",
-          "maximalist": "Wapenzi wa Bitcoin"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Endelea"
       },
       "CardDetails": {
-        "title": "Faida za ziada",
+        "title": "Kilichojumuishwa",
         "features": {
-          "accountManager": "Meneja akaunti maalum",
-          "support": "Msaada wa kipaumbele",
-          "onchainDeposits": "Urejeshaji wa 50% kwa ada za muamala",
-          "circularEconomies": "$100 kwa uchumi wa mzunguko"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "kadi yako ya Visa, iko tayari leo"
+          },
+          "accountManager": {
+            "title": "Meneja binafsi wa akaunti",
+            "subtitle": "na usaidizi wa kipaumbele"
+          },
+          "onOffRamping": "Kuingiza na kutoa pesa"
         },
-        "andMore": "... na zaidi zinakuja 2026",
+        "availableIn": "baada ya miezi {months}",
+        "footnote": "Baadhi ya vipengele vitapatikana ndani ya miezi {months}. Kadi iko tayari leo.",
         "buttonText": "Endelea"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Karibu kwenye bodi",
-          "subtitle": "Kwa Blink Binafsi",
+          "subtitle": "Kwa Blink Orange",
           "paragraphs": {
-            "body1": "Mtu fulani alikufikiria na kupendekeza kwamba tukualike kwa Blink Binafsi. Labda kwa sababu wewe ni Bitcoiner mzuri sana.",
-            "body2": "Lengo letu kwa 2026 ni kujaza programu na vitu vingi vizuri hivi kwamba itakuwa dhahiri kuhuisha mwaka ujao."
+            "body1": "Mtu fulani alikufikiria na kupendekeza kwamba tukualike kwa Blink Orange. Labda kwa sababu wewe ni Bitcoiner mzuri sana.",
+            "body2": "Blink Orange ni ngazi ya kwanza ya uanachama wa Blink kwa Bitcoiners, kwa mwaliko tu. Blink Card na meneja wako binafsi wa akaunti ni huduma mbili kati ya za kwanza tunazotoa — zilizobaki tunazijenga hadi 2027."
           }
         },
         "buttonText": "Twende"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Kazi",
-            "placeholder": "Chagua kazi yako"
+            "placeholder": "Chagua"
           },
           "annualSalaryRange": {
             "label": "Mshahara wa kila mwaka",
-            "placeholder": "Chagua kiwango cha mshahara wako"
+            "placeholder": "Chagua mshahara"
           },
           "accountPurpose": {
             "label": "Madhumuni ya akaunti",
@@ -3815,7 +3884,6 @@
             "placeholder": "Chagua kiwango cha matumizi yako"
           }
         },
-        "buttonText": "Wasilisha maombi",
         "select": "chagua"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", na",
           "cardTermsLinkText": "Masharti ya Kadi ya Blink"
         },
-        "certifyAccuracy": "Ninathibitisha kwamba maelezo niliyotoa ni sahihi na kwamba nitazingatia sheria na mahitaji yote yanayohusiana na Kadi yangu ya Blink Visa",
-        "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink Visa si ombi lisiloidhinishwa"
+        "certifyAccuracy": "Ninathibitisha kwamba maelezo niliyotoa ni sahihi na kwamba nitazingatia sheria na mahitaji yote yanayohusiana na Kadi yangu ya Blink",
+        "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink si ombi lisiloidhinishwa"
       },
       "CardPreapproved": {
-        "title": "Umeidhinishwa mapema kwa kadi ya Blink Visa!",
+        "title": "Blink Card yako iko tayari!",
+        "subtitle": "Sasa unaweza kuwasha kadi yako na kuanza kuitumia",
         "buttonText": "Funga"
+      },
+      "CardDeclined": {
+        "title": "Hatukuweza kuidhinisha ombi lako la kadi",
+        "subtitle": "Msimamizi wa akaunti yako atawasiliana nawe."
       },
       "CardProcessing": {
         "title": "Tunashughulikia maombi yako",
-        "subtitle": "Tutakujulisha mara tu tutakapokuwa tayari",
-        "buttonText": "Funga"
+        "subtitle": "Hii inaweza kuchukua hadi dakika moja"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Hamia sasa kwenye akaunti isiyo ya udhamini",
       "body": "Huwezi tena kupokea fedha kwenye akaunti yako ya udhamini. Blink imesitisha huduma ya udhamini katika eneo lako na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",
+      "bodyLevelZero": "Huwezi tena kupokea fedha kwenye akaunti hii ya majaribio. Blink inafunga akaunti za majaribio na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",
       "migrateCta": "Hamia sasa"
     },
     "reminderBulletin": {
       "title": "Muhimu",
       "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
+      "bodySingleDate": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date} — kila kitu kinahamia kwa miguso michache tu.",
+      "bodyLevelZero": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}.",
       "bodyReceiveDisabled": "Kupokea kumesimama. Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}.",
       "migrateCta": "Hamia"
     },
     "offboardBulletin": {
       "title": "Muhimu",
-      "body": "Akaunti yako imesajiliwa katika eneo ambalo hatuwezi kutoa akaunti. Toa fedha zako kabla ya tarehe 31 Agosti. Kupokea kunasimama tarehe 10 Agosti."
+      "bodyTwoDates": "Blink haiwezi kutoa akaunti za udhamini katika eneo lako. Toa fedha zako kabla ya {date} — bila malipo yoyote ya Blink. Kupokea kutasimama {receiveStopsDate}. Ikiwa unaamini akaunti yako imeathiriwa kimakosa, unaweza kuthibitisha makazi yako ya sasa ndani ya programu.",
+      "bodySingleDate": "Blink haiwezi kutoa akaunti za udhamini katika eneo lako. Toa fedha zako kabla ya {date} — bila malipo yoyote ya Blink. Ikiwa unaamini akaunti yako imeathiriwa kimakosa, unaweza kuthibitisha makazi yako ya sasa ndani ya programu.",
+      "bodyReceiveOff": "Blink haiwezi kutoa akaunti za udhamini katika eneo lako. Toa fedha zako kabla ya {date} — bila malipo yoyote ya Blink. Kupokea kumezimwa. Ikiwa unaamini akaunti yako imeathiriwa kimakosa, unaweza kuthibitisha makazi yako ya sasa ndani ya programu."
     },
     "dollarBalanceModal": {
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Hitilafu imetokea wakati wa kuendelea na uhamishaji wako. Tafadhali anza tena.",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "migrationRequiredForcedBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti.\n\nUsiwe na wasiwasi, non-custodial itakuwa bora kwako kwa muda mrefu.",
+    "migrationRequiredForcedBodyLevelZero": "Blink inafunga akaunti za majaribio. Hamisha salio lako kwenye akaunti isiyo ya udhamini. Inachukua miguso michache tu.",
     "migrationGateTitle": "Akaunti haipatikani",
     "migrationGateBody": "Kwa sababu za udhibiti hatuwezi kutoa akaunti za custodial katika eneo lako. Hamisha fedha zako kwenye akaunti ya non-custodial na Blink kwa kufuata hatua zifuatazo au wasiliana nasi kupitia <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Akaunti za majaribio sasa zimefungwa. Salio lako liko salama. Lihamishe kwenye akaunti isiyo ya udhamini kwa kufuata hatua zifuatazo, bila malipo na bila kikomo cha muda, au wasiliana nasi kupitia <link>{email}</link>",
     "bitcoinBalance": "Salio la Bitcoin",
     "dollarBalance": "Salio la dola",
     "moveToNonCustodial": "Hamia kwa non-custodial",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Imeshindwa kusoma kutoka kwenye ubao wa kunakili. Tafadhali ingiza msemo wako wa hifadhi mwenyewe.",
     "enterWord": "Neno",
     "invalidMnemonic": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi.",
+    "invalidPhrase": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi. Wasiliana na <link>Msaada</link> kama tatizo litaendelea.",
+    "invalidWord": "Neno si sahihi, tafadhali kagua tahajia",
     "restoring": "Kurudisha mkoba wako...",
     "restoreSuccess": "Mkoba umerejeshwa kwa mafanikio",
     "restoreFailed": "Imeshindikana kurejesha mkoba. Tafadhali jaribu tena.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Kiasi kiko chini ya kiwango cha chini kinachohitajika kwa malipo haya. Jaribu kiasi kikubwa zaidi.",
     "networkError": "Tatizo la muunganisho wa mtandao. Angalia muunganisho wako na ujaribu tena.",
     "invalidInput": "Maelezo ya malipo yanaonekana batili. Tafadhali kagua na ujaribu tena.",
-    "generic": "Malipo hayakuweza kukamilika. Jaribu tena baada ya muda mfupi, au tumia kiasi kidogo."
+    "generic": "Malipo hayakuweza kukamilika. Jaribu tena baada ya muda mfupi, au tumia kiasi kidogo.",
+    "outcomeUnknown": "Malipo haya huenda tayari yamefanyika. Angalia historia ya miamala yako kabla ya kuyatuma tena.",
+    "earlierConversionPending": "Ubadilishaji wako wa awali bado unathibitishwa. Jaribu tena baada ya dakika chache.",
+    "earlierPaymentFound": "Malipo yako ya awali kwenda kwenye anwani hii tayari yamefanyika, kwa kiasi tofauti. Yaangalie kabla ya kutuma tena.",
+    "earlierConversionFound": "Ubadilishaji wako wa awali tayari umefanyika, kwa kiasi tofauti. Uangalie katika historia ya miamala yako kabla ya kubadilisha tena.",
+    "convertedMeanwhile": "Ubadilishaji wa kiasi kinachokaribiana na hiki umefanyika sasa hivi. Angalia salio lako kabla ya kuthibitisha huu tena."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akaunti hii iliundwa kwenye {network}. Badilisha hadi {network} ili kuitumia."

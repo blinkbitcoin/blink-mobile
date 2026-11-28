@@ -1,5 +1,4 @@
 import React from "react"
-import { StyleSheet } from "react-native"
 
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -381,17 +380,15 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(input.props.value).toBe("youth")
   })
 
-  /** The number slot stays mounted with a fixed width so the row cannot reflow on the
-   *  first keystroke; empty inputs hide it with opacity only. */
   it("reveals the word number when the input gains content", async () => {
-    const { getByPlaceholderText, getByText } = render(
+    const { getByPlaceholderText, getByText, queryByText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
     await flushEffects()
 
-    expect(StyleSheet.flatten(getByText("1.").props.style).opacity).toBe(0)
+    expect(queryByText("1.")).toBeNull()
 
     fireEvent.changeText(
       getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
@@ -399,7 +396,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
     fireEvent.press(getByText("youth"))
 
-    expect(StyleSheet.flatten(getByText("1.").props.style).opacity).toBeUndefined()
+    expect(getByText("1.")).toBeTruthy()
   })
 
   const fillAllChallenges = (getByPlaceholderText: (p: string) => unknown) => {

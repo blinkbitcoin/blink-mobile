@@ -2354,15 +2354,41 @@
         "title": "Confirmar pago",
         "totalLabel": "Total:",
         "totalExceed": "El total excede su saldo de {balance: string}",
+        "feeExceedsAmount": "La tarifa de red supera la cantidad que envías",
         "maxFeeSelected": "Tarifa máxima que se cobrará por esta transacción. Podría ser menor una vez se realice el pago.",
         "invoiceAlreadyPaid": "Esta factura ya ha sido pagada.",
         "somethingWentWrong": "Algo salió mal",
+        "priceUpdated": "El precio cambió, así que los montos se actualizaron. Revísalos antes de enviar.",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
-        "slideToConfirm": "Desliza para confirmar",
+        "paymentMayStillLand": "Espera un momento, probablemente se complete pronto. Tu dinero llegará de forma segura o se quedará contigo.",
         "slideConfirming": "Confirmando...",
+        "slideToSend": "Desliza para enviar",
+        "calculatingFee": "Calculando la comisión…",
+        "sendProgress": {
+            "reviewing": "Revisando",
+            "signing": "Firmando",
+            "findingRoute": "Buscando ruta",
+            "broadcasting": "Transmitiendo",
+            "checkingDelivery": "Verificando la entrega",
+            "almostThere": "Ya casi",
+            "anyTimeNow": "En cualquier momento",
+            "hangTight": "Aguanta un poco",
+            "stillOnItsWay": "Sigue en camino"
+        },
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
-        "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}."
+        "sending": "Enviando",
+        "sent": "Enviado",
+        "receipt": "Recibo",
+        "sentAnnouncement": "Enviado, {amount: string}",
+        "fromBalance": "Desde el saldo",
+        "details": "Detalles",
+        "changeAmount": "Cambiar cantidad",
+        "tryAgain": "Intentar de nuevo",
+        "home": "Inicio",
+        "dustSweepSheetTitle": "Antes de enviar",
+        "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}.",
+        "sendAnyway": "Revisé mi historial, enviar de todos modos"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Los nombres de usuario de {bankName: string} ahora son direcciones de {bankName: string}.",
@@ -2405,8 +2431,16 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
         "amount": "Cantidad",
+        "addAmount": "Añade una cantidad",
+        "slideToSelectAmount": "Desliza para elegir la cantidad",
+        "lowFunds": "Fondos insuficientes",
         "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
+        "limitsUnavailable": "No pudimos comprobar tu límite diario. Inténtalo de nuevo en un momento.",
+        "problemSheetTitle": "Un pequeño problema",
+        "changeDestination": "Cambiar destino",
+        "recipientUnreachableTitle": "No se pudo contactar con el destinatario",
+        "recipientWrongAmountTitle": "El destinatario indicó un importe incorrecto",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
         "amountIsRequired": "Se requiere cantidad",
         "cost": "Costo",
@@ -2425,10 +2459,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Error al obtener la factura de lnurl",
         "lnurlInvoiceIncorrectAmount": "El servidor lnurl ha enviado una factura con un importe incorrecto.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de tarifa alta!",
-            "content": "Tu tarifa es un 50% más grande que la cantidad enviada. ¿Estás seguro de que quieres continuar?\n\nPara reducir la tarifa, pide al receptor que acepte la transacción a través de Lightning.",
-            "confirmButton": "Estoy 100% seguro"
+            "body": "Tu tarifa es el 50% o más del monto que envías. ¿Seguro que quieres continuar?",
+            "cancelPayment": "Cancelar pago",
+            "acceptFee": "Aceptar tarifa"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
@@ -2456,7 +2491,8 @@
         "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
         "sdkAmountTooLow": "El monto es muy bajo para una transacción on-chain.",
         "sdkNetworkError": "Error de red. Verifica tu conexión e intenta de nuevo.",
-        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
+        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente.",
+        "onchainSelfPayment": "Esta es la dirección de tu propia billetera. No puedes enviarte un pago on-chain a ti mismo."
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección Lightning",
@@ -2987,6 +3023,7 @@
         "note": "Nota ",
         "notification": "Notificación",
         "ok": "OK",
+        "okay": "De acuerdo",
         "or": "o",
         "openWallet": "Abrir billetera",
         "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fijar cantidad"
+    },
+    "Accessibility": {
+        "deleteKey": "Borrar",
+        "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
+        "switchToWallet": "Cambiar a {wallet: string}",
+        "copy": "Copiar",
+        "balanceHidden": "Saldo oculto",
+        "revealBalanceHint": "Muestra tu saldo en esta pantalla"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",
@@ -3671,30 +3716,36 @@
             "CardIntroducing": {
                 "title": "Presentando",
                 "cardInfo": {
-                    "bitcoinCard": "La tarjeta Visa de Blink",
+                    "bitcoinCard": "La Blink Card",
                     "for": "para",
-                    "maximalist": "Bitcoin Maximalistas"
+                    "bitcoiners": "Bitcoiners"
                 },
                 "buttonText": "Continuar"
             },
             "CardDetails": {
-                "title": "Beneficios adicionales",
+                "title": "Qué incluye",
                 "features": {
-                    "accountManager": "Gestor de cuentas dedicado",
-                    "support": "Apoyo prioritario",
-                    "onchainDeposits": "Reembolso del 50% en las comisiones de transacción",
-                    "circularEconomies": "$100 para economías circulares"
+                    "card": {
+                        "title": "Blink Card",
+                        "subtitle": "tu tarjeta Visa, lista hoy"
+                    },
+                    "accountManager": {
+                        "title": "Gestor de cuenta personal",
+                        "subtitle": "y soporte prioritario"
+                    },
+                    "onOffRamping": "Entrada y salida de dinero"
                 },
-                "andMore": "... y más próximamente en 2026",
+                "availableIn": "en {months} meses",
+                "footnote": "Algunas funciones estarán disponibles en un plazo de {months} meses. La tarjeta está lista hoy.",
                 "buttonText": "Continuar"
             },
             "WelcomeOnboard": {
                 "welcomeMessage": {
                     "title": "Bienvenido a bordo",
-                    "subtitle": "A Blink Private",
+                    "subtitle": "A Blink Orange",
                     "paragraphs": {
-                        "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Private. Probablemente porque eres un increíble Bitcoiner.",
-                        "body2": "Nuestra meta para 2026 es llenar el programa con tantas cosas buenas que será obvio renovar el próximo año."
+                        "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Orange. Probablemente porque eres un increíble Bitcoiner.",
+                        "body2": "Blink Orange es el primer nivel de la membresía de Blink para Bitcoiners, solo por invitación. La Blink Card y tu gestor de cuenta personal son dos de los primeros servicios que ofrecemos — el resto lo estamos construyendo hasta 2027."
                     }
                 },
                 "buttonText": "Vamos"
@@ -3704,8 +3755,14 @@
                 "paymentTitle": "Pago",
                 "acceptButton": "Aceptar",
                 "payButton": "Continuar y Pagar",
-                "cardTitle": "Blink Privado",
+                "cardTitle": "Blink Orange",
+                "free": "Gratis",
+                "forNow": "por ahora",
                 "perYear": "por año",
+                "freeBreakdown": {
+                    "card": "Blink Card",
+                    "memberBenefits": "Otros beneficios de miembro"
+                },
                 "status": {
                     "label": "Estado",
                     "specialOfferLabel": "Oferta especial",
@@ -3726,7 +3783,19 @@
                     "text": "He revisado y acepto la",
                     "linkText": "Tabla de Tarifas de Blink Card"
                 },
-                "renew": "Entiendo que mi suscripción se renovará automáticamente en {months: number} meses"
+                "renew": "Entiendo que mi suscripción se renovará automáticamente en {months: number} meses",
+                "freeNotice": "Entiendo que Blink Orange es gratis por ahora y que más adelante podría introducirse una cuota de membresía, con aviso previo"
+            },
+            "CardVerifyIdentity": {
+                "title": "Verifica tu identidad",
+                "description": "Para activar tu Blink Card, el emisor de la tarjeta debe verificar quién eres (KYC). Necesitarás:",
+                "requirements": {
+                    "governmentId": "Un documento de identidad oficial",
+                    "selfie": "Una selfie / prueba de vida",
+                    "proofOfAddress": "Comprobante de domicilio",
+                    "questions": "Algunas preguntas sobre ti"
+                },
+                "buttonText": "Continuar"
             },
             "LoadingCard": {
                 "title": "Estamos trabajando en tu tarjeta",
@@ -3739,11 +3808,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Ocupación",
-                        "placeholder": "Selecciona tu ocupación"
+                        "placeholder": "Selecciona"
                     },
                     "annualSalaryRange": {
                         "label": "Salario anual",
-                        "placeholder": "Selecciona tu rango salarial"
+                        "placeholder": "Selecciona el salario"
                     },
                     "accountPurpose": {
                         "label": "Propósito de la cuenta",
@@ -3754,7 +3823,6 @@
                         "placeholder": "Selecciona tu rango de gastos"
                     }
                 },
-                "buttonText": "Enviar solicitud",
                 "select": "seleccionar"
             },
             "Acknowledgement": {
@@ -3770,17 +3838,21 @@
                     "and": ", y los",
                     "cardTermsLinkText": "Términos de la tarjeta Blink"
                 },
-                "certifyAccuracy": "Certifico que la información que he proporcionado es precisa y que cumpliré todas las reglas y requisitos relacionados con mi tarjeta Blink Visa",
-                "acknowledgeSolicitation": "Reconozco que solicitar la tarjeta Blink Visa no constituye una solicitud no autorizada"
+                "certifyAccuracy": "Certifico que la información que he proporcionado es precisa y que cumpliré todas las reglas y requisitos relacionados con mi tarjeta Blink",
+                "acknowledgeSolicitation": "Reconozco que solicitar la tarjeta Blink no constituye una solicitud no autorizada"
             },
             "CardPreapproved": {
-                "title": "¡Has sido preaprobado para la tarjeta Blink Visa!",
+                "title": "¡Tu Blink Card está lista!",
+                "subtitle": "Ya puedes activar tu tarjeta y empezar a usarla",
                 "buttonText": "Cerrar"
+            },
+            "CardDeclined": {
+                "title": "No pudimos aprobar tu solicitud de tarjeta",
+                "subtitle": "Tu gestor de cuenta se pondrá en contacto contigo."
             },
             "CardProcessing": {
                 "title": "Procesando tu solicitud",
-                "subtitle": "Te avisaremos cuando estemos listos",
-                "buttonText": "Cerrar"
+                "subtitle": "Esto puede tardar hasta un minuto"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {
@@ -3957,17 +4029,22 @@
         "migrateNowModal": {
             "title": "Migra ahora a una cuenta no custodial",
             "body": "Ya no puedes recibir fondos en tu cuenta custodial. Blink descontinuó el servicio custodial en tu región y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
+            "bodyLevelZero": "Ya no puedes recibir fondos en esta cuenta de prueba. Blink está cerrando las cuentas de prueba y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
             "migrateCta": "Migrar ahora"
         },
         "reminderBulletin": {
             "title": "Importante",
             "body": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}. La recepción se detiene el {receiveStopsDate}.",
+            "bodySingleDate": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date} — todo se mueve en unos pocos toques.",
+            "bodyLevelZero": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "bodyReceiveDisabled": "La recepción se ha detenido. Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {
             "title": "Importante",
-            "body": "Tu cuenta está registrada en una región donde no podemos ofrecer cuentas. Retira tus fondos antes del 31 de agosto. La recepción se detiene el 10 de agosto."
+            "bodyTwoDates": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. La recepción se detiene el {receiveStopsDate}. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app.",
+            "bodySingleDate": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app.",
+            "bodyReceiveOff": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. La recepción está desactivada. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app."
         },
         "dollarBalanceModal": {
             "title": "No podemos migrar tu Saldo Dólar",
@@ -4023,8 +4100,10 @@
         "resumeFailed": "Algo salió mal al reanudar tu migración. Por favor, comiénzala de nuevo.",
         "migrationRequiredBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial.",
         "migrationRequiredForcedBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial. Es obligatorio por motivos regulatorios.\n\nNo te preocupes, la modalidad no custodial será mejor para ti a largo plazo.",
+        "migrationRequiredForcedBodyLevelZero": "Blink está cerrando las cuentas de prueba. Pasa tu saldo a una cuenta no custodial. Solo toma unos pocos toques.",
         "migrationGateTitle": "Cuenta no accesible",
         "migrationGateBody": "Por motivos regulatorios no podemos ofrecer cuentas custodiales en tu región. Transfiere tus fondos a una cuenta no custodial con Blink siguiendo los próximos pasos o contáctanos en <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Las cuentas de prueba ya están cerradas. Tu saldo está seguro. Pásalo a una cuenta no custodial siguiendo los próximos pasos, gratis y sin límite de tiempo, o contáctanos en <link>{email}</link>",
         "bitcoinBalance": "Saldo de Bitcoin",
         "dollarBalance": "Saldo en dólares",
         "moveToNonCustodial": "Migrar a no custodia",
@@ -4098,6 +4177,8 @@
         "pasteFailed": "No se pudo leer del portapapeles. Por favor ingresa tu frase de respaldo manualmente.",
         "enterWord": "Palabra",
         "invalidMnemonic": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto.",
+        "invalidPhrase": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto. Contacta a <link>Soporte</link> si el problema persiste.",
+        "invalidWord": "Palabra no válida, revisa la ortografía",
         "restoring": "Restaurando tu billetera...",
         "restoreSuccess": "Billetera restaurada exitosamente",
         "restoreFailed": "Error al restaurar la billetera. Por favor intenta de nuevo.",
@@ -4291,7 +4372,12 @@
         "belowMinimum": "El monto está por debajo del mínimo requerido para este pago. Prueba con un monto mayor.",
         "networkError": "Problema de conexión de red. Verifica tu conexión e inténtalo de nuevo.",
         "invalidInput": "Los datos del pago parecen inválidos. Por favor revísalos e inténtalo de nuevo.",
-        "generic": "El pago no pudo completarse. Inténtalo en un momento, o usa un monto menor."
+        "generic": "El pago no pudo completarse. Inténtalo en un momento, o usa un monto menor.",
+        "outcomeUnknown": "Es posible que este pago ya se haya realizado. Revisa tu historial de transacciones antes de enviarlo de nuevo.",
+        "earlierConversionPending": "Tu transferencia anterior todavía se está confirmando. Vuelve a intentarlo en unos minutos.",
+        "earlierPaymentFound": "Tu pago anterior a este destino ya se realizó, por un monto distinto. Revísalo antes de volver a enviar.",
+        "earlierConversionFound": "Tu transferencia anterior ya se realizó, por un monto distinto. Revísala en tu historial de transacciones antes de volver a transferir.",
+        "convertedMeanwhile": "Acaba de realizarse una transferencia de un monto similar a este. Revisa tu saldo antes de volver a confirmar esta."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Esta cuenta se creó en {network}. Cambia a {network} para usarla."

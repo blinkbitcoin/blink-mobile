@@ -36,7 +36,7 @@ import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 import RedeemBitcoinDetailScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-detail-screen"
 import RedeemBitcoinResultScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
-import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
+import { SendBitcoinConfirmationGated } from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-gated"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
 import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
@@ -67,6 +67,7 @@ import {
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { HeaderTitle } from "@react-navigation/elements"
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
@@ -134,6 +135,7 @@ import {
   CardDetailsScreen as OnboardingCardDetailsScreen,
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
+  CardVerifyIdentityScreen,
   LoadingCardScreen,
   WelcomeInvestScreen,
   SelectInvestScreen,
@@ -145,6 +147,7 @@ import {
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
+  CardDeclinedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
 } from "@app/screens/card-screen/onboarding"
@@ -200,10 +203,13 @@ import { HomeGate } from "./home-gate"
 import { LAUNCH_ROUTE } from "./unlock-routes"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
-import { TouchableOpacity } from "react-native"
+import { StyleSheet, Text as RNText, TouchableOpacity } from "react-native"
+
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
+import { fonts } from "@app/rne-theme/fonts"
 
 // Required lazily (not statically imported) so the developer screen module —
 // its debugScreen query, token copy/share UI and instance override controls —
@@ -213,6 +219,70 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
   ? // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../screens/developer-screen").DeveloperScreen
   : null
+
+const tabBarLabelStyles = StyleSheet.create({
+  label: {
+    paddingBottom: 6,
+    fontSize: 12,
+    fontFamily: fonts.bold,
+    width: "100%",
+    textAlign: "center",
+  },
+})
+
+// Heading 2/Bold, as `styles.title`. A `headerTitle` function gets no `headerTitleStyle`, and
+// the library's `HeaderTitle` otherwise draws the platform font at 17 on iOS.
+const headerTitleStyles = StyleSheet.create({
+  title: {
+    fontFamily: fonts.bold,
+    fontSize: 20,
+  },
+})
+
+/**
+ * The tab labels are drawn by the navigator's own Text, which the theme's ceiling never
+ * reaches, and they sit in a bar of fixed height: at the largest OS text sizes they grow
+ * out of it and clip to "Hom..", "Peop..". Rendering the label here is what lets them carry
+ * the same ceiling as the rest of the app, and it replaces `tabBarLabelStyle`, which the
+ * navigator only applies to the label it renders itself.
+ *
+ * Built once, like the header controls above, so the option keeps one identity across
+ * renders rather than remounting every label.
+ */
+/**
+ * The header title is drawn by the navigator too, and it is the widest single line in the
+ * app: at the largest OS text sizes it grows until a screen name clips mid-word
+ * ("Lightning in…"). Wrapping the library's own title keeps its placement and tint, and
+ * adds the Source Sans Pro face and the ceiling the rest of the app follows.
+ *
+ * Built once for the same reason as the controls above.
+ */
+const renderHeaderTitle = (props: { children: string; tintColor?: string }) => (
+  <HeaderTitle
+    {...props}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    style={headerTitleStyles.title}
+  />
+)
+
+const renderTabBarLabel = ({ color, children }: { color: string; children: string }) => (
+  <RNText
+    style={[tabBarLabelStyles.label, { color }]}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    numberOfLines={1}
+  >
+    {children}
+  </RNText>
+)
+
+/** `headerBackVisible: false` hides only the native button, while the navigators here
+ *  also draw their own back through `headerLeft`, so a screen that offers only the close
+ *  button clears both. A null element leaves no left item for iOS 26 to wrap in a glass
+ *  capsule. The swipe and the hardware back are left as they are. */
+const noHeaderBack = {
+  headerBackVisible: false,
+  headerLeft: () => null,
+}
 
 /**
  * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is
@@ -255,7 +325,6 @@ const withOfflineGate = <P extends object>(Screen: React.ComponentType<P>) => {
 const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
-const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
 const MerchantSelectionGated = withOfflineGate(MerchantSelectionScreen)
 const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
 const ReceiveGated: React.FC = () => (
@@ -409,6 +478,8 @@ export const RootStack = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -491,7 +562,8 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinDetails"
         component={SendBitcoinDetailsGated}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        // The screen leads with its own send icon and destination, so the bar stays bare.
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="merchantSelection"
@@ -501,12 +573,18 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
         component={SendBitcoinConfirmationGated}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        // Headerless so the Sent glow can fill the screen; review draws its own back row.
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="sendBitcoinCompleted"
         component={SendBitcoinCompletedScreen}
-        options={{ title: LL.SendBitcoinScreen.title(), headerShown: false }}
+        options={({ route }) => ({
+          title: LL.SendBitcoinScreen.title(),
+          headerShown: false,
+          // Sent already played on review, so the receipt replaces it in one cut.
+          animation: route.params.hasShownSuccess ? "none" : "default",
+        })}
       />
       <RootNavigator.Screen
         name="receiveBitcoin"
@@ -915,13 +993,25 @@ export const RootStack = () => {
         component={WelcomeOnboardScreen}
         options={{
           title: "",
+          ...noHeaderBack,
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
         name="cardOnboardingSubscribeScreen"
         component={CardSubscriptionScreen}
         options={{
-          title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
+          /** The screen sets its own title: the free offer has none. */
+          title: "",
+          ...headerCloseControlOptions(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingVerifyIdentityScreen"
+        component={CardVerifyIdentityScreen}
+        options={{
+          /** The design leaves this step untitled. */
+          title: "",
           ...headerCloseControlOptions(),
         }}
       />
@@ -946,9 +1036,7 @@ export const RootStack = () => {
         component={CardPersonalInformationScreen}
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
-          // Suppresses the back button natively — an empty custom headerLeft item
-          // would still get the iOS 26 Liquid Glass capsule drawn around it.
-          headerBackVisible: false,
+          ...noHeaderBack,
           ...headerCloseControlOptions(),
         }}
       />
@@ -964,9 +1052,8 @@ export const RootStack = () => {
         name="cardOnboardingProcessingScreen"
         component={CardProcessingScreen}
         options={{
-          title: "",
-          headerBackVisible: false,
-          ...headerCloseControlOptions(),
+          headerShown: false,
+          gestureEnabled: false,
         }}
       />
       <RootNavigator.Screen
@@ -974,8 +1061,17 @@ export const RootStack = () => {
         component={CardPreapprovedScreen}
         options={{
           title: "",
-          headerBackVisible: false,
-          ...headerCloseControlOptions(),
+          ...noHeaderBack,
+          ...headerCloseControlOptions({ shouldPopTo: true }),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingDeclinedScreen"
+        component={CardDeclinedScreen}
+        options={{
+          title: "",
+          ...noHeaderBack,
+          ...headerCloseControlOptions({ shouldPopTo: true }),
         }}
       />
       <RootNavigator.Screen
@@ -1142,6 +1238,8 @@ export const OnboardingNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
       }}
@@ -1197,6 +1295,8 @@ export const ContactNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1255,6 +1355,8 @@ export const PhoneLoginNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1307,12 +1409,7 @@ export const PrimaryNavigator = () => {
           tabBarActiveTintColor: colors.accent,
           tabBarInactiveTintColor: colors.textMuted,
           tabBarStyle,
-          tabBarLabelStyle: {
-            paddingBottom: 6,
-            fontSize: 12,
-            fontWeight: "bold",
-            width: "100%",
-          },
+          tabBarLabel: renderTabBarLabel,
           tabBarHideOnKeyboard: true,
         }}
       >
@@ -1375,8 +1472,15 @@ const useStyles = makeStyles(({ colors }) => ({
   headerStyle: {
     backgroundColor: colors.backgroundDefault,
   },
+  // Heading 2/Bold. The native header draws the platform font unless it names a face.
   title: {
     color: colors.textOnBackground,
+    fontFamily: fonts.bold,
+    fontSize: 20,
+  },
+  // The iOS back button label, which is native text too.
+  backTitle: {
+    fontFamily: fonts.regular,
   },
   // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {

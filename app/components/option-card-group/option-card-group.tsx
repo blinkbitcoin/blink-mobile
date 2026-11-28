@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
@@ -89,7 +90,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
     color: colors.textOnBackground,
     textAlign: "center",

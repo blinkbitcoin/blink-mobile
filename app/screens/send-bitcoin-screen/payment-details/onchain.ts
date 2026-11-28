@@ -347,12 +347,15 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  // A send-all is the whole balance of the wallet it was slid on, so another wallet's
+  // amount starts as a plain one (blink-wip#2048 E3).
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (
     newSendingWalletDescriptor,
   ) => {
     return createNoAmountOnchainPaymentDetails({
       ...params,
       idempotencyKeyRef: undefined,
+      isSendingMax: false,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
@@ -388,6 +391,10 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     ...sendPaymentAndGetFee,
     canSendMax: true,
     isSendingMax,
+    // onChainPaymentSendAll pays the network fee out of the balance it sends, so the
+    // recipient gets the balance less the fee. Derived from isSendingMax, which every
+    // rebuild but setAmount carries, so it cannot fall out of step with the mutation.
+    isFeeIncluded: Boolean(isSendingMax),
   } as const
 }
 

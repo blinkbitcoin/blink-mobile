@@ -2354,15 +2354,41 @@
     "title": "Confirmați plata",
     "totalLabel": "Total:",
     "totalExceed": "Total depășește soldul {sold: string}",
+    "feeExceedsAmount": "Taxa de rețea depășește suma pe care o trimiteți",
     "maxFeeSelected": "Aceasta este taxa maximă care vi se va percepe pentru această tranzacție. Poate ajunge să fie mai mică odată ce plata a fost efectuată.",
     "invoiceAlreadyPaid": "Această factură a fost deja plătită",
     "somethingWentWrong": "Ceva nu a mers bine",
+    "priceUpdated": "Prețul s-a modificat, așa că sumele au fost actualizate. Verificați-le înainte de a trimite.",
     "paymentAlreadyAttempted": "Plata deja încercată.\n\nDacă doriți să trimiteți din nou această plată, începeți de la zero.",
-    "slideToConfirm": "Glisați pentru a confirma",
+    "paymentMayStillLand": "Așteptați puțin, probabil plata va reuși în curând. Banii dumneavoastră vor ajunge în siguranță sau vor rămâne la dumneavoastră.",
     "slideConfirming": "Confirmare...",
+    "slideToSend": "Glisați pentru a trimite",
+    "calculatingFee": "Se calculează taxa…",
+    "sendProgress": {
+      "reviewing": "Verificare",
+      "signing": "Semnare",
+      "findingRoute": "Se caută ruta",
+      "broadcasting": "Difuzare",
+      "checkingDelivery": "Se verifică livrarea",
+      "almostThere": "Aproape gata",
+      "anyTimeNow": "Din clipă în clipă",
+      "hangTight": "Mai rezistă puțin",
+      "stillOnItsWay": "Încă pe drum"
+    },
     "copiedDestination": "Destinație copiată în clipboard",
-    "lightningRecommended": "Taxă mare! Vă recomandăm Lightning.",
-    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}."
+    "lightningRecommended": "Taxă mare. Vă recomandăm Lightning.",
+    "sending": "Trimitere",
+    "sent": "Trimis",
+    "receipt": "Chitanță",
+    "sentAnnouncement": "Trimis, {amount: string}",
+    "fromBalance": "Din sold",
+    "details": "Detalii",
+    "changeAmount": "Schimbă suma",
+    "tryAgain": "Încercați din nou",
+    "home": "Acasă",
+    "dustSweepSheetTitle": "Înainte de a trimite",
+    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}.",
+    "sendAnyway": "Mi-am verificat istoricul, trimite oricum"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Numele de utilizator {bankName: string} sunt acum adrese {bankName: string}.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Tranzacția trebuie trimisă la mempool",
     "amount": "Suma",
+    "addAmount": "Adaugă suma",
+    "slideToSelectAmount": "Glisați pentru a alege suma",
+    "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
+    "limitsUnavailable": "Nu am putut verifica limita dumneavoastră zilnică. Încercați din nou peste câteva momente.",
+    "problemSheetTitle": "O mică problemă",
+    "changeDestination": "Schimbă destinația",
+    "recipientUnreachableTitle": "Destinatarul nu a putut fi contactat",
+    "recipientWrongAmountTitle": "Destinatarul a indicat o sumă greșită",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
     "amountIsRequired": "Suma este necesară",
     "cost": "Cost",
@@ -2425,10 +2459,11 @@
     "title": "Trimite Bitcoin",
     "failedToFetchLnurlInvoice": "Nu s-a reușit preluarea facturii lnurl",
     "lnurlInvoiceIncorrectAmount": "Serverul lnurl a răspuns cu o factură cu o sumă incorectă.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alertă de taxă mare!",
-      "content": "Taxa este cu peste 50% mai mare decât suma trimisă. Sunteți sigur că doriți să continuați?\n\nPentru a reduce taxele, cereți destinatarului să accepte tranzacția via Lightning",
-      "confirmButton": "Sunt 100% sigur"
+      "body": "Taxa ta este de 50% sau mai mult din suma pe care o trimiți. Sigur vrei să continui?",
+      "cancelPayment": "Anulează plata",
+      "acceptFee": "Acceptă taxa"
     },
     "copiedDestination": "Destinație copiată în clipboard",
     "pendingPayment": "Plata a fost trimisă, dar nu s-a confirmată încă.\n\nEste posibil ca plata să nu se confirme, caz în care fondurile vor fi returnate în contul dvs.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
     "sdkAmountTooLow": "Suma este prea mică pentru o tranzacție on-chain.",
     "sdkNetworkError": "Eroare de rețea. Verificați conexiunea și încercați din nou.",
-    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
+    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită.",
+    "onchainSelfPayment": "Aceasta este adresa propriului portofel. Nu vă puteți trimite o plată on-chain dumneavoastră înșivă."
   },
   "SettingsScreen": {
     "createAddress": "Creează adresă Lightning",
@@ -2988,6 +3024,7 @@
     "note": "Notă",
     "notification": "Notificare",
     "ok": "OK",
+    "okay": "Bine",
     "or": "sau",
     "openWallet": "Deschideți portofelul",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Setați suma"
+  },
+  "Accessibility": {
+    "deleteKey": "Șterge",
+    "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
+    "switchToWallet": "Treci la {wallet: string}",
+    "copy": "Copiați",
+    "balanceHidden": "Sold ascuns",
+    "revealBalanceHint": "Afișează soldul pe acest ecran"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Plată",
         "acceptButton": "Acceptă",
         "payButton": "Continuă și Plătește",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratuit",
+        "forNow": "deocamdată",
         "perYear": "pe an",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Alte beneficii pentru membri"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Ofertă specială",
@@ -3695,35 +3746,53 @@
           "text": "Am examinat și sunt de acord cu",
           "linkText": "Grila de Tarife Blink Card"
         },
-        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni"
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni",
+        "freeNotice": "Înțeleg că Blink Orange este gratuit deocamdată și că ulterior ar putea fi introdusă o taxă de membru, cu notificare prealabilă"
+      },
+      "CardVerifyIdentity": {
+        "title": "Verificați-vă identitatea",
+        "description": "Pentru a vă activa Blink Card, emitentul cardului trebuie să verifice cine sunteți (KYC). Veți avea nevoie de:",
+        "requirements": {
+          "governmentId": "Un act de identitate emis de stat",
+          "selfie": "Un selfie / verificare de prezență",
+          "proofOfAddress": "Dovada adresei",
+          "questions": "Câteva întrebări despre dumneavoastră"
+        },
+        "buttonText": "Continuă"
       },
       "CardIntroducing": {
         "title": "Prezentare",
         "cardInfo": {
-          "bitcoinCard": "Cardul Visa Blink",
+          "bitcoinCard": "Blink Card",
           "for": "pentru",
-          "maximalist": "Maximaliștii Bitcoin"
+          "bitcoiners": "Bitcoineri"
         },
         "buttonText": "Continuă"
       },
       "CardDetails": {
-        "title": "Avantaje suplimentare",
+        "title": "Ce este inclus",
         "features": {
-          "accountManager": "Manager de cont dedicat",
-          "support": "Suport prioritar",
-          "onchainDeposits": "50% înapoi din comisioanele de tranzacție",
-          "circularEconomies": "100 $ pentru economii circulare"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "cardul tău Visa, gata astăzi"
+          },
+          "accountManager": {
+            "title": "Manager de cont personal",
+            "subtitle": "și asistență prioritară"
+          },
+          "onOffRamping": "Intrări și ieșiri de bani"
         },
-        "andMore": "... și mai multe vin în 2026",
+        "availableIn": "în {months} luni",
+        "footnote": "Unele funcții vor fi disponibile în cel mult {months} luni. Cardul este gata astăzi.",
         "buttonText": "Continuă"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Bun venit la bord",
-          "subtitle": "La Blink Privat",
+          "subtitle": "La Blink Orange",
           "paragraphs": {
-            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Privat. Probabil pentru că ești un Bitcoiner grozav.",
-            "body2": "Obiectivul nostru pentru 2026 este să umplem programul cu atâtea avantaje încât va fi evident să reînnoiești anul viitor."
+            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Orange. Probabil pentru că ești un Bitcoiner grozav.",
+            "body2": "Blink Orange este primul nivel al calității de membru Blink pentru Bitcoineri, doar pe bază de invitație. Blink Card și managerul tău personal de cont sunt două dintre primele servicii pe care le oferim — restul îl construim până în 2027."
           }
         },
         "buttonText": "Hai să mergem"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Ocupație",
-            "placeholder": "Selectează ocupația ta"
+            "placeholder": "Selectează"
           },
           "annualSalaryRange": {
             "label": "Salariu anual",
-            "placeholder": "Selectează intervalul salarial"
+            "placeholder": "Selectează salariul"
           },
           "accountPurpose": {
             "label": "Scopul contului",
@@ -3815,7 +3884,6 @@
             "placeholder": "Selectează intervalul de cheltuieli"
           }
         },
-        "buttonText": "Trimite cererea",
         "select": "selectează"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", și",
           "cardTermsLinkText": "Termenii cardului Blink"
         },
-        "certifyAccuracy": "Certific că informațiile pe care le-am furnizat sunt exacte și că voi respecta toate regulile și cerințele legate de cardul meu Blink Visa",
-        "acknowledgeSolicitation": "Recunosc că solicitarea cardului Blink Visa nu constituie o solicitare neautorizată"
+        "certifyAccuracy": "Certific că informațiile pe care le-am furnizat sunt exacte și că voi respecta toate regulile și cerințele legate de cardul meu Blink",
+        "acknowledgeSolicitation": "Recunosc că solicitarea cardului Blink nu constituie o solicitare neautorizată"
       },
       "CardPreapproved": {
-        "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
+        "title": "Blink Card-ul dumneavoastră este gata!",
+        "subtitle": "Acum vă puteți activa cardul și puteți începe să îl folosiți",
         "buttonText": "Închide"
+      },
+      "CardDeclined": {
+        "title": "Nu am putut aproba cererea dumneavoastră de card",
+        "subtitle": "Managerul dumneavoastră de cont vă va contacta."
       },
       "CardProcessing": {
         "title": "Se procesează cererea ta",
-        "subtitle": "Te vom anunța de îndată ce vom fi pregătiți",
-        "buttonText": "Închide"
+        "subtitle": "Acest lucru poate dura până la un minut"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Migrează acum către un cont non-custodial",
       "body": "Nu mai poți primi fonduri în contul tău custodial. Blink a întrerupt serviciul custodial în regiunea ta, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
+      "bodyLevelZero": "Nu mai poți primi fonduri în acest cont de probă. Blink închide conturile de probă, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
       "migrateCta": "Migrează acum"
     },
     "reminderBulletin": {
       "title": "Important",
       "body": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}. Primirea se oprește pe {receiveStopsDate}.",
+      "bodySingleDate": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date} — totul se mută în câteva atingeri.",
+      "bodyLevelZero": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "bodyReceiveDisabled": "Primirea s-a oprit. Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "migrateCta": "Migrează"
     },
     "offboardBulletin": {
       "title": "Important",
-      "body": "Contul tău este înregistrat într-o regiune în care nu putem oferi conturi. Retrage-ți fondurile înainte de 31 august. Primirea se oprește pe 10 august."
+      "bodyTwoDates": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Primirea se oprește pe {receiveStopsDate}. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație.",
+      "bodySingleDate": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație.",
+      "bodyReceiveOff": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Primirea este oprită. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație."
     },
     "dollarBalanceModal": {
       "title": "Nu îți putem migra soldul în dolari",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Ceva nu a mers bine la reluarea migrării. Te rugăm să o începi din nou.",
     "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
     "migrationRequiredForcedBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial. Este necesar din motive de reglementare.\n\nNu-ți face griji, non-custodial va fi mai bun pentru tine pe termen lung.",
+    "migrationRequiredForcedBodyLevelZero": "Blink închide conturile de probă. Mută-ți soldul într-un cont non-custodial. Durează doar câteva atingeri.",
     "migrationGateTitle": "Cont inaccesibil",
     "migrationGateBody": "Din motive de reglementare nu putem oferi conturi custodial în regiunea ta. Transferă-ți fondurile într-un cont non-custodial cu Blink urmând pașii următori sau contactează-ne la <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Conturile de probă sunt acum închise. Soldul tău este în siguranță. Mută-l într-un cont non-custodial urmând pașii următori, gratuit și fără limită de timp, sau contactează-ne la <link>{email}</link>",
     "bitcoinBalance": "Sold Bitcoin",
     "dollarBalance": "Sold în dolari",
     "moveToNonCustodial": "Treci la non-custodial",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "Nu s-a putut citi din clipboard. Vă rugăm să introduceți fraza de backup manual.",
     "enterWord": "Cuvânt",
     "invalidMnemonic": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă.",
+    "invalidPhrase": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă. Contactați <link>Asistența</link> dacă problema persistă.",
+    "invalidWord": "Cuvânt invalid, verificați ortografia",
     "restoring": "Se restaurează portofelul...",
     "restoreSuccess": "Portofel restaurat cu succes",
     "restoreFailed": "Restaurarea a eșuat. Încercați din nou.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "Suma este sub minimul necesar pentru această plată. Încearcă o sumă mai mare.",
     "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
     "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
-    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
+    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică.",
+    "outcomeUnknown": "Este posibil ca această plată să fi fost deja efectuată. Verifică istoricul tranzacțiilor înainte de a o trimite din nou.",
+    "earlierConversionPending": "Conversia ta anterioară este încă în curs de confirmare. Încearcă din nou peste câteva minute.",
+    "earlierPaymentFound": "Plata ta anterioară către această destinație a fost deja efectuată, pentru o altă sumă. Verifică-o înainte de a trimite din nou.",
+    "earlierConversionFound": "Conversia ta anterioară a fost deja efectuată, pentru o altă sumă. Verific-o în istoricul tranzacțiilor înainte de a converti din nou.",
+    "convertedMeanwhile": "Tocmai a fost efectuată o conversie de aproximativ aceeași sumă. Verifică-ți soldul înainte de a o confirma din nou pe aceasta."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Acest cont a fost creat pe {network}. Comută la {network} pentru a-l folosi."

@@ -1,15 +1,11 @@
 import React, { useState } from "react"
 import { Pressable, View } from "react-native"
-import Animated from "react-native-reanimated"
-
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
-import { useAlternatingSpin } from "@app/components/animations"
-import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
+import { WalletSwitch } from "@app/components/wallet-switch"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
@@ -19,6 +15,8 @@ import {
   MoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { fonts } from "@app/rne-theme/fonts"
+import { haptics } from "@app/utils/haptics"
 
 type FormattedAmounts = { formattedPrimary: string; formattedSecondary: string }
 
@@ -79,18 +77,11 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
   disabled,
 }) => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
   const { formatMoneyAmount, getSecondaryAmountIfCurrencyIsDifferent } =
     useDisplayCurrency()
   const [isPressed, setIsPressed] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
-    labels: { BTC: LL.common.bitcoin(), USD: LL.common.dollar() },
-  })
-  const { triggerSpin, spinStyle } = useAlternatingSpin()
 
   const { formattedPrimary, formattedSecondary } = formatAmounts({
     unitOfAccountAmount,
@@ -132,7 +123,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
         <Pressable
           style={styles.walletSection}
           onPress={() => {
-            triggerSpin()
+            haptics.select()
             onToggleWallet()
           }}
           onPressIn={() => setIsPressed(true)}
@@ -141,15 +132,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Toggle wallet"
         >
-          <Animated.View style={[spinStyle, !canToggleWallet && styles.iconHidden]}>
-            <GaloyIcon name="refresh" size={16} color={colors.textSecondary} />
-          </Animated.View>
-          <CurrencyPill
-            currency={walletCurrency}
-            containerSize="medium"
-            containerStyle={pillWidthStyle}
-            onLayout={onPillLayout(walletCurrency)}
-          />
+          <WalletSwitch currency={walletCurrency} canToggle={canToggleWallet} />
         </Pressable>
       </View>
       <AmountInputModal
@@ -184,9 +167,6 @@ const useStyles = makeStyles(({ colors }) => ({
   textDisabled: {
     opacity: 0.5,
   },
-  iconHidden: {
-    opacity: 0,
-  },
   amountSection: {
     flex: 1,
     justifyContent: "center",
@@ -195,26 +175,25 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   amountText: {
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     color: colors.textOnBackground,
   },
   placeholderText: {
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     color: colors.textOnBackground,
   },
   secondaryText: {
     fontSize: 12,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 18,
     color: colors.textOnBackground,
   },
   walletSection: {
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 12,
     paddingHorizontal: 14,
     paddingVertical: 14,
   },

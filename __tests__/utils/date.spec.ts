@@ -16,6 +16,7 @@ import {
   formatUnixTimestampYMDHM,
   getLastDayOfMonth,
   getTimeLeft,
+  isOnOrAfterDay,
   isSameDay,
   isToday,
   isYesterday,
@@ -512,6 +513,72 @@ describe("date utils", () => {
       expect(formatted).toContain("August")
       expect(mockReportError).toHaveBeenCalledWith(
         "formatDayAndMonth timezone",
+        expect.any(Error),
+      )
+    })
+  })
+
+  describe("isOnOrAfterDay", () => {
+    const AUG_31_2026_NOON_UTC = Date.UTC(2026, 7, 31, 12) / 1000
+    const AUG_31_2026_EARLY_UTC = Date.UTC(2026, 7, 31, 1) / 1000
+    const AUG_10_2026_NOON_UTC = Date.UTC(2026, 7, 10, 12) / 1000
+    const SEP_1_2026_NOON_UTC = Date.UTC(2026, 8, 1, 12) / 1000
+
+    it.each([
+      { label: "an earlier day", a: AUG_10_2026_NOON_UTC, expected: false },
+      { label: "the same day, earlier hour", a: AUG_31_2026_EARLY_UTC, expected: true },
+      { label: "the same instant", a: AUG_31_2026_NOON_UTC, expected: true },
+      { label: "a later day", a: SEP_1_2026_NOON_UTC, expected: true },
+    ])("compares calendar days: $label", ({ a, expected }) => {
+      expect(isOnOrAfterDay({ a, b: AUG_31_2026_NOON_UTC, timezone: "UTC" })).toBe(
+        expected,
+      )
+    })
+
+    it("compares the days in the given timezone, not in UTC", () => {
+      /** 23:30 UTC on Aug 30 is already Aug 31 in Paris (CEST, UTC+2). */
+      const aug30LateUtc = Date.UTC(2026, 7, 30, 23, 30) / 1000
+
+      expect(
+        isOnOrAfterDay({ a: aug30LateUtc, b: AUG_31_2026_NOON_UTC, timezone: "UTC" }),
+      ).toBe(false)
+      expect(
+        isOnOrAfterDay({
+          a: aug30LateUtc,
+          b: AUG_31_2026_NOON_UTC,
+          timezone: "Europe/Paris",
+        }),
+      ).toBe(true)
+    })
+
+    it("falls back to the device timezone and reports when the timezone is malformed", () => {
+      mockReportError.mockClear()
+
+      expect(
+        isOnOrAfterDay({
+          a: AUG_10_2026_NOON_UTC,
+          b: AUG_31_2026_NOON_UTC,
+          timezone: "Not/A_Timezone",
+        }),
+      ).toBe(false)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "isOnOrAfterDay timezone",
+        expect.any(Error),
+      )
+    })
+
+    it("still finds the same day on a malformed timezone", () => {
+      mockReportError.mockClear()
+
+      expect(
+        isOnOrAfterDay({
+          a: AUG_31_2026_NOON_UTC,
+          b: AUG_31_2026_NOON_UTC,
+          timezone: "Not/A_Timezone",
+        }),
+      ).toBe(true)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "isOnOrAfterDay timezone",
         expect.any(Error),
       )
     })

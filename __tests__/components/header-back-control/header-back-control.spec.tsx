@@ -1,8 +1,9 @@
 import React from "react"
-import { Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { Image, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { fonts } from "@app/rne-theme/fonts"
 import theme from "@app/rne-theme/theme"
 import {
   headerBackControl,
@@ -144,6 +145,41 @@ describe("headerBackControl", () => {
 
     // HeaderBackButton builds its accessibility label from the one the header supplies.
     expect(getByLabelText("Settings, back")).toBeTruthy()
+  })
+
+  /* With no tint from the header, HeaderBackButton passes an undefined tint to its icon,
+   * which drops the icon's own default and draws the raw black glyph. */
+  it("tints the arrow with the theme foreground when the header gives no tint", () => {
+    const rendered = renderHeaderLeft(headerBackControl()(headerProps))
+
+    expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe(
+      theme.lightColors?.textOnBackground,
+    )
+  })
+
+  it("keeps the tint a header supplies", () => {
+    const rendered = renderHeaderLeft(
+      headerBackControl()({ ...headerProps, tintColor: "#123456" }),
+    )
+
+    expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe("#123456")
+  })
+
+  /* headerBackTitleStyle only reaches the native back item, which this control replaces,
+   * so the label HeaderBackButton draws has to name the face itself. It also renders
+   * hidden copies to measure, so every one is checked. */
+  it("draws the iOS back label in the regular face", () => {
+    const { getAllByText } = renderHeaderLeft(
+      headerBackControl()({ ...headerProps, label: "Settings" }),
+    )
+
+    const labels = getAllByText("Settings", { includeHiddenElements: true })
+    expect(labels.length).toBeGreaterThan(0)
+    labels.forEach((label) => {
+      expect(StyleSheet.flatten(label.props.style)).toMatchObject({
+        fontFamily: fonts.regular,
+      })
+    })
   })
 
   it("renders the invisible placeholder when going back is not allowed", () => {

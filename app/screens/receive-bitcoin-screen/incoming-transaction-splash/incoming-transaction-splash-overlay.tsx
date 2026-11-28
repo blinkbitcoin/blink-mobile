@@ -9,7 +9,6 @@ import {
   useWindowDimensions,
   View,
 } from "react-native"
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import Animated, {
   cancelAnimation,
   Easing,
@@ -39,6 +38,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
 import { radius } from "@app/rne-theme/radius"
 import { toBtcMoneyAmount } from "@app/types/amounts"
+import { haptics } from "@app/utils/haptics"
 
 import type { ShownSplash } from "./incoming-transaction-splash-provider"
 import { PendingHourglass } from "./pending-hourglass"
@@ -119,13 +119,6 @@ const SplashWindow: React.FC<
 /** On-chain is shown when it is detected, before it confirms. */
 const isPendingOnchain = (splash: ShownSplash) =>
   splash.paymentType === SplashPaymentType.Onchain
-
-const triggerSuccessHaptic = () => {
-  // Honors the phone's system haptics setting, unlike the shared triggerHapticFeedback.
-  ReactNativeHapticFeedback.trigger("notificationSuccess", {
-    ignoreAndroidSystemSettings: false,
-  })
-}
 
 /** Animation layers: nothing for a screen reader to land on. */
 const decorative = {
@@ -249,7 +242,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   const onImpact = useCallback(() => {
     if (!isMounted.current) return
     phase.current = "settling"
-    triggerSuccessHaptic()
+    haptics.success()
     setImpactKey((key) => key + 1)
     announce(latest.current)
     /** The canvas goes once the entrance is over, not on the impact frame itself: closed,

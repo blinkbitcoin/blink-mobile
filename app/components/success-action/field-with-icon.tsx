@@ -3,6 +3,7 @@ import { View, Linking } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 type TTextWithUrl = {
   text: string
@@ -40,7 +41,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
       <View style={styles.fieldBackground}>
         <View>
           {textData.text && (
-            <Text style={styles.inputStyle} type={"p3"}>
+            <Text style={styles.inputStyle} type={"p3"} bold>
               {textData.text}
             </Text>
           )}
@@ -50,6 +51,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
               style={[styles.inputStyle, styles.inputUrl]}
               onPress={() => Linking.openURL(textData.url!)}
               type={"p3"}
+              bold
             >
               {textData.url}
             </Text>
@@ -57,6 +59,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
           {subValue && (
             <Text
               type={"p3"}
+              bold
               style={[styles.inputStyle, styles.subValueStyle]}
             >{`(${subValue})`}</Text>
           )}
@@ -73,7 +76,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
   },
   titleFieldBackground: {
-    fontWeight: "300",
+    fontFamily: fonts.regular,
     fontStyle: "normal",
     color: colors.textMuted,
     minWidth: 80,

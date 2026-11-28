@@ -1,12 +1,23 @@
 import React from "react"
+import { ApolloError } from "@apollo/client"
+import { GraphQLError } from "graphql"
 import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
+import type { ReactTestInstance } from "react-test-renderer"
 
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import { AmountSlider } from "@app/screens/send-bitcoin-screen/amount-entry/amount-slider"
 import {
   ConvertMoneyAmount,
   PaymentDetail,
@@ -48,11 +59,31 @@ jest.mock("lnurl-pay", () => ({
     mockRequestInvoiceWithServiceParams(...args),
 }))
 
+/** The invoice decoder, real unless a test sets the next decode to a wrong amount. Read
+ *  lazily, since the factory is hoisted above this declaration. */
+const mockNextDecodedInvoice: { current?: unknown } = {}
+jest.mock("@blinkbitcoin/blink-client", () => {
+  const actual = jest.requireActual("@blinkbitcoin/blink-client")
+  return {
+    ...actual,
+    decodeInvoiceString: (...args: Parameters<typeof actual.decodeInvoiceString>) => {
+      const next = mockNextDecodedInvoice.current
+      mockNextDecodedInvoice.current = undefined
+      return next ?? actual.decodeInvoiceString(...args)
+    },
+  }
+})
+
+const ERROR_SHEET_TEST_ID = "amount-entry-error-msg-bottom-sheet"
+const errorSheet = () => screen.queryByTestId(ERROR_SHEET_TEST_ID)
+
 const mockNavigate = jest.fn()
+const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    dispatch: mockDispatch,
     setOptions: jest.fn(),
   }),
 }))
@@ -115,16 +146,28 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => {
       usdWallet,
       network: "mainnet",
       loading: false,
-      isSelfCustodial: false,
+      isSelfCustodial: mockAccountMode.isSelfCustodial,
     }),
   }
 })
+
+/** Which rail the send is on. Signed in all the same, as a user holding both accounts is. */
+const mockAccountMode = { isSelfCustodial: false }
 
 /**
  * The withdrawal allowance, in cents. It starts where the shared account mock leaves it, so
  * only a test that lowers it on purpose has an amount turned down for being over the limit.
  */
 const mockWithdrawalAllowance = { remaining: 100_000_000 }
+
+/** The limits query's first read still out, its own failure, and its refetch, for the
+ *  fail-closed tests. */
+const mockWithdrawalLimitsQuery: { loading: boolean; error?: Error; refetch: jest.Mock } =
+  {
+    loading: false,
+    error: undefined,
+    refetch: jest.fn(),
+  }
 
 /**
  * The tier quote, answered per test rather than left to fall off the end of the mocked
@@ -135,23 +178,40 @@ const mockQuoteFees = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useSendBitcoinWithdrawalLimitsQuery: () => ({
-    data: {
-      me: {
-        defaultAccount: {
-          limits: {
-            withdrawal: [
-              {
-                totalLimit: 100_000_000,
-                remainingLimit: mockWithdrawalAllowance.remaining,
-                interval: 86_400,
+  useSendBitcoinWithdrawalLimitsQuery: ({ skip }: { skip?: boolean } = {}) => {
+    // Apollo renders the screen again once a refetch answers; the mock has to as well.
+    const [, rerender] = jest.requireActual("react").useReducer((n: number) => n + 1, 0)
+    const refetch = async () => {
+      await mockWithdrawalLimitsQuery.refetch()
+      rerender()
+    }
+    // A skipped query asks nothing: no data, no error, never loading.
+    if (skip) return { data: undefined, loading: false, error: undefined, refetch }
+    return {
+      loading: mockWithdrawalLimitsQuery.loading,
+      error: mockWithdrawalLimitsQuery.error,
+      refetch,
+      // A read still out, or a failed one, has no data, so no limit to check against.
+      data:
+        mockWithdrawalLimitsQuery.loading || mockWithdrawalLimitsQuery.error
+          ? undefined
+          : {
+              me: {
+                defaultAccount: {
+                  limits: {
+                    withdrawal: [
+                      {
+                        totalLimit: 100_000_000,
+                        remainingLimit: mockWithdrawalAllowance.remaining,
+                        interval: 86_400,
+                      },
+                    ],
+                  },
+                },
               },
-            ],
-          },
-        },
-      },
-    },
-  }),
+            },
+    }
+  },
   useOnChainTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
   useOnChainUsdTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
   useOnChainUsdTxFeeAsBtcDenominatedBySpeedLazyQuery: () => [mockQuoteFees],
@@ -167,7 +227,11 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  mockAccountMode.isSelfCustodial = false
+  mockWithdrawalLimitsQuery.loading = false
   mockWithdrawalAllowance.remaining = 100_000_000
+  mockWithdrawalLimitsQuery.error = undefined
+  mockWithdrawalLimitsQuery.refetch.mockClear()
 })
 
 jest.mock("@react-native-firebase/app-check", () => {
@@ -279,7 +343,7 @@ it("SendScreen Details", async () => {
   await act(async () => {})
 })
 
-it("applies send amount when Set Amount is pressed", async () => {
+it("applies the amount typed on the in-screen keypad", async () => {
   loadLocale("en")
   const LL = i18nObject("en")
 
@@ -295,14 +359,8 @@ it("applies send amount when Set Amount is pressed", async () => {
   await flushAsync()
   await flushAsync()
 
-  fireEvent.press(screen.getByTestId("Amount Input Button"))
-  await flushAsync()
-
   fireEvent.press(screen.getByTestId("Key 1"))
   await flushAsync()
-
-  const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-  fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
 
   await waitFor(() => {
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
@@ -528,6 +586,255 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
   })
 })
 
+describe("SendBitcoinDetailsScreen — LNURL invoice errors", () => {
+  const lnurlParams: LnUrlPayServiceResponse = {
+    callback: "https://example.com/cb",
+    fixed: false,
+    min: 1 as Satoshis,
+    max: 1000000 as Satoshis,
+    domain: "example.com",
+    metadata: [["text/plain", "Test"]],
+    metadataHash: "",
+    identifier: "alice@example.com",
+    description: "Pay alice",
+    image: "",
+    commentAllowed: 0,
+    rawData: { metadata: '[["text/plain","Test"]]' },
+  }
+
+  const amount = {
+    amount: 5000,
+    currency: WalletCurrency.Btc,
+    currencyCode: "BTC",
+  } as const
+
+  const lnurlDetail = (): PaymentDetail<WalletCurrency> => {
+    const detail = {
+      paymentType: PaymentType.Lnurl,
+      destination: "alice@example.com",
+      memo: "",
+      convertMoneyAmount: ((money, currency) => ({
+        amount: money.amount,
+        currency,
+        currencyCode: currency,
+      })) as ConvertMoneyAmount,
+      setConvertMoneyAmount: () => detail,
+      settlementAmount: amount,
+      settlementAmountIsEstimated: false,
+      unitOfAccountAmount: amount,
+      sendingWalletDescriptor: { id: "btc-wallet-id", currency: WalletCurrency.Btc },
+      setSendingWalletDescriptor: () => detail,
+      lnurlParams,
+      setInvoice: () => detail,
+      successAction: undefined,
+      setSuccessAction: () => detail,
+      isMerchant: false,
+      canSetAmount: true as const,
+      setAmount: () => detail,
+      canSetMemo: true as const,
+      setMemo: () => detail,
+      canSendPayment: false as const,
+      canGetFee: false as const,
+    }
+    return detail as unknown as PaymentDetail<WalletCurrency>
+  }
+
+  const renderLnurl = async () => {
+    const detail = lnurlDetail()
+    render(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen
+          route={
+            {
+              key: "sendBitcoinDetails",
+              name: "sendBitcoinDetails",
+              params: {
+                paymentDestination: {
+                  valid: true,
+                  createPaymentDetail: () => detail,
+                } as never,
+              },
+            } as never
+          }
+        />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+  }
+
+  const pressNext = async (LL: ReturnType<typeof i18nObject>) => {
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.common.next()))
+    })
+    await flushAsync()
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+  })
+
+  it("titles the sheet 'Couldn't reach the recipient' and repeats Next on Try again (L1/L2)", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockRejectedValue(new Error("timeout"))
+    await renderLnurl()
+    await pressNext(LL)
+
+    const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.recipientUnreachableTitle())).toBeTruthy()
+    expect(
+      screen.getAllByText(LL.SendBitcoinScreen.failedToFetchLnurlInvoice()),
+    ).toHaveLength(2)
+    expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+    await flushAsync()
+
+    expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledTimes(2)
+    // The retry failed too, so the sheet is open again for the new failure.
+    expect(errorSheet()).toBeTruthy()
+  })
+
+  it("titles the sheet 'Recipient sent the wrong amount' and only offers Close (L3)", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc-wrong-amount",
+      successAction: undefined,
+    })
+    mockNextDecodedInvoice.current = { millisatoshis: "1000" }
+    await renderLnurl()
+    await pressNext(LL)
+
+    const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.recipientWrongAmountTitle())).toBeTruthy()
+    expect(sheet.queryByText(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeNull()
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.common.close()))
+    })
+
+    expect(errorSheet()).toBeNull()
+    expect(
+      screen.getByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("clears the invoice error on a slid amount, as on a typed one", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc-wrong-amount",
+      successAction: undefined,
+    })
+    mockNextDecodedInvoice.current = { millisatoshis: "1000" }
+    await renderLnurl()
+    await pressNext(LL)
+    await act(async () => {
+      fireEvent.press(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(LL.common.close()),
+      )
+    })
+    expect(
+      screen.getByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeTruthy()
+
+    await act(async () => {
+      screen.UNSAFE_getByType(AmountSlider).props.onSlide(50)
+    })
+    await flushAsync()
+
+    expect(
+      screen.queryByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeNull()
+  })
+
+  /** Over the limit Next is off, so only a new amount can clear the old request's error. */
+  it("clears the invoice error on a new amount, so crossing the limit opens its sheet (L3 then A3)", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc-wrong-amount",
+      successAction: undefined,
+    })
+    mockNextDecodedInvoice.current = { millisatoshis: "1000" }
+    await renderLnurl()
+    await pressNext(LL)
+    await act(async () => {
+      fireEvent.press(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(LL.common.close()),
+      )
+    })
+    expect(errorSheet()).toBeNull()
+
+    // $5 left today, under the 5,000 the invoice was for.
+    mockWithdrawalAllowance.remaining = 500
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("Key 1"))
+    })
+    await flushAsync()
+
+    expect(
+      screen.queryByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeNull()
+    const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+    expect(sheet.getByText(LL.SendBitcoinConfirmationScreen.changeAmount())).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinDetailsScreen — Change amount from review", () => {
+  it("empties the amount when review sends a fresh resetAmountAt, and not on a plain return", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    const { rerender } = render(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen route={intraledgerRoute} />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId(LL.common.next())
+    await flushAsync()
+    await flushAsync()
+
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+
+    // The back arrow: same params, the amount stays.
+    rerender(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen route={{ ...intraledgerRoute }} />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
+    )
+
+    rerender(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen
+          route={{
+            ...intraledgerRoute,
+            params: { ...intraledgerRoute.params, resetAmountAt: 1 },
+          }}
+        />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    expect(screen.getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
+  })
+})
+
 describe("onchain fee tier gating", () => {
   it("renders the speed selector for a custodial onchain send", async () => {
     render(
@@ -564,7 +871,9 @@ describe("onchain fee tier gating", () => {
     await flushAsync()
 
     // A zeroed placeholder must never read as a fee somebody quoted.
-    expect(screen.getByText(LL.SendBitcoinScreen.fast())).toBeTruthy()
+    expect(
+      screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} ~ `)),
+    ).toBeTruthy()
     expect(screen.queryByText(`${LL.SendBitcoinScreen.fast()} (0 sats)`)).toBeNull()
   })
 
@@ -584,10 +893,12 @@ describe("onchain fee tier gating", () => {
     fireEvent.press(screen.getByTestId("fee-tier-slow"))
     await flushAsync()
 
-    expect(screen.getAllByText(LL.SendBitcoinScreen.slow()).length).toBeGreaterThan(0)
+    expect(
+      screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.slow()} ~ `)),
+    ).toBeTruthy()
   })
 
-  it("carries the quoted fee into the tier label", async () => {
+  it("shows the custodial payout windows on the row and in the options", async () => {
     loadLocale("en")
     const LL = i18nObject("en")
 
@@ -599,20 +910,43 @@ describe("onchain fee tier gating", () => {
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
 
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
+    // Custodial sends wait on the payout queues, so Standard is ~ 4h here, not the
+    // self-custodial ~ 30m.
+    expect(screen.getByText(`${LL.SendBitcoinScreen.fast()} ~ 10m`)).toBeTruthy()
+    fireEvent.press(screen.getByTestId("fee-tier-dropdown"))
+    expect(screen.getByText("~ 4h")).toBeTruthy()
+    expect(screen.getByText("~ 24h")).toBeTruthy()
+    expect(screen.queryByText("~ 30m")).toBeNull()
+  })
+
+  it("keeps the quoted fee off the priority row", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
     fireEvent.press(screen.getByTestId("Key 1"))
     await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
     await flushAsync()
 
-    // The fee itself is formatted in the display currency, so only its presence is asserted.
+    // The fee shows on review only, so a landed quote leaves the row at name and ETA.
     await waitFor(() => {
       expect(
-        screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} \\(`)),
-      ).toBeTruthy()
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
     })
+    expect(
+      screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} ~ `)),
+    ).toBeTruthy()
+    fireEvent.press(screen.getByTestId("fee-tier-dropdown"))
+    expect(
+      screen.queryByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} \\(`)),
+    ).toBeNull()
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       false,
@@ -631,13 +965,8 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     fireEvent.press(screen.getByTestId("Key 1"))
     await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
     await flushAsync()
 
     /**
@@ -653,11 +982,52 @@ describe("onchain fee tier gating", () => {
     )
   })
 
+  /** blink-mobile#4261: the backend refuses the quote with CANT_PAY_SELF. */
+  it("names a payment to the sender's own address, holds Next and offers Change destination", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockDispatch.mockClear()
+    mockQuoteFees.mockResolvedValue({
+      data: undefined,
+      error: new ApolloError({
+        graphQLErrors: [
+          new GraphQLError("User tried to pay themselves", {
+            extensions: { code: "CANT_PAY_SELF" },
+          }),
+        ],
+      }),
+    })
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.onchainSelfPayment())).toBeTruthy()
+    expect(screen.queryByText(LL.common.feeError())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.changeDestination()))
+    })
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+  })
+
   /**
    * The high-fee warning is judged by the fee the selector quoted, so leaving before the
-   * quote lands would leave without the warning.
+   * quote lands would leave without the warning. The hold shows as Next's spinner, since a
+   * quote can take seconds and a dimmed Next said nothing about why.
    */
-  it("holds Next while the custodial quote is still out", async () => {
+  it("holds Next on its spinner while the custodial quote is still out", async () => {
     loadLocale("en")
     const LL = i18nObject("en")
     mockQuoteFees.mockResolvedValue(failedQuote)
@@ -669,24 +1039,20 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     fireEvent.press(screen.getByTestId("Key 1"))
-    await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
 
     // Asserted before flushing: the quote goes out on this render and nothing is back yet.
-    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
-      true,
-    )
+    const next = screen.getByTestId(LL.common.next())
+    expect(next.props.accessibilityState?.busy).toBe(true)
+    mockNavigate.mockClear()
+    fireEvent.press(next)
+    expect(mockNavigate).not.toHaveBeenCalled()
 
     await waitFor(() => {
       expect(screen.getByText(LL.common.feeError())).toBeTruthy()
     })
-    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
-      false,
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState).toEqual(
+      expect.objectContaining({ busy: false, disabled: false }),
     )
   })
 
@@ -708,17 +1074,12 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     // Against the mocked price 9,999 NGN is $99.99, well past the $5 left on the limit.
     fireEvent.press(screen.getByTestId("Key 9"))
     fireEvent.press(screen.getByTestId("Key 9"))
     fireEvent.press(screen.getByTestId("Key 9"))
     fireEvent.press(screen.getByTestId("Key 9"))
     await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
     await flushAsync()
 
     // Matched by its opening words, since the allowance is formatted into the rest of it.
@@ -726,12 +1087,306 @@ describe("onchain fee tier gating", () => {
       limit: "",
     }).trim()
 
+    // Inline, and in the sheet that opened on top of it when the amount crossed the limit.
     await waitFor(() => {
-      expect(screen.getByText(new RegExp(`^${amountExceedsLimitOpening}`))).toBeTruthy()
+      expect(
+        screen.getAllByText(new RegExp(`^${amountExceedsLimitOpening}`)),
+      ).toHaveLength(2)
     })
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       true,
+    )
+  })
+
+  it("opens the error sheet on crossing the daily limit, and Change amount empties the amount (A3)", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalAllowance.remaining = 500
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    for (let i = 0; i < 4; i += 1) fireEvent.press(screen.getByTestId("Key 9"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+    })
+    await flushAsync()
+
+    expect(errorSheet()).toBeNull()
+    expect(screen.getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
+  })
+})
+
+describe("daily limit that could not be read", () => {
+  const renderOnchain = async () => {
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+  }
+
+  it("opens the sheet, since nobody checked the limit", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+    expect(sheet.getByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeTruthy()
+  })
+
+  it("reads the limit again on Try again", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+
+    expect(mockWithdrawalLimitsQuery.refetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps saying so inline once the sheet is closed", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+
+    // The sheet may still hold its copy as it slides out; the error slot holds the other.
+    const isInSheet = (node: ReactTestInstance | null): boolean =>
+      Boolean(node) &&
+      (node?.props.testID === ERROR_SHEET_TEST_ID || isInSheet(node?.parent ?? null))
+    const inline = screen
+      .queryAllByText(LL.SendBitcoinScreen.limitsUnavailable(), {
+        includeHiddenElements: true,
+      })
+      .filter((node) => !isInSheet(node))
+    expect(inline).toHaveLength(1)
+  })
+
+  it("holds Next while the limit can't be read, whatever the amount", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    for (let i = 0; i < 4; i += 1) fireEvent.press(screen.getByTestId("Key 9"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+  })
+
+  it("holds Next while the first read of the limit is out, then frees it", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.loading = true
+
+    const view = render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    // Still on its way is not a failure: no sheet, and nothing said inline.
+    expect(errorSheet()).toBeNull()
+    expect(screen.queryByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeNull()
+
+    mockWithdrawalLimitsQuery.loading = false
+    view.rerender(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+  })
+
+  /** Blink's limits are the custodial account's. A signed-in user sending on the
+   *  self-custodial rail is not held by a custodial query that failed. */
+  it("asks a self-custodial send for no custodial limit, so a failed read holds nothing", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockAccountMode.isSelfCustodial = true
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(errorSheet()).toBeNull()
+    expect(screen.queryByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
+    )
+  })
+
+  it("frees Next once a read of the limit answers", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+    mockWithdrawalLimitsQuery.refetch.mockImplementationOnce(async () => {
+      mockWithdrawalLimitsQuery.error = undefined
+    })
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+    expect(screen.queryByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeNull()
+  })
+
+  // A remaining limit of 0 reads as no limit, as on main (blink-wip#1273 G1, senior dev).
+})
+
+describe("high-fee sheet (blink-wip#1323)", () => {
+  const HIGH_FEE_SHEET_TEST_ID = "high-fee-sheet"
+
+  /** One unit typed is 4,164 sats at this price. */
+  const highFeeQuote = {
+    data: { fast: { amount: 5000 }, medium: { amount: 5000 }, slow: { amount: 5000 } },
+  }
+
+  const pressNextOnHighFeeSend = async () => {
+    const LL = i18nObject("en")
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+    await act(async () => {
+      fireEvent.press(screen.getByTestId(LL.common.next()))
+    })
+    await flushAsync()
+  }
+
+  beforeEach(() => {
+    loadLocale("en")
+    mockQuoteFees.mockResolvedValue(highFeeQuote)
+    mockNavigate.mockClear()
+    mockDispatch.mockClear()
+  })
+
+  it("opens on Next instead of going to review", async () => {
+    const LL = i18nObject("en")
+    await pressNextOnHighFeeSend()
+
+    const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(
+      sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.cancelPayment()),
+    ).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  it("continues to review once the fee is accepted", async () => {
+    const LL = i18nObject("en")
+    await pressNextOnHighFeeSend()
+
+    const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  it("starts the send over on Cancel payment", async () => {
+    const LL = i18nObject("en")
+    await pressNextOnHighFeeSend()
+
+    const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.cancelPayment()))
+    })
+
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  it("goes straight to review while the fee is under half the amount", async () => {
+    // 2,081 sats is just under half of 4,164.
+    mockQuoteFees.mockResolvedValue({
+      data: { fast: { amount: 2081 }, medium: { amount: 2081 }, slow: { amount: 2081 } },
+    })
+    await pressNextOnHighFeeSend()
+
+    expect(screen.queryByTestId(HIGH_FEE_SHEET_TEST_ID)).toBeNull()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
     )
   })
 })

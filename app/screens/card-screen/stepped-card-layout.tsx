@@ -6,6 +6,7 @@ import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { StepsProgressBar } from "@app/components/steps-progress-bar"
+import { fonts } from "@app/rne-theme/fonts"
 
 type SteppedCardLayoutProps = {
   steps: string[]
@@ -102,17 +103,15 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: 264,
   },
   title: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     fontSize: 20,
-    fontWeight: "700",
     lineHeight: 24,
     color: colors.textOnBackground,
     textAlign: "center",
   },
   subtitle: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontSize: 12,
-    fontWeight: "400",
     lineHeight: 18,
     color: colors.textMuted,
     textAlign: "center",

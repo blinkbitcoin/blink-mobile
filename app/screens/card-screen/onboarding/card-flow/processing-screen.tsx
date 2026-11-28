@@ -1,92 +1,51 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { Screen } from "@app/components/screen"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { BusyStateScreen, CHIP_GLYPH_SIZE } from "@app/components/busy-state"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { useCardApplicationApproval } from "./use-card-application-approval"
+
 export const CardProcessingScreen: React.FC = () => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const {
+    params: { applicationId },
+  } = useRoute<RouteProp<RootStackParamList, "cardOnboardingProcessingScreen">>()
 
-  const handleNext = () => {
-    navigation.navigate("Primary")
-  }
+  const approvalWait = useCardApplicationApproval(applicationId)
+  const isWaitOver = approvalWait !== "waiting"
+
+  const handleDone = React.useCallback(() => {
+    if (approvalWait === "approved") {
+      navigation.replace("cardOnboardingPreapprovedScreen")
+      return
+    }
+    if (approvalWait === "declined") {
+      navigation.replace("cardOnboardingDeclinedScreen")
+      return
+    }
+    /** A minute without an answer leaves it to the home and a bulletin. */
+    navigation.popTo("Primary")
+  }, [approvalWait, navigation])
 
   return (
-    <Screen>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <Icon
-                name={"time-outline"}
-                color={colors.success}
-                size={40}
-                type="ionicon"
-              />
-            </View>
-          </View>
-
-          <Text type="h2" style={styles.title}>
-            {LL.CardFlow.Onboarding.CardProcessing.title()}
-          </Text>
-          <Text type="p3" color={colors.textDisabled}>
-            {LL.CardFlow.Onboarding.CardProcessing.subtitle()}
-          </Text>
-        </View>
-      </ScrollView>
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.CardProcessing.buttonText()}
-          onPress={handleNext}
-        />
-      </View>
-    </Screen>
+    <BusyStateScreen
+      icon1={<GaloyIcon name="clock" size={CHIP_GLYPH_SIZE} color={colors.success} />}
+      icon2={
+        <GaloyIcon name="card" size={CHIP_GLYPH_SIZE} color={colors.textOnBackground} />
+      }
+      title={LL.CardFlow.Onboarding.CardProcessing.title()}
+      body={LL.CardFlow.Onboarding.CardProcessing.subtitle()}
+      completion={{ kind: "pending", done: isWaitOver }}
+      onDone={handleDone}
+    />
   )
 }
-
-const useStyles = makeStyles(({ colors }) => ({
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 40,
-  },
-  contentContainer: {
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 15,
-  },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.surfaceInteractive,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    marginBottom: 10,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-}))

@@ -2354,15 +2354,41 @@
     "title": "Confirma el pagament",
     "totalLabel": "Total:",
     "totalExceed": "El total supera el teu saldo de {balance: string}",
+    "feeExceedsAmount": "La comissió de la xarxa supera l'import que envies",
     "maxFeeSelected": "Aquesta és la comissió màxima que se't cobrarà per aquesta transacció. Pot acabar sent inferior un cop s'hagi realitzat el pagament.",
     "invoiceAlreadyPaid": "Aquesta factura ja ha estat pagada",
     "somethingWentWrong": "Alguna cosa ha anat malament",
+    "priceUpdated": "El preu ha canviat, així que els imports s'han actualitzat. Revisa'ls abans d'enviar.",
     "paymentAlreadyAttempted": "Pagament ja intentat.\n\nSi vols enviar aquest pagament de nou, comença des de zero.",
-    "slideToConfirm": "Llisca per confirmar",
+    "paymentMayStillLand": "Espera un moment, probablement es completarà aviat. Els teus diners arribaran amb seguretat o es quedaran amb tu.",
     "slideConfirming": "Confirmant...",
+    "slideToSend": "Llisca per enviar",
+    "calculatingFee": "Calculant la comissió…",
+    "sendProgress": {
+      "reviewing": "Revisant",
+      "signing": "Signant",
+      "findingRoute": "Cercant una ruta",
+      "broadcasting": "Difonent",
+      "checkingDelivery": "Comprovant el lliurament",
+      "almostThere": "Gairebé hi som",
+      "anyTimeNow": "En qualsevol moment",
+      "hangTight": "Un moment",
+      "stillOnItsWay": "Encara de camí"
+    },
     "copiedDestination": "Destinació copiada al porta-retalls",
-    "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
-    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
+    "lightningRecommended": "Comissió alta. Recomanem utilitzar Lightning.",
+    "sending": "Enviant",
+    "sent": "Enviat",
+    "receipt": "Rebut",
+    "sentAnnouncement": "Enviat, {amount: string}",
+    "fromBalance": "Des del saldo",
+    "details": "Detalls",
+    "changeAmount": "Canvia l'import",
+    "tryAgain": "Torna-ho a provar",
+    "home": "Inici",
+    "dustSweepSheetTitle": "Abans d'enviar",
+    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}.",
+    "sendAnyway": "He revisat el meu historial, envia igualment"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nom d'usuari és ara la adreça {bankName: string}.",
@@ -2405,8 +2431,16 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",
+    "addAmount": "Afegir import",
+    "slideToSelectAmount": "Llisca per triar l'import",
+    "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
+    "limitsUnavailable": "No hem pogut comprovar el teu límit diari. Torna-ho a provar d'aquí a un moment.",
+    "problemSheetTitle": "Un petit problema",
+    "changeDestination": "Canvia la destinació",
+    "recipientUnreachableTitle": "No s'ha pogut contactar amb el destinatari",
+    "recipientWrongAmountTitle": "El destinatari ha indicat un import incorrecte",
     "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
     "amountIsRequired": "L'import és necessari",
     "cost": "Cost",
@@ -2425,10 +2459,11 @@
     "title": "Envia Bitcoin",
     "failedToFetchLnurlInvoice": "No s'ha pogut obtenir la factura lnurl",
     "lnurlInvoiceIncorrectAmount": "El servidor de lnurl ha enviat una factura amb un import incorrecte.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alerta d'altes comissions !",
-      "content": "La comissió és més gran que el 50% de l'import enviat. Estàs segur que vols continuar?\n\nPer reduir les comissions, demana al receptor que accepti la transacció a través de Lightning.",
-      "confirmButton": "Estic 100% segur"
+      "body": "La teva comissió és el 50% o més de l'import que envies. Segur que vols continuar?",
+      "cancelPayment": "Cancel·la el pagament",
+      "acceptFee": "Accepta la comissió"
     },
     "copiedDestination": "Destinació copiada al porta-retalls",
     "pendingPayment": "El pagament s'ha enviat, però encara no s'ha confirmat.\n\nÉs possible que el pagament no es confirmi, en aquest cas els fons es retornaran al teu compte.",
@@ -2456,7 +2491,8 @@
     "sdkInsufficientFunds": "No hi ha prou fons per a aquesta transacció.",
     "sdkAmountTooLow": "L'import és massa baix per a una transacció on-chain.",
     "sdkNetworkError": "Error de xarxa. Comproveu la connexió i torneu-ho a provar.",
-    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
+    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent.",
+    "onchainSelfPayment": "Aquesta és l'adreça del vostre propi moneder. No us podeu enviar un pagament on-chain a vós mateix."
   },
   "SettingsScreen": {
     "createAddress": "Crea una adreça Lightning",
@@ -2988,6 +3024,7 @@
     "note": "Nota",
     "notification": "Notificació",
     "ok": "D'acord",
+    "okay": "D'acord",
     "or": "o",
     "openWallet": "Obrir el moneder",
     "onchain": "Onchain",
@@ -3133,6 +3170,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Estableix l'import"
+  },
+  "Accessibility": {
+    "deleteKey": "Esborra",
+    "swapCurrencyHint": "Canvia la moneda en què escrius l'import",
+    "switchToWallet": "Canvia a {wallet: string}",
+    "copy": "Copiar",
+    "balanceHidden": "Saldo amagat",
+    "revealBalanceHint": "Mostra el teu saldo en aquesta pantalla"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os: string} versió {version: string}.",
@@ -3673,8 +3718,14 @@
         "paymentTitle": "Pagament",
         "acceptButton": "Acceptar",
         "payButton": "Continuar i Pagar",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "de moment",
         "perYear": "per any",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Altres avantatges de membre"
+        },
         "status": {
           "label": "Estat",
           "specialOfferLabel": "Oferta especial",
@@ -3695,35 +3746,53 @@
           "text": "He revisat i accepto la",
           "linkText": "Taula de Tarifes de Blink Card"
         },
-        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos"
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos",
+        "freeNotice": "Entenc que Blink Orange és gratuït de moment i que més endavant es podria introduir una quota de membre, amb avís previ"
+      },
+      "CardVerifyIdentity": {
+        "title": "Verifica la teva identitat",
+        "description": "Per activar la teva Blink Card, l'emissor de la targeta ha de verificar qui ets (KYC). Necessitaràs:",
+        "requirements": {
+          "governmentId": "Un document d'identitat oficial",
+          "selfie": "Una selfie / prova de vida",
+          "proofOfAddress": "Comprovant de domicili",
+          "questions": "Unes quantes preguntes sobre tu"
+        },
+        "buttonText": "Continuar"
       },
       "CardIntroducing": {
         "title": "Presentant",
         "cardInfo": {
-          "bitcoinCard": "La targeta Visa de Blink",
+          "bitcoinCard": "La Blink Card",
           "for": "per a",
-          "maximalist": "Bitcoin Maximalistes"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Continuar"
       },
       "CardDetails": {
-        "title": "Avantatges addicionals",
+        "title": "Què inclou",
         "features": {
-          "accountManager": "Gestor de comptes dedicat",
-          "support": "Suport prioritari",
-          "onchainDeposits": "50% de reemborsament en comissions de transacció",
-          "circularEconomies": "100$ per a economies circulars"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "la teva targeta Visa, llesta avui"
+          },
+          "accountManager": {
+            "title": "Gestor de compte personal",
+            "subtitle": "i suport prioritari"
+          },
+          "onOffRamping": "Entrada i sortida de diners"
         },
-        "andMore": "... i més per venir el 2026",
+        "availableIn": "d'aquí a {months} mesos",
+        "footnote": "Algunes funcions estaran disponibles d'aquí a {months} mesos. La targeta està llesta avui.",
         "buttonText": "Continuar"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Benvingut a bord",
-          "subtitle": "A Blink Privat",
+          "subtitle": "A Blink Orange",
           "paragraphs": {
-            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Privat. Probablement perquè ets un Bitcoiner increïble.",
-            "body2": "El nostre objectiu per al 2026 és omplir el programa amb tantes coses bones que serà obvi renovar l'any vinent."
+            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Orange. Probablement perquè ets un Bitcoiner increïble.",
+            "body2": "Blink Orange és el primer nivell de la membresia de Blink per a Bitcoiners, només per invitació. La Blink Card i el teu gestor de compte personal són dos dels primers serveis que oferim — la resta l'anem construint fins al 2027."
           }
         },
         "buttonText": "Anem-hi"
@@ -3800,11 +3869,11 @@
         "fields": {
           "occupation": {
             "label": "Ocupació",
-            "placeholder": "Selecciona la teva ocupació"
+            "placeholder": "Selecciona"
           },
           "annualSalaryRange": {
             "label": "Salari anual",
-            "placeholder": "Selecciona el teu rang salarial"
+            "placeholder": "Selecciona el salari"
           },
           "accountPurpose": {
             "label": "Propòsit del compte",
@@ -3815,7 +3884,6 @@
             "placeholder": "Selecciona el teu rang de despesa"
           }
         },
-        "buttonText": "Enviar sol·licitud",
         "select": "seleccionar"
       },
       "Acknowledgement": {
@@ -3831,17 +3899,21 @@
           "and": ", i",
           "cardTermsLinkText": "Condicions de la targeta Blink"
         },
-        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink Visa",
-        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink Visa no constitueix una sol·licitud no autoritzada"
+        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink",
+        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink no constitueix una sol·licitud no autoritzada"
       },
       "CardPreapproved": {
-        "title": "Has estat preaprovat per a la targeta Blink Visa!",
+        "title": "La teva Blink Card està llesta!",
+        "subtitle": "Ara pots activar la teva targeta i començar a fer-la servir",
         "buttonText": "Tancar"
+      },
+      "CardDeclined": {
+        "title": "No hem pogut aprovar la teva sol·licitud de targeta",
+        "subtitle": "El teu gestor de compte es posarà en contacte amb tu."
       },
       "CardProcessing": {
         "title": "Processant la teva sol·licitud",
-        "subtitle": "T'avisarem quan estiguem preparats",
-        "buttonText": "Tancar"
+        "subtitle": "Això pot trigar fins a un minut"
       }
     }
   },
@@ -3957,17 +4029,22 @@
     "migrateNowModal": {
       "title": "Migra ara a un compte no custodi",
       "body": "Ja no pots rebre fons al teu compte custodial. Blink ha discontinuat el servei de custòdia a la teva regió i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
+      "bodyLevelZero": "Ja no pots rebre fons en aquest compte de prova. Blink tanca els comptes de prova i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
       "migrateCta": "Migra ara"
     },
     "reminderBulletin": {
       "title": "Important",
       "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
+      "bodySingleDate": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date} — tot es mou en uns pocs tocs.",
+      "bodyLevelZero": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}.",
       "bodyReceiveDisabled": "La recepció s'ha aturat. Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}.",
       "migrateCta": "Migra"
     },
     "offboardBulletin": {
       "title": "Important",
-      "body": "El teu compte està registrat en una regió on no podem oferir comptes. Retira els teus fons abans del 31 d'agost. La recepció s'atura el 10 d'agost."
+      "bodyTwoDates": "Blink no pot oferir comptes custodials a la teva regió. Retira els teus fons abans del {date} — sense cap càrrec de Blink. La recepció s'atura el {receiveStopsDate}. Si creus que el teu compte s'ha vist afectat per error, pots verificar la teva residència actual a l'app.",
+      "bodySingleDate": "Blink no pot oferir comptes custodials a la teva regió. Retira els teus fons abans del {date} — sense cap càrrec de Blink. Si creus que el teu compte s'ha vist afectat per error, pots verificar la teva residència actual a l'app.",
+      "bodyReceiveOff": "Blink no pot oferir comptes custodials a la teva regió. Retira els teus fons abans del {date} — sense cap càrrec de Blink. La recepció està desactivada. Si creus que el teu compte s'ha vist afectat per error, pots verificar la teva residència actual a l'app."
     },
     "dollarBalanceModal": {
       "title": "No podem migrar el teu saldo en dòlars",
@@ -4023,8 +4100,10 @@
     "resumeFailed": "Alguna cosa ha fallat en reprendre la migració. Si us plau, torna-la a començar.",
     "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
     "migrationRequiredForcedBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors.\n\nNo et preocupis, la modalitat no custodial serà millor per a tu a llarg termini.",
+    "migrationRequiredForcedBodyLevelZero": "Blink tanca els comptes de prova. Passa el teu saldo a un compte no custodi. Només calen uns pocs tocs.",
     "migrationGateTitle": "Compte no accessible",
     "migrationGateBody": "Per motius reguladors no podem oferir comptes custodials a la teva regió. Transfereix els teus fons a un compte no custodial amb Blink seguint els passos següents o contacta amb nosaltres a <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Els comptes de prova ja estan tancats. El teu saldo està segur. Passa'l a un compte no custodi seguint els passos següents, de franc i sense límit de temps, o contacta amb nosaltres a <link>{email}</link>",
     "bitcoinBalance": "Saldo de Bitcoin",
     "dollarBalance": "Saldo en dòlars",
     "moveToNonCustodial": "Passa a no custodial",
@@ -4098,6 +4177,8 @@
     "pasteFailed": "No s'ha pogut llegir del porta-retalls. Introdueix la teva frase de recuperació manualment.",
     "enterWord": "Paraula",
     "invalidMnemonic": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte.",
+    "invalidPhrase": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte. Contacta amb <link>Suport</link> si el problema persisteix.",
+    "invalidWord": "Paraula no vàlida, comprova l'ortografia",
     "restoring": "Restaurant la teva cartera...",
     "restoreSuccess": "Cartera restaurada amb èxit",
     "restoreFailed": "No s'ha pogut restaurar la cartera. Si us plau, torna-ho a provar.",
@@ -4291,7 +4372,12 @@
     "belowMinimum": "L'import és inferior al mínim requerit per a aquest pagament. Prova un import més gran.",
     "networkError": "Problema de connexió de xarxa. Comprova la teva connexió i torna-ho a provar.",
     "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
-    "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit."
+    "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit.",
+    "outcomeUnknown": "És possible que aquest pagament ja s'hagi fet. Comprova el teu historial de transaccions abans de tornar-lo a enviar.",
+    "earlierConversionPending": "La teva conversió anterior encara s'està confirmant. Torna-ho a provar d'aquí a uns minuts.",
+    "earlierPaymentFound": "El teu pagament anterior a aquesta destinació ja s'ha fet, per un import diferent. Comprova'l abans de tornar a enviar.",
+    "earlierConversionFound": "La teva conversió anterior ja s'ha fet, per un import diferent. Comprova-la al teu historial de transaccions abans de tornar a convertir.",
+    "convertedMeanwhile": "Acaba de fer-se una conversió d'un import semblant a aquest. Comprova el teu saldo abans de tornar a confirmar aquesta."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Aquest compte es va crear a {network}. Canvia a {network} per utilitzar-lo."

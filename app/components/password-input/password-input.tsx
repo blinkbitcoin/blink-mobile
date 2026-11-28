@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Pressable, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -7,6 +8,7 @@ import { GaloyIcon } from "../atomic/galoy-icon"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 
 import { radius } from "@app/rne-theme/radius"
+import { fonts } from "@app/rne-theme/fonts"
 
 type PasswordInputProps = {
   label: string
@@ -38,6 +40,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputContainer}>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={styles.input}
           value={value}
           onChangeText={onChangeText}
@@ -88,6 +91,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
   },
   input: {
+    fontFamily: fonts.regular,
     flex: 1,
     fontSize: 14,
     lineHeight: 20,

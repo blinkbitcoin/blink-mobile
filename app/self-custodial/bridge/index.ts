@@ -35,15 +35,26 @@ export { createLnurlWithdraw } from "./lnurl-withdraw"
 export {
   prepareSend,
   executeSend,
+  hasTokenLeg,
+  identifyPreparedSend,
   extractOnchainFees,
+  onchainQuoteExpiresAt,
   extractLightningFee,
   toSdkSendAmount,
   resolveSendTokenIdentifier,
   prepareLnurl,
   executeLnurl,
   extractLnurlFee,
+  assertFeePolicyApplied,
 } from "./send"
-export type { OnchainFeeTiers, PrepareSendOptions, PrepareLnurlOptions } from "./send"
+export type {
+  ExecuteSendOptions,
+  OnchainFeeTiers,
+  PreparedTokenLegs,
+  PrepareSendOptions,
+  PrepareLnurlOptions,
+  SendIdentity,
+} from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { ClaimOutcome, MappedDeposit, NetworkFeeRates } from "./deposits"
 export { createGetConversionQuote, mapAmountAdjustment } from "./convert"

@@ -10,6 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
@@ -86,7 +87,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   description: {

@@ -1,9 +1,12 @@
 import * as React from "react"
 import { Pressable, StyleSheet, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { haptics } from "@app/utils/haptics"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
@@ -20,7 +23,7 @@ export type AmountInputScreenUIProps = {
   secondaryCurrencyCode?: string
   errorMessage?: string
   setAmountDisabled?: boolean
-  onKeyPress: (key: Key) => void
+  onKeyPress: (key: Key) => boolean
   onPaste: (keys: number) => void
   onToggleCurrency?: () => void
   onClearAmount: () => void
@@ -49,6 +52,13 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 
   const hasSecondary = Boolean(secondaryCurrencyFormattedAmount)
   const hasError = Boolean(errorMessage)
+  /** With nothing to swap to, the button keeps no handler, so it neither ticks nor acts. */
+  const handleToggleCurrency =
+    onToggleCurrency &&
+    (() => {
+      haptics.select()
+      onToggleCurrency()
+    })
 
   return (
     <View style={styles.sheet}>
@@ -69,6 +79,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
               {primaryCurrencyFormattedAmount || "0"}
             </Text>
             <TextInput
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
               value=""
               showSoftInputOnFocus={false}
               onChangeText={(e) => {
@@ -99,7 +110,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
             </View>
             <View style={styles.toggleOverlay} pointerEvents="box-none">
               <Pressable
-                onPress={onToggleCurrency}
+                onPress={handleToggleCurrency}
                 hitSlop={8}
                 accessibilityLabel="Switch currencies"
                 accessibilityRole="button"
@@ -209,7 +220,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   amountText: {
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
     textAlign: "right",
     color: colors.textOnBackground,

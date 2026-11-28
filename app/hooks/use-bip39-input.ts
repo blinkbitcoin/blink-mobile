@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Keyboard } from "react-native"
 
 import {
@@ -16,8 +16,13 @@ const getBip39WordSet = (): Set<string> => {
   return bip39WordSet
 }
 
-const MIN_CHARS = 3
 const MAX_SUGGESTIONS = 3
+
+const isBip39Word = (word: string): boolean => getBip39WordSet().has(word)
+
+/** Whether some backup word still starts with `text`, so typing on can make it valid. */
+const isBip39Prefix = (text: string): boolean =>
+  BIP39_WORDLIST_EN.some((word) => word.startsWith(text))
 
 type UseBip39InputParams = {
   wordCount: number
@@ -35,22 +40,14 @@ export const useBip39Input = ({
   const offset = (step - 1) * wordsPerStep
 
   const [words, setWords] = useState<string[]>(initialWords ?? Array(wordCount).fill(""))
-  const [activeIndex, setActiveIndex] = useState(offset)
-  const [keyboardVisible, setKeyboardVisible] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const [focusRequest, setFocusRequest] = useState<number | null>(null)
 
+  /** Closing the keyboard leaves the field focused on Android, so no blur fires; this is
+   *  what marks the user as done with it, for the suggestions and the prefix check. */
   useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", () =>
-      setKeyboardVisible(true),
-    )
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardVisible(false)
-      setActiveIndex(-1)
-    })
-    return () => {
-      showSub.remove()
-      hideSub.remove()
-    }
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setActiveIndex(-1))
+    return () => hideSub.remove()
   }, [])
 
   const updateWord = useCallback(
@@ -62,7 +59,7 @@ export const useBip39Input = ({
         return next
       })
       const lastIndexInStep = offset + wordsPerStep - 1
-      if (!getBip39WordSet().has(normalized)) return
+      if (!isBip39Word(normalized)) return
       if (index >= lastIndexInStep) return
       const matches = BIP39_WORDLIST_EN.filter((w) => w.startsWith(normalized))
       if (matches.length !== 1) return
@@ -84,29 +81,37 @@ export const useBip39Input = ({
     [wordCount],
   )
 
-  const suggestions = useMemo(() => {
-    if (!keyboardVisible) return []
-    const current = words[activeIndex]
-    if (!current || current.length < MIN_CHARS) return []
-    const matches = getBip39Suggestions(current, { maxResults: MAX_SUGGESTIONS })
-    if (matches.length === 1 && matches[0] === current) return []
-    return matches
-  }, [words, activeIndex, keyboardVisible])
+  /** Same rule as the backup confirm screen: up to three matches for the focused word.
+   *  Only within this step: "Next" can be tapped with the keyboard up, and a word from
+   *  step 1 must not take suggestions (and picks) on step 2. */
+  const activeInStep = activeIndex >= offset && activeIndex < offset + wordsPerStep
+  const suggestions = activeInStep
+    ? getBip39Suggestions(words[activeIndex], { maxResults: MAX_SUGGESTIONS })
+    : []
 
+  /** A picked word is always a backup word, so focus moves on like a fully typed one. */
   const selectSuggestion = useCallback(
     (word: string) => {
       updateWord(activeIndex, word)
-      const maxForStep = offset + wordsPerStep - 1
-      if (activeIndex < maxForStep) {
-        setActiveIndex(activeIndex + 1)
-      }
+      if (activeIndex < offset + wordsPerStep - 1) setFocusRequest(activeIndex + 1)
     },
     [activeIndex, updateWord, offset, wordsPerStep],
   )
 
+  /** Flagged as soon as no backup word starts with it; a bare prefix only once the user
+   *  has left the field, so "hel" on its way to "hello" stays neutral while typed. */
+  const isWordInvalid = useCallback(
+    (index: number): boolean => {
+      const word = words[index]
+      if (!word || isBip39Word(word)) return false
+      return index !== activeIndex || !isBip39Prefix(word)
+    },
+    [words, activeIndex],
+  )
+
   const stepWords = words.slice(offset, offset + wordsPerStep)
-  const stepFilled = stepWords.every((w) => w.length > 0)
-  const allFilled = words.every((w) => w.length > 0)
+  const stepValid = stepWords.every(isBip39Word)
+  const allValid = words.every(isBip39Word)
 
   return {
     words,
@@ -118,8 +123,9 @@ export const useBip39Input = ({
     handlePaste,
     suggestions,
     selectSuggestion,
-    stepFilled,
-    allFilled,
+    isWordInvalid,
+    stepValid,
+    allValid,
     focusRequest,
     clearFocusRequest,
   }

@@ -13,6 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { CardTransactionDetailsFragment } from "@app/graphql/generated"
 import { toastShow } from "@app/utils/toast"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useCardTransaction } from "./hooks/use-card-transaction"
 
@@ -238,16 +239,14 @@ const useStyles = makeStyles(({ colors }) => ({
   amount: {
     color: colors.textOnBackground,
     fontSize: 20,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
     textAlign: "center",
   },
   merchantName: {
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
     textAlign: "center",
   },
@@ -258,8 +257,7 @@ const useStyles = makeStyles(({ colors }) => ({
   helpDescription: {
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 16,
   },
   helpLink: {
