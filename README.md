@@ -10,6 +10,8 @@ This repository is the Blink mobile application. The goal is to make a mobile ap
 
 Found critical bugs/vulnerabilities?
 Please contact our team by email at security@blink.sv .
+Do not open a public issue. See [SECURITY.md](./SECURITY.md) for what to
+include and which versions are supported.
 
 ## Screenshots
 
