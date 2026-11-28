@@ -26,7 +26,9 @@ export const usePaidDismiss = (state: PaymentRequestStateType | undefined) => {
   useEffect(() => {
     if (!isPaid) return
     if (paidAfterConversion) {
-      navigation.navigate("Primary")
+      // `navigate` would push a second Home over this screen, and Back would bring the
+      // paid request back.
+      navigation.popTo("Primary")
       return
     }
     const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)

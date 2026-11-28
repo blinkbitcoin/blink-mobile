@@ -6,11 +6,11 @@ import {
   PaymentRequestStateType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 
-const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 const mockGoBack = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({ popTo: mockPopTo, goBack: mockGoBack }),
 }))
 
 const renderDismiss = (initial: PaymentRequestStateType) =>
@@ -38,7 +38,7 @@ describe("usePaidDismiss", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
     jest.advanceTimersByTime(1)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 
   it("shows Converting while a Dollar receive converts", () => {
@@ -47,7 +47,7 @@ describe("usePaidDismiss", () => {
     rerender({ state: PaymentRequestState.Converting })
 
     expect(result.current).toEqual({ completed: false, converting: true })
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 
   it("skips the success badge and goes straight to Home once the conversion settles", () => {
@@ -57,7 +57,7 @@ describe("usePaidDismiss", () => {
     rerender({ state: PaymentRequestState.Paid })
 
     expect(result.current).toEqual({ completed: false, converting: true })
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
     jest.advanceTimersByTime(5000)
     expect(mockGoBack).not.toHaveBeenCalled()
   })
@@ -68,6 +68,6 @@ describe("usePaidDismiss", () => {
     jest.advanceTimersByTime(5000)
 
     expect(mockGoBack).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 })
