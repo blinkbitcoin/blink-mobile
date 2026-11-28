@@ -4172,7 +4172,13 @@
     "pickBackupTitle": "Válassz tárcát",
     "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz",
     "recognizePhraseTitle": "Felismered ezt a biztonsági mentési kifejezést?",
-    "recognizePhraseBody": "Soha ne írj be olyan szavakat, amelyeket valaki más küldött neked."
+    "recognizePhraseBody": "Soha ne írj be olyan szavakat, amelyeket valaki más küldött neked.",
+    "scanSeedQr": "SeedQR beolvasása",
+    "seedQrInvalid": "Ez a SeedQR nem érvényes biztonsági mentési kifejezés.",
+    "seedQrOnly12Words": "A Blink csak 12 szavas biztonsági mentési kifejezéseket állít vissza.",
+    "seedQrNotSeedQr": "Ez nem érvényes SeedQR.",
+    "seedQrUnreadable": "Nem sikerült beolvasni ezt a SeedQR-t. Próbáld újra.",
+    "seedQrCameraFailed": "Nem sikerült elindítani a kamerát. Próbáld újra."
   },
   "EmergencyRecovery": {
     "outageTitle": "Az üzemeltető nem érhető el",

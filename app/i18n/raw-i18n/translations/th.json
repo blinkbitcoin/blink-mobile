@@ -4172,7 +4172,13 @@
     "pickBackupTitle": "เลือกกระเป๋าเงิน",
     "pickBackupDescription": "เลือกการสำรองข้อมูลเพื่อกู้คืน",
     "recognizePhraseTitle": "คุณจำวลีสำรองข้อมูลนี้ได้ไหม",
-    "recognizePhraseBody": "อย่าป้อนคำที่คนอื่นส่งมาให้คุณเด็ดขาด"
+    "recognizePhraseBody": "อย่าป้อนคำที่คนอื่นส่งมาให้คุณเด็ดขาด",
+    "scanSeedQr": "สแกน SeedQR",
+    "seedQrInvalid": "SeedQR นี้ไม่ใช่วลีสำรองที่ถูกต้อง",
+    "seedQrOnly12Words": "Blink กู้คืนได้เฉพาะวลีสำรอง 12 คำเท่านั้น",
+    "seedQrNotSeedQr": "นี่ไม่ใช่ SeedQR ที่ถูกต้อง",
+    "seedQrUnreadable": "ไม่สามารถอ่าน SeedQR นี้ได้ โปรดลองอีกครั้ง",
+    "seedQrCameraFailed": "ไม่สามารถเปิดกล้องได้ โปรดลองอีกครั้ง"
   },
   "EmergencyRecovery": {
     "outageTitle": "ไม่สามารถเชื่อมต่อผู้ให้บริการ",

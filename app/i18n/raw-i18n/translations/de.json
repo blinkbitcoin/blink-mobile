@@ -4172,7 +4172,13 @@
         "pickBackupTitle": "Wallet auswählen",
         "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen",
         "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
-        "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
+        "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat.",
+        "scanSeedQr": "SeedQR scannen",
+        "seedQrInvalid": "Dieser SeedQR ist keine gültige Backup-Phrase.",
+        "seedQrOnly12Words": "Blink stellt nur Backup-Phrasen mit 12 Wörtern wieder her.",
+        "seedQrNotSeedQr": "Das ist kein gültiger SeedQR.",
+        "seedQrUnreadable": "Dieser SeedQR konnte nicht gelesen werden. Versuche es erneut.",
+        "seedQrCameraFailed": "Die Kamera konnte nicht gestartet werden. Versuche es erneut."
     },
     "EmergencyRecovery": {
         "outageTitle": "Betreiber nicht erreichbar",

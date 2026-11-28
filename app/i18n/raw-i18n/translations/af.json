@@ -4172,7 +4172,13 @@
     "pickBackupTitle": "Kies 'n beursie",
     "pickBackupDescription": "Kies 'n rugsteun om te herstel",
     "recognizePhraseTitle": "Herken jy hierdie rugsteunfrase?",
-    "recognizePhraseBody": "Moet nooit woorde invoer wat iemand anders aan jou gestuur het nie."
+    "recognizePhraseBody": "Moet nooit woorde invoer wat iemand anders aan jou gestuur het nie.",
+    "scanSeedQr": "Skandeer SeedQR",
+    "seedQrInvalid": "Hierdie SeedQR is nie 'n geldige rugsteunfrase nie.",
+    "seedQrOnly12Words": "Blink herstel slegs rugsteunfrases van 12 woorde.",
+    "seedQrNotSeedQr": "Dit is nie 'n geldige SeedQR nie.",
+    "seedQrUnreadable": "Kon nie hierdie SeedQR lees nie. Probeer weer.",
+    "seedQrCameraFailed": "Kon nie die kamera begin nie. Probeer weer."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operateur onbereikbaar",

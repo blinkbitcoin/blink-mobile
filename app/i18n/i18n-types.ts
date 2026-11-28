@@ -13959,6 +13959,30 @@ type RootTranslation = {
 		 * N​e​v​e​r​ ​e​n​t​e​r​ ​w​o​r​d​s​ ​s​o​m​e​o​n​e​ ​e​l​s​e​ ​s​e​n​t​ ​y​o​u​.
 		 */
 		recognizePhraseBody: string
+		/**
+		 * S​c​a​n​ ​S​e​e​d​Q​R
+		 */
+		scanSeedQr: string
+		/**
+		 * T​h​i​s​ ​S​e​e​d​Q​R​ ​i​s​n​'​t​ ​a​ ​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+		 */
+		seedQrInvalid: string
+		/**
+		 * B​l​i​n​k​ ​r​e​s​t​o​r​e​s​ ​1​2​-​w​o​r​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​s​ ​o​n​l​y​.
+		 */
+		seedQrOnly12Words: string
+		/**
+		 * T​h​i​s​ ​i​s​n​'​t​ ​a​ ​v​a​l​i​d​ ​S​e​e​d​Q​R​.
+		 */
+		seedQrNotSeedQr: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​d​ ​t​h​i​s​ ​S​e​e​d​Q​R​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		seedQrUnreadable: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​s​t​a​r​t​ ​t​h​e​ ​c​a​m​e​r​a​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		seedQrCameraFailed: string
 	}
 	EmergencyRecovery: {
 		/**
@@ -28490,6 +28514,30 @@ export type TranslationFunctions = {
 		 * Never enter words someone else sent you.
 		 */
 		recognizePhraseBody: () => LocalizedString
+		/**
+		 * Scan SeedQR
+		 */
+		scanSeedQr: () => LocalizedString
+		/**
+		 * This SeedQR isn't a valid backup phrase.
+		 */
+		seedQrInvalid: () => LocalizedString
+		/**
+		 * Blink restores 12-word backup phrases only.
+		 */
+		seedQrOnly12Words: () => LocalizedString
+		/**
+		 * This isn't a valid SeedQR.
+		 */
+		seedQrNotSeedQr: () => LocalizedString
+		/**
+		 * Couldn't read this SeedQR. Try again.
+		 */
+		seedQrUnreadable: () => LocalizedString
+		/**
+		 * Couldn't start the camera. Try again.
+		 */
+		seedQrCameraFailed: () => LocalizedString
 	}
 	EmergencyRecovery: {
 		/**

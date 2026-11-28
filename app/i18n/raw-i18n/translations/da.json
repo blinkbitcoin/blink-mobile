@@ -4172,7 +4172,13 @@
     "pickBackupTitle": "Vælg en tegnebog",
     "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne",
     "recognizePhraseTitle": "Genkender du denne backup-sætning?",
-    "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig."
+    "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig.",
+    "scanSeedQr": "Scan SeedQR",
+    "seedQrInvalid": "Denne SeedQR er ikke en gyldig backup-frase.",
+    "seedQrOnly12Words": "Blink gendanner kun backup-fraser på 12 ord.",
+    "seedQrNotSeedQr": "Dette er ikke en gyldig SeedQR.",
+    "seedQrUnreadable": "Kunne ikke læse denne SeedQR. Prøv igen.",
+    "seedQrCameraFailed": "Kunne ikke starte kameraet. Prøv igen."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operatør kan ikke nås",

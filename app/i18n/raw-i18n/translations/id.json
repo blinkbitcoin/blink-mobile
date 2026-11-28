@@ -4172,7 +4172,13 @@
     "pickBackupTitle": "Pilih dompet",
     "pickBackupDescription": "Pilih cadangan untuk dipulihkan",
     "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
-    "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda."
+    "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda.",
+    "scanSeedQr": "Pindai SeedQR",
+    "seedQrInvalid": "SeedQR ini bukan frasa cadangan yang valid.",
+    "seedQrOnly12Words": "Blink hanya memulihkan frasa cadangan 12 kata.",
+    "seedQrNotSeedQr": "Ini bukan SeedQR yang valid.",
+    "seedQrUnreadable": "Tidak dapat membaca SeedQR ini. Coba lagi.",
+    "seedQrCameraFailed": "Tidak dapat memulai kamera. Coba lagi."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operator tidak dapat dijangkau",

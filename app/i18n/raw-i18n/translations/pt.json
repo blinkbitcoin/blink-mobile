@@ -4172,7 +4172,13 @@
         "pickBackupTitle": "Escolha uma carteira",
         "pickBackupDescription": "Selecione um backup para restaurar",
         "recognizePhraseTitle": "Você reconhece esta frase de backup?",
-        "recognizePhraseBody": "Nunca insira palavras que outra pessoa lhe enviou."
+        "recognizePhraseBody": "Nunca insira palavras que outra pessoa lhe enviou.",
+        "scanSeedQr": "Escanear SeedQR",
+        "seedQrInvalid": "Este SeedQR não é uma frase de backup válida.",
+        "seedQrOnly12Words": "A Blink restaura apenas frases de backup de 12 palavras.",
+        "seedQrNotSeedQr": "Isto não é um SeedQR válido.",
+        "seedQrUnreadable": "Não foi possível ler este SeedQR. Tente novamente.",
+        "seedQrCameraFailed": "Não foi possível iniciar a câmera. Tente novamente."
     },
     "EmergencyRecovery": {
         "outageTitle": "Operador inacessível",

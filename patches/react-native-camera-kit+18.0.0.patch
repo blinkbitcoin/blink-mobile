@@ -1,3 +1,44 @@
+diff --git a/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/CKCamera.kt b/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/CKCamera.kt
+index bf8d9e7..49afcc2 100644
+--- a/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/CKCamera.kt
++++ b/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/CKCamera.kt
+@@ -584,7 +584,7 @@ class CKCamera(context: ThemedReactContext) : FrameLayout(context), LifecycleObs
+         val surfaceId = UIManagerHelper.getSurfaceId(currentContext)
+         UIManagerHelper
+             .getEventDispatcherForReactTag(currentContext, id)
+-            ?.dispatchEvent(ReadCodeEvent(surfaceId, id, barcodes.first().rawValue, codeFormat.code))
++            ?.dispatchEvent(ReadCodeEvent(surfaceId, id, barcodes.first().rawValue, codeFormat.code, barcodes.first().rawBytes))
+     }
+ 
+     private fun onFaceDetected(payloads: List<FacePayload>) {
+diff --git a/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/events/ReadCodeEvent.kt b/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/events/ReadCodeEvent.kt
+index ff3d3a7..1ba551c 100644
+--- a/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/events/ReadCodeEvent.kt
++++ b/node_modules/react-native-camera-kit/android/src/main/java/com/rncamerakit/events/ReadCodeEvent.kt
+@@ -1,5 +1,6 @@
+ package com.rncamerakit.events
+ 
++import android.util.Base64
+ import com.facebook.react.bridge.Arguments
+ import com.facebook.react.bridge.WritableMap
+ import com.facebook.react.uimanager.events.Event
+@@ -9,6 +10,7 @@ class ReadCodeEvent(
+     viewId: Int,
+     private val codeStringValue: String?,
+     private val codeFormat: String,
++    private val codeRawBytes: ByteArray? = null,
+ ) : Event<ReadCodeEvent>(surfaceId, viewId) {
+     override fun getEventName(): String = EVENT_NAME
+ 
+@@ -16,6 +18,8 @@ class ReadCodeEvent(
+         Arguments.createMap().apply {
+             putString("codeFormat", codeFormat)
+             putString("codeStringValue", codeStringValue)
++            // Binary QR payloads (CompactSeedQR) don't survive the text value.
++            codeRawBytes?.let { putString("codeRawBase64", Base64.encodeToString(it, Base64.NO_WRAP)) }
+         }
+ 
+     companion object {
 diff --git a/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift b/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift
 index cc722c6..6a9f4dc 100644
 --- a/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift

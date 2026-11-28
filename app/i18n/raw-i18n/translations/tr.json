@@ -4172,7 +4172,13 @@
     "pickBackupTitle": "Bir cüzdan seçin",
     "pickBackupDescription": "Geri yüklemek için bir yedek seçin",
     "recognizePhraseTitle": "Bu yedekleme ifadesini tanıyor musun?",
-    "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme."
+    "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme.",
+    "scanSeedQr": "SeedQR Tara",
+    "seedQrInvalid": "Bu SeedQR geçerli bir yedekleme ifadesi değil.",
+    "seedQrOnly12Words": "Blink yalnızca 12 kelimelik yedekleme ifadelerini geri yükler.",
+    "seedQrNotSeedQr": "Bu geçerli bir SeedQR değil.",
+    "seedQrUnreadable": "Bu SeedQR okunamadı. Tekrar deneyin.",
+    "seedQrCameraFailed": "Kamera başlatılamadı. Tekrar deneyin."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operatöre ulaşılamıyor",

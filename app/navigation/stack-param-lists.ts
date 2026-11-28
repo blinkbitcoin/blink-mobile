@@ -403,7 +403,13 @@ export type RootStackParamList = {
      *  can no longer answer for the custodial account the ticket is about. */
     custodialAccountId?: string
   }
-  selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
+  selfCustodialRestorePhrase: {
+    step: PhraseStep
+    words?: string[]
+    /** A SeedQR scan handed back by the scanner, taken in as a paste and then cleared. */
+    scannedWords?: string[]
+  }
+  selfCustodialSeedQrScanner: undefined
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
   selfCustodialOperatorUnreachable: undefined
