@@ -19,6 +19,8 @@ gql`
         iv
         data
       }
+      expirationMonth
+      expirationYear
     }
   }
 `
@@ -32,6 +34,8 @@ const SECRETS_ATTEMPT_TIMEOUT_MS = 30_000
 type CardSecrets = {
   pan: string
   cvc: string
+  /** As `YYYY-MM`, the shape the card face reads; null until the issuer issued the card. */
+  expiry: string | null
 }
 
 /**
@@ -107,7 +111,11 @@ export const useCardSecrets = () => {
           key: secretKey,
         })
 
-        return { pan, cvc }
+        const { expirationMonth, expirationYear } = encrypted
+        const isExpirySet = Boolean(expirationMonth && expirationYear)
+        const expiry = isExpirySet ? `${expirationYear}-${expirationMonth}` : null
+
+        return { pan, cvc, expiry }
       }
 
       setHasFailed(false)

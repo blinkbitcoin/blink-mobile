@@ -18,6 +18,11 @@ gql`
     merchantCountry
     status
     createdAt
+    satsAmount
+    btcRate
+    cardLastFour
+    paymentMethod
+    declineReason
   }
 `
 

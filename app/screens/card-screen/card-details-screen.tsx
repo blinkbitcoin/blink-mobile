@@ -24,7 +24,12 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatCardDisplayNumber } from "@app/utils/helper"
 
 import { useCardSecrets } from "./hooks/use-card-secrets"
-import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-display"
+import {
+  isCardFrozen,
+  formatCardExpiry,
+  formatCardType,
+  formatIssuedDate,
+} from "./utils/card-display"
 
 const CLIPBOARD_CLEAR_MS = 60_000
 
@@ -156,6 +161,10 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
   const copyCvv = secrets
     ? () => handleCopy(secrets.cvc, LL.CardFlow.CardDetails.cvv())
     : undefined
+  const expiry = formatCardExpiry(secrets?.expiry ?? null)
+  const copyExpiry = expiry
+    ? () => handleCopy(expiry, LL.CardFlow.CardDetails.expiryDate())
+    : undefined
 
   return (
     <Screen preset="scroll">
@@ -163,7 +172,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
         <BlinkCard
           cardId={card.id}
           cardNumber={visibleCardNumber}
-          validThruDate=""
+          validThruDate={secrets?.expiry ?? ""}
           isFrozen={isFrozen}
           showCardDetails
         />
@@ -192,8 +201,10 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
             <View style={styles.halfField}>
               <ActionField
                 label={LL.CardFlow.CardDetails.expiryDate()}
-                value={null}
+                value={expiry}
                 icon="copy-paste"
+                testID="card-expiry-field"
+                onAction={copyExpiry}
               />
             </View>
             <View style={styles.halfField}>

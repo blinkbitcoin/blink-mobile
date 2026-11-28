@@ -11819,6 +11819,62 @@ type RootTranslation = {
 			 * P​a​y​m​e​n​t​ ​m​e​t​h​o​d
 			 */
 			paymentMethod: string
+			PaymentMethods: {
+				/**
+				 * C​o​n​t​a​c​t​l​e​s​s
+				 */
+				contactless: string
+				/**
+				 * C​h​i​p
+				 */
+				chip: string
+				/**
+				 * S​w​i​p​e
+				 */
+				swipe: string
+				/**
+				 * O​n​l​i​n​e
+				 */
+				online: string
+				/**
+				 * O​t​h​e​r
+				 */
+				other: string
+			}
+			/**
+			 * D​e​c​l​i​n​e​ ​r​e​a​s​o​n
+			 */
+			declineReason: string
+			DeclineReasons: {
+				/**
+				 * I​n​s​u​f​f​i​c​i​e​n​t​ ​f​u​n​d​s
+				 */
+				insufficientFunds: string
+				/**
+				 * C​a​r​d​ ​l​i​m​i​t​ ​r​e​a​c​h​e​d
+				 */
+				limitExceeded: string
+				/**
+				 * I​n​c​o​r​r​e​c​t​ ​P​I​N
+				 */
+				incorrectPin: string
+				/**
+				 * C​a​r​d​ ​e​x​p​i​r​e​d
+				 */
+				cardExpired: string
+				/**
+				 * C​a​r​d​ ​f​r​o​z​e​n
+				 */
+				cardLocked: string
+				/**
+				 * S​u​s​p​e​c​t​e​d​ ​f​r​a​u​d
+				 */
+				suspectedFraud: string
+				/**
+				 * D​e​c​l​i​n​e​d​ ​b​y​ ​t​h​e​ ​c​a​r​d​ ​n​e​t​w​o​r​k
+				 */
+				other: string
+			}
 			/**
 			 * M​e​r​c​h​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
 			 */
@@ -26300,6 +26356,62 @@ export type TranslationFunctions = {
 			 * Payment method
 			 */
 			paymentMethod: () => LocalizedString
+			PaymentMethods: {
+				/**
+				 * Contactless
+				 */
+				contactless: () => LocalizedString
+				/**
+				 * Chip
+				 */
+				chip: () => LocalizedString
+				/**
+				 * Swipe
+				 */
+				swipe: () => LocalizedString
+				/**
+				 * Online
+				 */
+				online: () => LocalizedString
+				/**
+				 * Other
+				 */
+				other: () => LocalizedString
+			}
+			/**
+			 * Decline reason
+			 */
+			declineReason: () => LocalizedString
+			DeclineReasons: {
+				/**
+				 * Insufficient funds
+				 */
+				insufficientFunds: () => LocalizedString
+				/**
+				 * Card limit reached
+				 */
+				limitExceeded: () => LocalizedString
+				/**
+				 * Incorrect PIN
+				 */
+				incorrectPin: () => LocalizedString
+				/**
+				 * Card expired
+				 */
+				cardExpired: () => LocalizedString
+				/**
+				 * Card frozen
+				 */
+				cardLocked: () => LocalizedString
+				/**
+				 * Suspected fraud
+				 */
+				suspectedFraud: () => LocalizedString
+				/**
+				 * Declined by the card network
+				 */
+				other: () => LocalizedString
+			}
 			/**
 			 * Merchant information
 			 */

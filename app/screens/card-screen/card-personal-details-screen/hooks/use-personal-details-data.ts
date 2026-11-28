@@ -56,7 +56,8 @@ export const usePersonalDetailsData = () => {
   const lastName = account?.lastName ?? ""
   const fullName = [firstName, lastName].filter(Boolean).join(" ")
 
-  const shippingAddress = account?.cards?.[0]?.shippingAddress ?? null
+  const card = account?.cards?.[0]
+  const shippingAddress = card?.shippingAddress ?? null
 
   useEffect(() => {
     if (error) {
@@ -72,6 +73,7 @@ export const usePersonalDetailsData = () => {
     email: me?.email?.address ?? "",
     phone: me?.phone ?? "",
     shippingAddress,
+    cardId: card?.id,
     loading,
     error,
   }

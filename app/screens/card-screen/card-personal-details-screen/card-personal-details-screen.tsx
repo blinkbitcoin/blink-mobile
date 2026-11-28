@@ -7,13 +7,16 @@ import {
   ContactSupportRow,
   InfoCard,
   InputField,
+  MultiLineField,
   SettingItemRow,
 } from "@app/components/card-screen"
 import { IconTextButton } from "@app/components/icon-text-button"
 import { Screen } from "@app/components/screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { OnboardingStatus } from "@app/graphql/generated"
+import { useCardHolder } from "@app/hooks/use-card-holder"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { addressToLines } from "../utils/address"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
 import { groupTitleGap } from "@app/rne-theme/tokens"
@@ -36,8 +39,10 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     phone,
     // TODO: uncomment when shipping address section is enabled
     // shippingAddress,
+    cardId,
     loading,
   } = usePersonalDetailsData()
+  const { dateOfBirth, address: kycAddress } = useCardHolder(cardId)
 
   const kycBanner = getKycBannerConfig({
     status: onboardingStatus,
@@ -105,13 +110,9 @@ export const CardPersonalDetailsScreen: React.FC = () => {
 
         <InputField label={LLPersonalDetails.lastName()} value={lastName} />
 
-        {/*
-         * TODO: uncomment when dateOfBirth is available via the API
-         * <InputField
-         *   label={LLPersonalDetails.dateOfBirth()}
-         *   value={...}
-         * />
-         */}
+        {dateOfBirth && (
+          <InputField label={LLPersonalDetails.dateOfBirth()} value={dateOfBirth} />
+        )}
 
         <SettingsGroup
           name={LLPersonalDetails.contactInformation()}
@@ -123,16 +124,17 @@ export const CardPersonalDetailsScreen: React.FC = () => {
           ]}
         />
 
-        {/*
-         * TODO: uncomment when registeredAddress is available via the API
-         * <View style={styles.section}>
-         *   <Text style={styles.sectionTitle}>{LLPersonalDetails.registeredAddress()}</Text>
-         *   <MultiLineField
-         *     lines={addressToLines(...)}
-         *     leftIcon="map-pin"
-         *   />
-         * </View>
-         */}
+        {kycAddress && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              {LLPersonalDetails.registeredAddress()}
+            </Text>
+            <MultiLineField
+              lines={addressToLines(kycAddress, false)}
+              leftIcon="map-pin"
+            />
+          </View>
+        )}
 
         {/*
          * TODO: uncomment when shipping address section is enabled

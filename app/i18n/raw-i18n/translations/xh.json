@@ -3436,6 +3436,23 @@
       "cardUsed": "Ikhadi elisetyenzisiweyo",
       "cardUsedValue": "Ikhadi le-Blink •••• {lastFour}",
       "paymentMethod": "Indlela yokuhlawula",
+      "PaymentMethods": {
+        "contactless": "Ngaphandle kokuchukumisa",
+        "chip": "Itshiphu",
+        "swipe": "Ukutyibilikisa ikhadi",
+        "online": "Kwi-intanethi",
+        "other": "Okunye"
+      },
+      "declineReason": "Isizathu sokwaliwa",
+      "DeclineReasons": {
+        "insufficientFunds": "Imali ayonelanga",
+        "limitExceeded": "Umda wekhadi ufikelelwe",
+        "incorrectPin": "I-PIN engachanekanga",
+        "cardExpired": "Ikhadi liphelelwe lixesha",
+        "cardLocked": "Ikhadi limisiwe",
+        "suspectedFraud": "Kurhanelwa ubuqhophololo",
+        "other": "Kwaliwe yinethiwekhi yekhadi"
+      },
       "merchantInformation": "Ulwazi lomrhwebi",
       "merchant": "Umrhwebi",
       "category": "Udidi",

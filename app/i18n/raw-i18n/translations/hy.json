@@ -3436,6 +3436,23 @@
       "cardUsed": "Ogtagortsats qart",
       "cardUsedValue": "Blink քարտ •••• {lastFour}",
       "paymentMethod": "Vacharqi yeghanak",
+      "PaymentMethods": {
+        "contactless": "Անհպում",
+        "chip": "Չիպ",
+        "swipe": "Մագնիսական ժապավեն",
+        "online": "Առցանց",
+        "other": "Այլ"
+      },
+      "declineReason": "Մերժման պատճառը",
+      "DeclineReasons": {
+        "insufficientFunds": "Անբավարար միջոցներ",
+        "limitExceeded": "Քարտի սահմանաչափը սպառված է",
+        "incorrectPin": "Սխալ PIN",
+        "cardExpired": "Քարտի ժամկետն անցել է",
+        "cardLocked": "Քարտը սառեցված է",
+        "suspectedFraud": "Խարդախության կասկած",
+        "other": "Մերժվել է քարտային ցանցի կողմից"
+      },
       "merchantInformation": "Vacharogi teghekutyun",
       "merchant": "Vacharog",
       "category": "Kategoriya",

@@ -26,6 +26,11 @@ gql`
           status
           createdAt
           cardId
+          satsAmount
+          btcRate
+          cardLastFour
+          paymentMethod
+          declineReason
         }
       }
       pageInfo {

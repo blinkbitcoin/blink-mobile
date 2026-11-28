@@ -3436,6 +3436,23 @@
       "cardUsed": "Κάρτα που χρησιμοποιήθηκε",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Μέθοδος πληρωμής",
+      "PaymentMethods": {
+        "contactless": "Ανέπαφα",
+        "chip": "Τσιπ",
+        "swipe": "Μαγνητική ταινία",
+        "online": "Διαδικτυακά",
+        "other": "Άλλο"
+      },
+      "declineReason": "Λόγος απόρριψης",
+      "DeclineReasons": {
+        "insufficientFunds": "Ανεπαρκές υπόλοιπο",
+        "limitExceeded": "Συμπληρώθηκε το όριο της κάρτας",
+        "incorrectPin": "Λάθος PIN",
+        "cardExpired": "Η κάρτα έληξε",
+        "cardLocked": "Η κάρτα είναι παγωμένη",
+        "suspectedFraud": "Υποψία απάτης",
+        "other": "Απορρίφθηκε από το δίκτυο της κάρτας"
+      },
       "merchantInformation": "Πληροφορίες εμπόρου",
       "merchant": "Έμπορος",
       "category": "Κατηγορία",

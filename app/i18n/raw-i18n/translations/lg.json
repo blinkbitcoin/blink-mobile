@@ -3436,6 +3436,23 @@
       "cardUsed": "Kaadi eyakozesebwa",
       "cardUsedValue": "Kaadi ya Blink •••• {lastFour}",
       "paymentMethod": "Enkola y'okusasula",
+      "PaymentMethods": {
+        "contactless": "Awatali kukwata",
+        "chip": "Chip",
+        "swipe": "Okusiiga kaadi",
+        "online": "Ku mutimbagano",
+        "other": "Ebirala"
+      },
+      "declineReason": "Ensonga y'okugaanibwa",
+      "DeclineReasons": {
+        "insufficientFunds": "Ssente tezimala",
+        "limitExceeded": "Ekkomo lya kaadi lituuse",
+        "incorrectPin": "PIN si ntuufu",
+        "cardExpired": "Kaadi eweddeko obudde",
+        "cardLocked": "Kaadi esibiddwa",
+        "suspectedFraud": "Kiteeberezebwa okuba obufere",
+        "other": "Kigaaniddwa omukutu gwa kaadi"
+      },
       "merchantInformation": "Ebikwata ku musuubuzi",
       "merchant": "Omusuubuzi",
       "category": "Ekika",

@@ -7,6 +7,15 @@ gql`
     cardHolder(cardId: $cardId) {
       firstName
       lastName
+      dateOfBirth
+      address {
+        line1
+        line2
+        city
+        region
+        postalCode
+        countryCode
+      }
     }
   }
 `
@@ -22,5 +31,9 @@ export const useCardHolder = (cardId: string | undefined) => {
   const lastName = data?.cardHolder.lastName ?? ""
   const fullName = firstName && lastName ? `${firstName} ${lastName}` : ""
 
-  return { firstName, lastName, fullName, loading }
+  /** What the issuer verified at KYC; null for each it keeps none of. */
+  const dateOfBirth = data?.cardHolder.dateOfBirth ?? null
+  const address = data?.cardHolder.address ?? null
+
+  return { firstName, lastName, fullName, dateOfBirth, address, loading }
 }

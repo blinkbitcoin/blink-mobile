@@ -32,6 +32,7 @@ type PersonalDetailsReturn = {
   email: string
   phone: string
   shippingAddress: null
+  cardId: string | undefined
   loading: boolean
   error: Error | undefined
 }
@@ -44,11 +45,36 @@ const defaultMockData: PersonalDetailsReturn = {
   email: "john@example.com",
   phone: "+1 (999) 888-7777",
   shippingAddress: null,
+  cardId: "card-1",
   loading: false,
   error: undefined,
 }
 
 let mockPersonalDetailsReturn: PersonalDetailsReturn = { ...defaultMockData }
+
+const kycAddress = {
+  line1: "123 Main St",
+  line2: null,
+  city: "Miami",
+  region: "FL",
+  postalCode: "33101",
+  countryCode: "US",
+}
+
+type CardHolderReturn = {
+  dateOfBirth: string | null
+  address: typeof kycAddress | null
+}
+
+let mockCardHolderReturn: CardHolderReturn = {
+  dateOfBirth: "1971-01-03",
+  address: kycAddress,
+}
+const mockUseCardHolder = jest.fn((_cardId: string | undefined) => mockCardHolderReturn)
+
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: (cardId: string | undefined) => mockUseCardHolder(cardId),
+}))
 
 jest.mock(
   "@app/screens/card-screen/card-personal-details-screen/hooks/use-personal-details-data",
@@ -62,6 +88,7 @@ describe("CardPersonalDetailsScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockPersonalDetailsReturn = { ...defaultMockData }
+    mockCardHolderReturn = { dateOfBirth: "1971-01-03", address: kycAddress }
   })
 
   describe("rendering", () => {
@@ -515,6 +542,50 @@ describe("CardPersonalDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Contact Support")).toBeTruthy()
+    })
+  })
+
+  /** What the issuer verified at KYC, read from the cardholder of the card on file. */
+  describe("KYC details", () => {
+    const renderScreen = async () => {
+      const screen = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      return screen
+    }
+
+    it("asks for the cardholder of the card on file", async () => {
+      await renderScreen()
+
+      expect(mockUseCardHolder).toHaveBeenCalledWith("card-1")
+    })
+
+    it("shows the date of birth the issuer keeps", async () => {
+      const { getByText } = await renderScreen()
+
+      expect(getByText("Date of birth")).toBeTruthy()
+      expect(getByText("1971-01-03")).toBeTruthy()
+    })
+
+    it("shows the registered address the issuer keeps", async () => {
+      const { getByText } = await renderScreen()
+
+      expect(getByText("Registered address")).toBeTruthy()
+      expect(getByText("123 Main St")).toBeTruthy()
+      expect(getByText("Miami, FL, 33101")).toBeTruthy()
+      expect(getByText("United States")).toBeTruthy()
+    })
+
+    it("leaves both out when the issuer keeps neither", async () => {
+      mockCardHolderReturn = { dateOfBirth: null, address: null }
+
+      const { queryByText } = await renderScreen()
+
+      expect(queryByText("Date of birth")).toBeNull()
+      expect(queryByText("Registered address")).toBeNull()
     })
   })
 

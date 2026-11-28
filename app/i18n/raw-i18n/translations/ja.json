@@ -3436,6 +3436,23 @@
             "cardUsed": "使用カード",
             "cardUsedValue": "Blink カード •••• {lastFour}",
             "paymentMethod": "支払い方法",
+            "PaymentMethods": {
+                "contactless": "タッチ決済",
+                "chip": "ICチップ",
+                "swipe": "磁気ストライプ",
+                "online": "オンライン",
+                "other": "その他"
+            },
+            "declineReason": "拒否の理由",
+            "DeclineReasons": {
+                "insufficientFunds": "残高不足",
+                "limitExceeded": "カードの利用限度額に到達",
+                "incorrectPin": "PINが正しくありません",
+                "cardExpired": "カードの有効期限切れ",
+                "cardLocked": "カードは凍結中です",
+                "suspectedFraud": "不正利用の疑い",
+                "other": "カードネットワークにより拒否されました"
+            },
             "merchantInformation": "加盟店情報",
             "merchant": "加盟店",
             "category": "カテゴリ",

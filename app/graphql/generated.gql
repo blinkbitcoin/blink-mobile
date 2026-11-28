@@ -26,6 +26,11 @@ fragment CardTransactionDetails on CardTransaction {
   merchantCountry
   status
   createdAt
+  satsAmount
+  btcRate
+  cardLastFour
+  paymentMethod
+  declineReason
   __typename
 }
 
@@ -1393,6 +1398,16 @@ query cardHolder($cardId: ID!) {
   cardHolder(cardId: $cardId) {
     firstName
     lastName
+    dateOfBirth
+    address {
+      line1
+      line2
+      city
+      region
+      postalCode
+      countryCode
+      __typename
+    }
     __typename
   }
 }
@@ -1425,6 +1440,8 @@ query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
       data
       __typename
     }
+    expirationMonth
+    expirationYear
     __typename
   }
 }
@@ -1464,6 +1481,11 @@ query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
         status
         createdAt
         cardId
+        satsAmount
+        btcRate
+        cardLastFour
+        paymentMethod
+        declineReason
         __typename
       }
       __typename

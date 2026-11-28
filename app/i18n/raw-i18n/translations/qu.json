@@ -3436,6 +3436,23 @@
       "cardUsed": "Tarjeta llamkasqa",
       "cardUsedValue": "Blink tarjeta •••• {lastFour}",
       "paymentMethod": "Pagay ñan",
+      "PaymentMethods": {
+        "contactless": "Mana llamiykuspa",
+        "chip": "Chip",
+        "swipe": "Kaartata qhatachispa",
+        "online": "Internetpi",
+        "other": "Huk"
+      },
+      "declineReason": "Mana chaskisqa kasqanpa imanasqan",
+      "DeclineReasons": {
+        "insufficientFunds": "Qullqi mana aypanchu",
+        "limitExceeded": "Kaartapa tukukuynin aypasqa",
+        "incorrectPin": "PIN mana allinchu",
+        "cardExpired": "Kaartapa pachan tukukun",
+        "cardLocked": "Kaarta chiriyachisqa",
+        "suspectedFraud": "Suwakuy hina rikhurin",
+        "other": "Kaartapa llikan mana chaskirqanchu"
+      },
       "merchantInformation": "Ranqhaq willakuy",
       "merchant": "Ranqhaq",
       "category": "Rikch'aq",

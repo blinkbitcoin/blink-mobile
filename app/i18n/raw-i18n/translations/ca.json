@@ -3436,6 +3436,23 @@
       "cardUsed": "Targeta utilitzada",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Mètode de pagament",
+      "PaymentMethods": {
+        "contactless": "Sense contacte",
+        "chip": "Xip",
+        "swipe": "Banda magnètica",
+        "online": "En línia",
+        "other": "Altres"
+      },
+      "declineReason": "Motiu del rebuig",
+      "DeclineReasons": {
+        "insufficientFunds": "Fons insuficients",
+        "limitExceeded": "Límit de la targeta assolit",
+        "incorrectPin": "PIN incorrecte",
+        "cardExpired": "Targeta caducada",
+        "cardLocked": "Targeta congelada",
+        "suspectedFraud": "Sospita de frau",
+        "other": "Rebutjat per la xarxa de la targeta"
+      },
       "merchantInformation": "Informació del comerciant",
       "merchant": "Comerciant",
       "category": "Categoria",

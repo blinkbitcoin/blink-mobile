@@ -3436,6 +3436,23 @@
       "cardUsed": "Kullanılan kart",
       "cardUsedValue": "Blink Kartı •••• {lastFour}",
       "paymentMethod": "Ödeme yöntemi",
+      "PaymentMethods": {
+        "contactless": "Temassız",
+        "chip": "Çip",
+        "swipe": "Manyetik şerit",
+        "online": "Çevrim içi",
+        "other": "Diğer"
+      },
+      "declineReason": "Ret nedeni",
+      "DeclineReasons": {
+        "insufficientFunds": "Yetersiz bakiye",
+        "limitExceeded": "Kart limitine ulaşıldı",
+        "incorrectPin": "Yanlış PIN",
+        "cardExpired": "Kartın süresi doldu",
+        "cardLocked": "Kart donduruldu",
+        "suspectedFraud": "Dolandırıcılık şüphesi",
+        "other": "Kart ağı tarafından reddedildi"
+      },
       "merchantInformation": "Satıcı bilgileri",
       "merchant": "Satıcı",
       "category": "Kategori",

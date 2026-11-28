@@ -3436,6 +3436,23 @@
       "cardUsed": "Kartu yang digunakan",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Metode pembayaran",
+      "PaymentMethods": {
+        "contactless": "Nirsentuh",
+        "chip": "Chip",
+        "swipe": "Gesek",
+        "online": "Online",
+        "other": "Lainnya"
+      },
+      "declineReason": "Alasan penolakan",
+      "DeclineReasons": {
+        "insufficientFunds": "Saldo tidak cukup",
+        "limitExceeded": "Batas kartu tercapai",
+        "incorrectPin": "PIN salah",
+        "cardExpired": "Kartu kedaluwarsa",
+        "cardLocked": "Kartu dibekukan",
+        "suspectedFraud": "Dugaan penipuan",
+        "other": "Ditolak oleh jaringan kartu"
+      },
       "merchantInformation": "Informasi merchant",
       "merchant": "Merchant",
       "category": "Kategori",

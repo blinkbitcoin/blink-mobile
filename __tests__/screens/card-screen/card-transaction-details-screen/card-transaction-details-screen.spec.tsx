@@ -4,7 +4,11 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardTransactionDetailsScreen } from "@app/screens/card-screen/card-transaction-details-screen"
 import { ContextForScreen } from "../../helper"
-import { TransactionStatus } from "@app/graphql/generated"
+import {
+  CardDeclineReason,
+  CardPaymentMethod,
+  TransactionStatus,
+} from "@app/graphql/generated"
 
 const mockGoBack = jest.fn()
 const mockUseRoute = jest.fn()
@@ -38,8 +42,14 @@ const mockFormatCurrency = jest.fn(
   ({ amountInMajorUnits }: { amountInMajorUnits: number; currency: string }) =>
     `$${Math.abs(amountInMajorUnits).toFixed(2)}`,
 )
+const mockFormatMoneyAmount = jest.fn(
+  ({ moneyAmount }: { moneyAmount: { amount: number } }) => `${moneyAmount.amount} SAT`,
+)
 jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({ formatCurrency: mockFormatCurrency }),
+  useDisplayCurrency: () => ({
+    formatCurrency: mockFormatCurrency,
+    formatMoneyAmount: mockFormatMoneyAmount,
+  }),
 }))
 
 const mockUseCardTransaction = jest.fn()
@@ -510,6 +520,84 @@ describe("CardTransactionDetailsScreen", () => {
 
       expect(queryByText("Blink Card •••• 4242")).toBeNull()
       expect(queryByText("Blink Card •••• 2121")).toBeNull()
+    })
+
+    /** The transaction names the card that paid, which outranks the list it was opened
+     *  from: a replaced card's payments still list under the dashboard's card. */
+    it("names the card used from the transaction itself", async () => {
+      const { getByText, queryByText } = await renderTransaction({
+        ...detailedTransaction,
+        cardLastFour: "9999",
+      })
+
+      expect(getByText("Blink Card •••• 9999")).toBeTruthy()
+      expect(queryByText("Blink Card •••• 4242")).toBeNull()
+    })
+
+    it("names the card used from a link when the transaction carries it", async () => {
+      mockUseRoute.mockReturnValue({ params: { transactionId: "txn-002" } })
+
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        cardLastFour: "9999",
+      })
+
+      expect(getByText("Blink Card •••• 9999")).toBeTruthy()
+    })
+
+    it("shows the bitcoin rate and the sats the payment took", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        btcRate: 120180.06,
+        satsAmount: 35204,
+      })
+
+      expect(getByText("$120180.06")).toBeTruthy()
+      expect(getByText("35204 SAT")).toBeTruthy()
+      expect(mockFormatCurrency).toHaveBeenCalledWith({
+        amountInMajorUnits: 120180.06,
+        currency: "USD",
+      })
+    })
+
+    it("words how the payment was made", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        paymentMethod: CardPaymentMethod.Contactless,
+      })
+
+      expect(getByText("Contactless")).toBeTruthy()
+    })
+
+    it("says why the network declined a payment", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        status: TransactionStatus.Declined,
+        declineReason: CardDeclineReason.InsufficientFunds,
+      })
+
+      expect(getByText("Decline reason")).toBeTruthy()
+      expect(getByText("Insufficient funds")).toBeTruthy()
+    })
+
+    /** A network decline can arrive with no reason; it still reads as a decline. */
+    it("says the network declined a payment that came without a reason", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        status: TransactionStatus.Declined,
+        declineReason: null,
+      })
+
+      expect(getByText("Declined by the card network")).toBeTruthy()
+    })
+
+    it("has no decline reason for a payment that went through", async () => {
+      const { queryByText } = await renderTransaction({
+        ...detailedTransaction,
+        declineReason: CardDeclineReason.InsufficientFunds,
+      })
+
+      expect(queryByText("Decline reason")).toBeNull()
     })
 
     it("shows the enriched category, the city and country, and the MCC", async () => {

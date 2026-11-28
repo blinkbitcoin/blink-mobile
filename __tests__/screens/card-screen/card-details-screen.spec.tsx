@@ -89,7 +89,7 @@ jest.mock("@app/hooks/use-card-holder", () => ({
   }),
 }))
 
-let mockSecrets: { pan: string; cvc: string } | undefined
+let mockSecrets: { pan: string; cvc: string; expiry: string | null } | undefined
 let mockSecretsHasFailed = false
 const mockFetchSecrets = jest.fn()
 jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
@@ -562,8 +562,8 @@ describe("CardDetailsScreen", () => {
       expect(mockFetchSecrets).not.toHaveBeenCalled()
     })
 
-    it("shows the full card number, the CVV and the holder once loaded", async () => {
-      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+    it("shows the full card number, the expiry, the CVV and the holder once loaded", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342", expiry: "2029-09" }
       mockHolderName = "Satoshi Nakamoto"
 
       const { getByTestId, queryByTestId } = await renderDetails()
@@ -573,25 +573,48 @@ describe("CardDetailsScreen", () => {
         within(getByTestId("card-number-field")).getByText("4549 8800 5153 9745"),
       ).toBeTruthy()
       expect(within(getByTestId("card-cvv-field")).getByText("342")).toBeTruthy()
+      expect(within(getByTestId("card-expiry-field")).getByText("09/29")).toBeTruthy()
       expect(
         within(getByTestId("card-holder-field")).getByText("Satoshi Nakamoto"),
       ).toBeTruthy()
     })
 
-    it("copies the full card number, the CVV and the holder name", async () => {
-      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+    it("copies the full card number, the expiry, the CVV and the holder name", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342", expiry: "2029-09" }
       mockHolderName = "Satoshi Nakamoto"
 
       const { getByTestId } = await renderDetails()
 
       await act(async () => {
         fireEvent.press(getByTestId("card-number-field"))
+        fireEvent.press(getByTestId("card-expiry-field"))
         fireEvent.press(getByTestId("card-cvv-field"))
         fireEvent.press(getByTestId("card-holder-field"))
       })
 
       const copied = mockCopyToClipboard.mock.calls.map(([params]) => params.content)
-      expect(copied).toEqual(["4549880051539745", "342", "Satoshi Nakamoto"])
+      expect(copied).toEqual(["4549880051539745", "09/29", "342", "Satoshi Nakamoto"])
+    })
+
+    it("prints the expiry on the card face too", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342", expiry: "2029-09" }
+
+      const { getByText } = await renderDetails()
+
+      expect(getByText("09/ 29")).toBeTruthy()
+    })
+
+    /** Until the issuer has issued the card there is no expiry, so the field waits and has
+     *  nothing to copy. */
+    it("offers no expiry to copy for a card not issued yet", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342", expiry: null }
+
+      const { getByTestId } = await renderDetails()
+      await act(async () => {
+        fireEvent.press(getByTestId("card-expiry-field"))
+      })
+
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
     })
 
     it("shows a loader and no retry until the secrets arrive", async () => {
@@ -634,7 +657,7 @@ describe("CardDetailsScreen", () => {
 
     it("keeps the card secrets unfetched and hidden while the screen guard is pending", async () => {
       mockScreenGuard = "pending"
-      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+      mockSecrets = { pan: "4549880051539745", cvc: "342", expiry: "2029-09" }
 
       const { getByTestId, queryByTestId } = await renderDetails()
 
@@ -646,7 +669,7 @@ describe("CardDetailsScreen", () => {
 
     it("never mounts the card secrets when the screen guard fails", async () => {
       mockScreenGuard = "failed"
-      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+      mockSecrets = { pan: "4549880051539745", cvc: "342", expiry: "2029-09" }
 
       const { getByTestId, queryByTestId } = await renderDetails()
       await act(async () => {

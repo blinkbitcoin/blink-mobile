@@ -3436,6 +3436,23 @@
       "cardUsed": "Card folosit",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Metodă de plată",
+      "PaymentMethods": {
+        "contactless": "Contactless",
+        "chip": "Cip",
+        "swipe": "Bandă magnetică",
+        "online": "Online",
+        "other": "Altele"
+      },
+      "declineReason": "Motivul refuzului",
+      "DeclineReasons": {
+        "insufficientFunds": "Fonduri insuficiente",
+        "limitExceeded": "Limita cardului a fost atinsă",
+        "incorrectPin": "PIN incorect",
+        "cardExpired": "Card expirat",
+        "cardLocked": "Card înghețat",
+        "suspectedFraud": "Suspiciune de fraudă",
+        "other": "Refuzat de rețeaua cardului"
+      },
       "merchantInformation": "Informații comerciant",
       "merchant": "Comerciant",
       "category": "Categorie",

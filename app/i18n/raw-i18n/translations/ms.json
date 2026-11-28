@@ -3436,6 +3436,23 @@
       "cardUsed": "Kad digunakan",
       "cardUsedValue": "Kad Blink •••• {lastFour}",
       "paymentMethod": "Kaedah pembayaran",
+      "PaymentMethods": {
+        "contactless": "Tanpa sentuh",
+        "chip": "Cip",
+        "swipe": "Leret",
+        "online": "Dalam talian",
+        "other": "Lain-lain"
+      },
+      "declineReason": "Sebab penolakan",
+      "DeclineReasons": {
+        "insufficientFunds": "Dana tidak mencukupi",
+        "limitExceeded": "Had kad dicapai",
+        "incorrectPin": "PIN salah",
+        "cardExpired": "Kad tamat tempoh",
+        "cardLocked": "Kad dibekukan",
+        "suspectedFraud": "Disyaki penipuan",
+        "other": "Ditolak oleh rangkaian kad"
+      },
       "merchantInformation": "Maklumat peniaga",
       "merchant": "Peniaga",
       "category": "Kategori",

@@ -3436,6 +3436,23 @@
       "cardUsed": "Použitá karta",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Spôsob platby",
+      "PaymentMethods": {
+        "contactless": "Bezkontaktne",
+        "chip": "Čip",
+        "swipe": "Magnetický prúžok",
+        "online": "Online",
+        "other": "Iné"
+      },
+      "declineReason": "Dôvod zamietnutia",
+      "DeclineReasons": {
+        "insufficientFunds": "Nedostatok prostriedkov",
+        "limitExceeded": "Dosiahnutý limit karty",
+        "incorrectPin": "Nesprávny PIN",
+        "cardExpired": "Platnosť karty vypršala",
+        "cardLocked": "Karta je zmrazená",
+        "suspectedFraud": "Podozrenie z podvodu",
+        "other": "Zamietnuté kartovou sieťou"
+      },
       "merchantInformation": "Informácie o obchodníkovi",
       "merchant": "Obchodník",
       "category": "Kategória",

@@ -1,11 +1,24 @@
-import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
+import {
+  CardDeclineReason,
+  CardPaymentMethod,
+  CardStatus,
+  CardType,
+  TransactionStatus,
+} from "@app/graphql/generated"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
+import { parseCardValidThru } from "@app/utils/date"
 
 export const isCardFrozen = (status: CardStatus): boolean => status === CardStatus.Locked
 
 export const isCardUsable = (status: CardStatus): boolean =>
   status === CardStatus.Active || status === CardStatus.Locked
+
+/** The expiry as the card prints it, `MM/YY`; null until the issuer set one. */
+export const formatCardExpiry = (expiry: string | null): string | null => {
+  const parts = expiry ? parseCardValidThru(expiry) : null
+  return parts ? `${parts.month}/${parts.year}` : null
+}
 
 export const formatCardType = (
   cardType: CardType,
@@ -16,6 +29,62 @@ export const formatCardType = (
       return LL.cardTypeVirtual()
     case CardType.Physical:
       return LL.cardTypePhysical()
+  }
+}
+
+export const formatPaymentMethod = (
+  method: CardPaymentMethod,
+  LL: {
+    contactless: () => string
+    chip: () => string
+    swipe: () => string
+    online: () => string
+    other: () => string
+  },
+): string => {
+  switch (method) {
+    case CardPaymentMethod.Contactless:
+      return LL.contactless()
+    case CardPaymentMethod.Chip:
+      return LL.chip()
+    case CardPaymentMethod.Swipe:
+      return LL.swipe()
+    case CardPaymentMethod.Online:
+      return LL.online()
+    case CardPaymentMethod.Other:
+      return LL.other()
+  }
+}
+
+/** A network decline can arrive without a reason, which reads like one outside the list:
+ *  declined by the network, with nothing more to say. */
+export const formatDeclineReason = (
+  reason: CardDeclineReason | null | undefined,
+  LL: {
+    insufficientFunds: () => string
+    limitExceeded: () => string
+    incorrectPin: () => string
+    cardExpired: () => string
+    cardLocked: () => string
+    suspectedFraud: () => string
+    other: () => string
+  },
+): string => {
+  switch (reason) {
+    case CardDeclineReason.InsufficientFunds:
+      return LL.insufficientFunds()
+    case CardDeclineReason.LimitExceeded:
+      return LL.limitExceeded()
+    case CardDeclineReason.IncorrectPin:
+      return LL.incorrectPin()
+    case CardDeclineReason.CardExpired:
+      return LL.cardExpired()
+    case CardDeclineReason.CardLocked:
+      return LL.cardLocked()
+    case CardDeclineReason.SuspectedFraud:
+      return LL.suspectedFraud()
+    default:
+      return LL.other()
   }
 }
 
