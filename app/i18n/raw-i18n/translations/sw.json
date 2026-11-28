@@ -3543,7 +3543,20 @@
       "importantDescription": "Tafadhali hakikisha anwani yako ni sahihi na kamili.",
       "noPOBoxes": "Kadi haziwezi kupelekwa kwa sanduku la posta",
       "signatureRequired": "Sahihi inaweza kuhitajika wakati wa utoaji",
-      "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji"
+      "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji",
+      "useKycAddress": "Tumia anwani ya KYC kama anwani ya usafirishaji",
+      "kycAddress": "Anwani ya KYC",
+      "PrivacyTip": {
+        "title": "Kidokezo cha faragha",
+        "description": "Kadi itatumwa kwa anwani hii ndani ya bahasha isiyovutia macho. Kwa faragha zaidi, unaweza kuituma kwa anwani tofauti na nyumbani kwako."
+      }
+    },
+    "Delivery": {
+      "courier": "Usafirishaji kwa mjumbe",
+      "snailMail": "Usafirishaji kwa posta ya kawaida",
+      "snailMailUnavailable": "Si ya kuaminika vya kutosha kutolewa",
+      "businessDays": "{day1}-{day2} siku za kazi",
+      "free": "BURE"
     },
     "PinScreens": {
       "common": {
@@ -3605,14 +3618,7 @@
       },
       "Delivery": {
         "title": "Chagua kasi ya utoaji",
-        "subtitle": "Chagua haraka gani unataka kupokea kadi yako mpya",
-        "standardDelivery": "Utoaji wa kawaida",
-        "expressDelivery": "Utoaji wa haraka",
-        "businessDays": "Siku {day1}-{day2} za kazi",
-        "free": "BURE",
-        "shippingAddress": "Anwani ya usafirishaji",
-        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
-        "chooseDeliverySpeed": "Chagua kasi ya uwasilishaji"
+        "subtitle": "Chagua haraka gani unataka kupokea kadi yako mpya"
       },
       "Confirm": {
         "title": "Kagua ombi lako",
@@ -3621,24 +3627,15 @@
         "delivery": "Utoaji",
         "submitRequest": "Wasilisha ombi",
         "importantInformation": "Taarifa muhimu",
+        "samePin": "Kadi yako mpya itakuwa na PIN ile ile",
         "issueType": "Sababu",
         "deliveryTime": "Muda wa uwasilishaji",
-        "shippingCost": "Gharama ya utoaji",
-        "DamagedInfo": {
-          "bullet1": "Kadi yako ya sasa itaendelea kutumika hadi mpya ifike",
-          "bullet2": "Kadi yako mpya itakuwa na nambari mpya ya kadi",
-          "bullet3": "Haribu kadi yako iliyoharibika wakati mpya inafika"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kadi yako imefungwa kwa ulinzi wako",
-          "bullet2": "Kadi yako mpya itakuwa na nambari mpya ya kadi",
-          "bullet3": "Kadi yako ya zamani itafutwa kabisa"
-        }
+        "shippingCost": "Gharama ya utoaji"
       },
       "Status": {
         "title": "Kadi yako mpya iko njiani!",
         "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limewasilishwa.",
-        "buttonLabel": "Dashibodi"
+        "buttonLabel": "Rudi kwenye dashibodi"
       },
       "title": "Badilisha kadi",
       "errors": {
@@ -3656,24 +3653,7 @@
       "Shipping": {
         "title": "Agiza kadi yako ya kimwili",
         "subtitle": "Pokea kadi yako ya Blink Visa ikipelekwa kwenye anwani yako.",
-        "registeredAddress": "Anwani iliyosajiliwa",
-        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
-        "delivery": "Uwasilishaji",
-        "standardDelivery": "Uwasilishaji wa kawaida",
-        "expressDelivery": "Uwasilishaji wa haraka",
-        "businessDays": "{day1}-{day2} siku za kazi",
-        "free": "BURE",
-        "deliveryInformation": "Taarifa za uwasilishaji",
-        "bullet1": "Utapokea taarifa za ufuatiliaji kwa barua pepe",
-        "bullet2": "Huenda saini ikahitajika wakati wa uwasilishaji",
-        "bullet3": "Kadi itatumwa katika kifungashio kisichoonekana",
-        "bullet4": "Iwashe kadi yako inapowasili",
-        "cardFeatures": "Vipengele vya kadi",
-        "feature1": "Teknolojia ya malipo bila kugusa",
-        "feature2": "Chip ya EMV kwa usalama ulioimarishwa",
-        "feature3": "Mkanda wa sumaku kwa kukubalika kwa wote",
-        "feature4": "Jina lako limechongwa kwenye kadi",
-        "important": "Muhimu"
+        "delivery": "Uwasilishaji"
       },
       "Confirm": {
         "title": "Thibitisha agizo lako",
@@ -3684,12 +3664,7 @@
         "deliveryTime": "Muda wa uwasilishaji",
         "shippingCost": "Gharama ya usafirishaji",
         "shippingAddress": "Anwani ya usafirishaji",
-        "placeOrder": "Weka agizo",
-        "important": "Muhimu",
-        "bullet1": "Kadi yako ya mtandaoni itaendelea kuwa hai unapongoja kadi ya kimwili",
-        "bullet2": "Utahitaji kuwasha kadi yako ya kimwili inapowasili",
-        "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale",
-        "bullet4": "Anwani ya usafirishaji haiwezi kubadilishwa baada ya agizo kutolewa"
+        "placeOrder": "Weka agizo"
       },
       "errors": {
         "createFailed": "Imeshindikana kuagiza kadi yako halisi. Tafadhali jaribu tena."

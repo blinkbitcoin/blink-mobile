@@ -3543,7 +3543,20 @@
             },
             "noPOBoxes": "Cartões não podem ser entregues em caixas postais",
             "signatureRequired": "Pode ser necessária assinatura na entrega",
-            "supportedRegions": "O endereço deve estar dentro das regiões de envio suportadas"
+            "supportedRegions": "O endereço deve estar dentro das regiões de envio suportadas",
+            "useKycAddress": "Usar o endereço KYC como endereço de entrega",
+            "kycAddress": "Endereço KYC",
+            "PrivacyTip": {
+                "title": "Dica de privacidade",
+                "description": "O cartão será enviado para este endereço em um envelope discreto. Para mais privacidade, você pode enviá-lo para um endereço diferente da sua casa."
+            }
+        },
+        "Delivery": {
+            "courier": "Entrega por transportadora",
+            "snailMail": "Entrega por correio comum",
+            "snailMailUnavailable": "Não é confiável o suficiente para oferecer",
+            "businessDays": "{day1}-{day2} dias úteis",
+            "free": "GRÁTIS"
         },
         "PinScreens": {
             "common": {
@@ -3606,14 +3619,7 @@
             },
             "Delivery": {
                 "title": "Escolha a velocidade de entrega",
-                "subtitle": "Selecione a rapidez com que deseja receber o seu novo cartão",
-                "standardDelivery": "Entrega padrão",
-                "expressDelivery": "Entrega expresso",
-                "businessDays": "{day1}-{day2} dias úteis",
-                "free": "GRÁTIS",
-                "shippingAddress": "Endereço de envio",
-                "useRegisteredAddress": "Usar endereço registado como endereço de envio",
-                "chooseDeliverySpeed": "Escolha a velocidade de entrega"
+                "subtitle": "Selecione a rapidez com que deseja receber o seu novo cartão"
             },
             "Confirm": {
                 "title": "Revise o seu pedido",
@@ -3624,22 +3630,13 @@
                 "deliveryTime": "Tempo de entrega",
                 "shippingCost": "Custo de entrega",
                 "importantInformation": "Informações importantes",
-                "DamagedInfo": {
-                    "bullet1": "O seu cartão atual permanecerá ativo até que o novo chegue",
-                    "bullet2": "O seu novo cartão terá um novo número de cartão",
-                    "bullet3": "Destrua o seu cartão danificado quando o novo chegar"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "O seu cartão foi bloqueado para sua proteção",
-                    "bullet2": "O seu novo cartão terá um novo número de cartão",
-                    "bullet3": "O seu cartão antigo será cancelado permanentemente"
-                },
+                "samePin": "O seu novo cartão terá o mesmo PIN",
                 "submitRequest": "Enviar pedido"
             },
             "Status": {
                 "title": "O seu novo cartão está a caminho!",
                 "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
-                "buttonLabel": "Painel"
+                "buttonLabel": "Voltar ao painel"
             },
             "errors": {
                 "lockFailed": "Falha ao bloquear seu cartão. Por favor, tente novamente.",
@@ -3656,24 +3653,7 @@
             "Shipping": {
                 "title": "Peça o seu cartão físico",
                 "subtitle": "Receba o seu cartão Blink Visa no seu endereço.",
-                "registeredAddress": "Endereço registado",
-                "useRegisteredAddress": "Usar o endereço registado como endereço de envio",
-                "delivery": "Entrega",
-                "standardDelivery": "Entrega padrão",
-                "expressDelivery": "Entrega expressa",
-                "businessDays": "{day1}-{day2} dias úteis",
-                "free": "GRÁTIS",
-                "deliveryInformation": "Informações de entrega",
-                "bullet1": "Você receberá as informações de rastreamento por e-mail",
-                "bullet2": "Pode ser necessária assinatura na entrega",
-                "bullet3": "O cartão será enviado em embalagem discreta",
-                "bullet4": "Ative o seu cartão quando ele chegar",
-                "cardFeatures": "Características do cartão",
-                "feature1": "Tecnologia de pagamento por aproximação",
-                "feature2": "Chip EMV para maior segurança",
-                "feature3": "Faixa magnética para aceitação universal",
-                "feature4": "Seu nome em relevo no cartão",
-                "important": "Importante"
+                "delivery": "Entrega"
             },
             "Confirm": {
                 "title": "Confirme seu pedido",
@@ -3684,12 +3664,7 @@
                 "deliveryTime": "Tempo de entrega",
                 "shippingCost": "Custo de envio",
                 "shippingAddress": "Endereço de envio",
-                "placeOrder": "Fazer pedido",
-                "important": "Importante",
-                "bullet1": "Seu cartão virtual permanecerá ativo enquanto você espera o cartão físico",
-                "bullet2": "Você precisará ativar o cartão físico quando ele chegar",
-                "bullet3": "Ambos os cartões terão o mesmo número e detalhes",
-                "bullet4": "A morada de envio não pode ser alterada após a encomenda ser feita"
+                "placeOrder": "Fazer pedido"
             },
             "errors": {
                 "createFailed": "Falha ao solicitar seu cartão físico. Por favor, tente novamente."

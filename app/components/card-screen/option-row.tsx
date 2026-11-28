@@ -13,6 +13,7 @@ type OptionRowProps = {
   value?: string
   valueColor?: string
   highlighted?: boolean
+  isDisabled?: boolean
   children?: React.ReactNode
 }
 
@@ -28,6 +29,7 @@ export const OptionRow: React.FC<OptionRowProps> = ({
   value,
   valueColor,
   highlighted = false,
+  isDisabled = false,
   children,
 }) => {
   const styles = useStyles({ highlighted })
@@ -36,13 +38,15 @@ export const OptionRow: React.FC<OptionRowProps> = ({
   } = useTheme()
 
   const resolvedValueColor = valueColor ?? colors.textOnBackground
+  const resolvedIconColor = isDisabled ? colors.textDisabled : iconColor
+  const disabledText = isDisabled ? { color: colors.textDisabled } : null
 
   return (
     <View style={styles.container}>
-      <GaloyIcon name={icon} size={16} color={iconColor} />
+      <GaloyIcon name={icon} size={16} color={resolvedIconColor} />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text style={[styles.title, disabledText]}>{title}</Text>
+        <Text style={[styles.subtitle, disabledText]}>{subtitle}</Text>
         {value && (
           <Text style={[styles.value, { color: resolvedValueColor }]}>{value}</Text>
         )}

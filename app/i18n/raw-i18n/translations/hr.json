@@ -3543,7 +3543,20 @@
       "importantDescription": "Molimo provjerite da je vaša adresa točna i potpuna.",
       "noPOBoxes": "Kartice se ne mogu dostaviti na poštanske pretince",
       "signatureRequired": "Potpis može biti potreban prilikom dostave",
-      "supportedRegions": "Adresa mora biti unutar podržanih regija za dostavu"
+      "supportedRegions": "Adresa mora biti unutar podržanih regija za dostavu",
+      "useKycAddress": "Koristi KYC adresu kao adresu za dostavu",
+      "kycAddress": "KYC adresa",
+      "PrivacyTip": {
+        "title": "Savjet o privatnosti",
+        "description": "Kartica će biti poslana na ovu adresu u diskretnoj omotnici. Za veću privatnost možda je želite poslati na adresu koja nije vaš dom."
+      }
+    },
+    "Delivery": {
+      "courier": "Dostava kurirom",
+      "snailMail": "Dostava običnom poštom",
+      "snailMailUnavailable": "Previše nepouzdano da bismo ga nudili",
+      "businessDays": "{day1}-{day2} radnih dana",
+      "free": "BESPLATNO"
     },
     "PinScreens": {
       "common": {
@@ -3605,14 +3618,7 @@
       },
       "Delivery": {
         "title": "Odaberite brzinu dostave",
-        "subtitle": "Odaberite koliko brzo želite primiti novu karticu",
-        "standardDelivery": "Standardna dostava",
-        "expressDelivery": "Ekspresna dostava",
-        "businessDays": "{day1}-{day2} radnih dana",
-        "free": "BESPLATNO",
-        "shippingAddress": "Adresa za dostavu",
-        "useRegisteredAddress": "Koristi registriranu adresu kao adresu za dostavu",
-        "chooseDeliverySpeed": "Odaberite brzinu dostave"
+        "subtitle": "Odaberite koliko brzo želite primiti novu karticu"
       },
       "Confirm": {
         "title": "Pregledajte svoj zahtjev",
@@ -3621,24 +3627,15 @@
         "delivery": "Dostava",
         "submitRequest": "Pošalji zahtjev",
         "importantInformation": "Važne informacije",
+        "samePin": "Vaša nova kartica imat će isti PIN",
         "issueType": "Razlog",
         "deliveryTime": "Vrijeme isporuke",
-        "shippingCost": "Trošak dostave",
-        "DamagedInfo": {
-          "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
-          "bullet2": "Vaša nova kartica imat će novi broj kartice",
-          "bullet3": "Uništite svoju oštećenu karticu kad stigne nova"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Vaša kartica je zaključana za vašu zaštitu",
-          "bullet2": "Vaša nova kartica imat će novi broj kartice",
-          "bullet3": "Vaša stara kartica bit će trajno otkazana"
-        }
+        "shippingCost": "Trošak dostave"
       },
       "Status": {
         "title": "Vaša nova kartica je na putu!",
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
-        "buttonLabel": "Nadzorna ploča"
+        "buttonLabel": "Natrag na nadzornu ploču"
       },
       "title": "Zamijeni karticu",
       "errors": {
@@ -3656,24 +3653,7 @@
       "Shipping": {
         "title": "Naručite svoju fizičku karticu",
         "subtitle": "Neka vam se Blink Visa kartica dostavi na adresu.",
-        "registeredAddress": "Registrirana adresa",
-        "useRegisteredAddress": "Koristi registriranu adresu kao adresu dostave",
-        "delivery": "Dostava",
-        "standardDelivery": "Standardna dostava",
-        "expressDelivery": "Ekspresna dostava",
-        "businessDays": "{day1}-{day2} radnih dana",
-        "free": "BESPLATNO",
-        "deliveryInformation": "Informacije o dostavi",
-        "bullet1": "Podatke za praćenje dobit ćete e-poštom",
-        "bullet2": "Pri dostavi može biti potreban potpis",
-        "bullet3": "Kartica će biti poslana u diskretnoj ambalaži",
-        "bullet4": "Aktivirajte karticu kada stigne",
-        "cardFeatures": "Značajke kartice",
-        "feature1": "Tehnologija beskontaktnog plaćanja",
-        "feature2": "EMV čip za veću sigurnost",
-        "feature3": "Magnetska traka za univerzalnu prihvaćenost",
-        "feature4": "Vaše ime utisnuto na kartici",
-        "important": "Važno"
+        "delivery": "Dostava"
       },
       "Confirm": {
         "title": "Potvrdite narudžbu",
@@ -3684,12 +3664,7 @@
         "deliveryTime": "Vrijeme dostave",
         "shippingCost": "Trošak dostave",
         "shippingAddress": "Adresa dostave",
-        "placeOrder": "Naruči",
-        "important": "Važno",
-        "bullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
-        "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
-        "bullet3": "Obje kartice imat će isti broj i podatke",
-        "bullet4": "Adresa za dostavu ne može se promijeniti nakon što je narudžba poslana"
+        "placeOrder": "Naruči"
       },
       "errors": {
         "createFailed": "Naručivanje vaše fizičke kartice nije uspjelo. Pokušajte ponovo."

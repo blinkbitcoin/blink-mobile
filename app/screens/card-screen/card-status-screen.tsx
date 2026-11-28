@@ -30,6 +30,7 @@ export const CardStatusScreen: React.FC = () => {
     iconColor = colors.success,
     showCard = true,
     showAddToWallet = true,
+    isWalletPrimary = false,
     lastFour,
     cardId,
   } = route.params
@@ -37,16 +38,23 @@ export const CardStatusScreen: React.FC = () => {
   const { canAddToWallet, isAdding, addToWallet } = useAddToWallet(cardId, lastFour)
   const isAddToWalletShown = showAddToWallet && canAddToWallet
 
-  const handlePrimaryButtonPress = () => {
+  /** Under the wallet button only while it shows, so the screen never ends on a lone
+   *  text link. */
+  const isActionSecondary = isWalletPrimary && isAddToWalletShown
+
+  const handleActionPress = () => {
     navigation.dispatch(CommonActions.navigate(navigateTo))
   }
+
+  const actionButton = isActionSecondary
+    ? { secondaryButtonLabel: buttonLabel, onSecondaryButtonPress: handleActionPress }
+    : { buttonLabel, onPrimaryButtonPress: handleActionPress }
 
   return (
     <CardStatusLayout
       title={title}
       subtitle={subtitle}
-      buttonLabel={buttonLabel}
-      onPrimaryButtonPress={handlePrimaryButtonPress}
+      {...actionButton}
       iconName={iconName}
       iconColor={iconColor}
       showCard={showCard}

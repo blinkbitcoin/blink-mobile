@@ -2,23 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { getRegionsByCountry } from "@app/utils/address-metadata"
-import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
-
-const FALLBACK_COUNTRY = "US"
-
-const buildDefaultAddress = (countryCode: string): ShippingAddress => ({
-  firstName: "",
-  lastName: "",
-  line1: "",
-  line2: "",
-  city: "",
-  region: getRegionsByCountry(countryCode)[0]?.value ?? "",
-  postalCode: "",
-  countryCode,
-})
+import { useShippingAddressDraft } from "@app/screens/card-screen/hooks/use-shipping-address-draft"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
 export const Step = {
   Shipping: 1,
@@ -28,8 +14,7 @@ export const Step = {
 export type StepType = (typeof Step)[keyof typeof Step]
 
 type FlowState = {
-  selectedDelivery: DeliveryType
-  useRegisteredAddress: boolean
+  useKycAddress: boolean
   customAddress: ShippingAddress
 }
 
@@ -40,7 +25,7 @@ type UseOrderCardFlowParams = {
 type UseOrderCardFlowReturn = {
   step: StepType
   state: FlowState
-  toggleUseRegisteredAddress: () => void
+  toggleUseKycAddress: () => void
   setCustomAddress: (address: ShippingAddress) => void
   goToNextStep: () => void
   completeFlow: () => void
@@ -53,37 +38,12 @@ export const useOrderCardFlow = ({
   initialAddress,
 }: UseOrderCardFlowParams): UseOrderCardFlowReturn => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { countryCode: detectedCountry } = useDeviceLocation()
 
   const [step, setStep] = useState<StepType>(FIRST_STEP)
-  const [selectedDelivery] = useState<DeliveryType>(Delivery.Standard)
-  const [useRegisteredAddress, setUseRegisteredAddress] = useState(
-    initialAddress !== null,
-  )
-  const [customAddress, setCustomAddress] = useState<ShippingAddress>(
-    initialAddress ?? buildDefaultAddress(FALLBACK_COUNTRY),
-  )
+  /** Unticked by default: the KYC address is a choice, never the default (D42, D123). */
+  const [useKycAddress, setUseKycAddress] = useState(false)
+  const [customAddress, setCustomAddress] = useShippingAddressDraft(initialAddress)
   const isCompleteRef = useRef(false)
-  const hasInitializedRef = useRef(initialAddress !== null)
-  const hasAppliedLocationRef = useRef(false)
-
-  useEffect(() => {
-    if (hasInitializedRef.current) return
-    if (!initialAddress) return
-
-    hasInitializedRef.current = true
-    setUseRegisteredAddress(true)
-    setCustomAddress(initialAddress)
-  }, [initialAddress])
-
-  useEffect(() => {
-    if (hasInitializedRef.current) return
-    if (hasAppliedLocationRef.current) return
-    if (!detectedCountry || detectedCountry === FALLBACK_COUNTRY) return
-
-    hasAppliedLocationRef.current = true
-    setCustomAddress(buildDefaultAddress(detectedCountry))
-  }, [detectedCountry])
 
   const goToNextStep = useCallback(() => {
     setStep((prev) => (prev >= LAST_STEP ? prev : ((prev + 1) as StepType)))
@@ -95,8 +55,8 @@ export const useOrderCardFlow = ({
     return true
   }, [step])
 
-  const toggleUseRegisteredAddress = useCallback(() => {
-    setUseRegisteredAddress((prev) => !prev)
+  const toggleUseKycAddress = useCallback(() => {
+    setUseKycAddress((prev) => !prev)
   }, [])
 
   const completeFlow = useCallback(() => {
@@ -116,11 +76,10 @@ export const useOrderCardFlow = ({
   return {
     step,
     state: {
-      selectedDelivery,
-      useRegisteredAddress,
+      useKycAddress,
       customAddress,
     },
-    toggleUseRegisteredAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,

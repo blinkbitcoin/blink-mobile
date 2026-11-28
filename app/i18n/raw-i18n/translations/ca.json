@@ -3543,7 +3543,20 @@
       "importantDescription": "Assegureu-vos que la vostra adreça sigui precisa i completa.",
       "noPOBoxes": "Les targetes no es poden lliurar a apartats de correus",
       "signatureRequired": "Es pot requerir signatura en el lliurament",
-      "supportedRegions": "L'adreça ha de ser dins de les regions d'enviament admeses"
+      "supportedRegions": "L'adreça ha de ser dins de les regions d'enviament admeses",
+      "useKycAddress": "Utilitza l'adreça KYC com a adreça d'enviament",
+      "kycAddress": "Adreça KYC",
+      "PrivacyTip": {
+        "title": "Consell de privadesa",
+        "description": "La targeta s'enviarà a aquesta adreça en un sobre discret. Per a més privadesa, potser voldràs enviar-la a una adreça diferent de la de casa teva."
+      }
+    },
+    "Delivery": {
+      "courier": "Lliurament per missatger",
+      "snailMail": "Lliurament per correu ordinari",
+      "snailMailUnavailable": "Massa poc fiable per oferir-lo",
+      "businessDays": "{day1}-{day2} dies laborables",
+      "free": "GRATUÏT"
     },
     "PinScreens": {
       "common": {
@@ -3605,14 +3618,7 @@
       },
       "Delivery": {
         "title": "Tria la velocitat de lliurament",
-        "subtitle": "Selecciona com de ràpid vols rebre la teva nova targeta",
-        "standardDelivery": "Lliurament estàndard",
-        "expressDelivery": "Lliurament exprés",
-        "businessDays": "{day1}-{day2} dies laborables",
-        "free": "GRATUÏT",
-        "shippingAddress": "Adreça d'enviament",
-        "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament",
-        "chooseDeliverySpeed": "Tria la velocitat de lliurament"
+        "subtitle": "Selecciona com de ràpid vols rebre la teva nova targeta"
       },
       "Confirm": {
         "title": "Revisa la teva sol·licitud",
@@ -3621,24 +3627,15 @@
         "delivery": "Lliurament",
         "submitRequest": "Enviar sol·licitud",
         "importantInformation": "Informació important",
+        "samePin": "La teva nova targeta tindrà el mateix PIN",
         "issueType": "Motiu",
         "deliveryTime": "Temps de lliurament",
-        "shippingCost": "Cost de lliurament",
-        "DamagedInfo": {
-          "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
-          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
-          "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
-        },
-        "LostStolenInfo": {
-          "bullet1": "La teva targeta ha estat bloquejada per a la teva protecció",
-          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
-          "bullet3": "La teva targeta antiga serà cancel·lada permanentment"
-        }
+        "shippingCost": "Cost de lliurament"
       },
       "Status": {
         "title": "La teva nova targeta està en camí!",
         "subtitle": "S'ha enviat la comanda de lliurament de la teva targeta Blink.",
-        "buttonLabel": "Tauler"
+        "buttonLabel": "Torna al tauler"
       },
       "title": "Substituir targeta",
       "errors": {
@@ -3656,24 +3653,7 @@
       "Shipping": {
         "title": "Demana la teva targeta física",
         "subtitle": "Rep la teva targeta Blink Visa al teu domicili.",
-        "registeredAddress": "Adreça registrada",
-        "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament",
-        "delivery": "Lliurament",
-        "standardDelivery": "Lliurament estàndard",
-        "expressDelivery": "Lliurament exprés",
-        "businessDays": "{day1}-{day2} dies laborables",
-        "free": "GRATUÏT",
-        "deliveryInformation": "Informació de lliurament",
-        "bullet1": "Rebràs la informació de seguiment per correu electrònic",
-        "bullet2": "Es pot requerir signatura en el lliurament",
-        "bullet3": "La targeta s'enviarà en un embalatge discret",
-        "bullet4": "Activa la teva targeta quan arribi",
-        "cardFeatures": "Característiques de la targeta",
-        "feature1": "Tecnologia de pagament sense contacte",
-        "feature2": "Xip EMV per a més seguretat",
-        "feature3": "Banda magnètica per a acceptació universal",
-        "feature4": "El teu nom en relleu a la targeta",
-        "important": "Important"
+        "delivery": "Lliurament"
       },
       "Confirm": {
         "title": "Confirma la teva comanda",
@@ -3684,12 +3664,7 @@
         "deliveryTime": "Termini de lliurament",
         "shippingCost": "Cost d'enviament",
         "shippingAddress": "Adreça d'enviament",
-        "placeOrder": "Fer la comanda",
-        "important": "Important",
-        "bullet1": "La teva targeta virtual romandrà activa mentre esperes la targeta física",
-        "bullet2": "Hauràs d'activar la targeta física quan arribi",
-        "bullet3": "Totes dues targetes tindran el mateix número i dades",
-        "bullet4": "L'adreça d'enviament no es pot canviar un cop feta la comanda"
+        "placeOrder": "Fer la comanda"
       },
       "errors": {
         "createFailed": "No s'ha pogut demanar la teva targeta física. Si us plau, torna-ho a provar."

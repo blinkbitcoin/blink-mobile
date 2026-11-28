@@ -3543,7 +3543,20 @@
             },
             "noPOBoxes": "No se puede entregar tarjetas a apartados postales",
             "signatureRequired": "Puede requerirse firma al momento de la entrega",
-            "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas"
+            "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas",
+            "useKycAddress": "Usar la dirección KYC como dirección de envío",
+            "kycAddress": "Dirección KYC",
+            "PrivacyTip": {
+                "title": "Consejo de privacidad",
+                "description": "La tarjeta se enviará a esta dirección en un sobre discreto. Para mayor privacidad, quizá quieras enviarla a una dirección distinta de tu casa."
+            }
+        },
+        "Delivery": {
+            "courier": "Entrega por mensajería",
+            "snailMail": "Entrega por correo postal",
+            "snailMailUnavailable": "Demasiado poco fiable para ofrecerlo",
+            "businessDays": "{day1}-{day2} días hábiles",
+            "free": "GRATIS"
         },
         "PinScreens": {
             "common": {
@@ -3606,14 +3619,7 @@
             },
             "Delivery": {
                 "title": "Elige tu velocidad de entrega",
-                "subtitle": "Selecciona qué tan rápido deseas recibir tu nueva tarjeta",
-                "standardDelivery": "Entrega estándar",
-                "expressDelivery": "Entrega exprés",
-                "businessDays": "{day1}-{day2} días hábiles",
-                "free": "GRATIS",
-                "shippingAddress": "Dirección de envío",
-                "useRegisteredAddress": "Usar dirección registrada como dirección de envío",
-                "chooseDeliverySpeed": "Elige velocidad de envío"
+                "subtitle": "Selecciona qué tan rápido deseas recibir tu nueva tarjeta"
             },
             "Confirm": {
                 "title": "Revisa tu solicitud",
@@ -3624,22 +3630,13 @@
                 "deliveryTime": "Tiempo de entrega",
                 "shippingCost": "Costo de entrega",
                 "importantInformation": "Información importante",
-                "DamagedInfo": {
-                    "bullet1": "Tu tarjeta actual permanecerá activa hasta que llegue la nueva",
-                    "bullet2": "Tu nueva tarjeta tendrá un nuevo número de tarjeta",
-                    "bullet3": "Destruye tu tarjeta dañada cuando llegue la nueva"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "Tu tarjeta ha sido bloqueada para tu protección",
-                    "bullet2": "Tu nueva tarjeta tendrá un nuevo número de tarjeta",
-                    "bullet3": "Tu tarjeta anterior será cancelada permanentemente"
-                },
+                "samePin": "Tu nueva tarjeta tendrá el mismo PIN",
                 "submitRequest": "Enviar solicitud"
             },
             "Status": {
                 "title": "¡Tu nueva tarjeta está en camino!",
                 "subtitle": "El pedido de entrega de tu tarjeta Blink ha sido enviado.",
-                "buttonLabel": "Panel"
+                "buttonLabel": "Volver al panel"
             },
             "errors": {
                 "lockFailed": "No se pudo bloquear tu tarjeta. Por favor, inténtalo de nuevo.",
@@ -3656,24 +3653,7 @@
             "Shipping": {
                 "title": "Pide tu tarjeta física",
                 "subtitle": "Recibe tu tarjeta Blink Visa en tu dirección.",
-                "registeredAddress": "Dirección registrada",
-                "useRegisteredAddress": "Usar la dirección registrada como dirección de envío",
-                "delivery": "Entrega",
-                "standardDelivery": "Entrega estándar",
-                "expressDelivery": "Entrega exprés",
-                "businessDays": "{day1}-{day2} días hábiles",
-                "free": "GRATIS",
-                "deliveryInformation": "Información de entrega",
-                "bullet1": "Recibirás la información de seguimiento por correo electrónico",
-                "bullet2": "Puede requerirse firma al momento de la entrega",
-                "bullet3": "La tarjeta se enviará en un embalaje discreto",
-                "bullet4": "Activa tu tarjeta cuando llegue",
-                "cardFeatures": "Características de la tarjeta",
-                "feature1": "Tecnología de pago sin contacto",
-                "feature2": "Chip EMV para mayor seguridad",
-                "feature3": "Banda magnética para aceptación universal",
-                "feature4": "Tu nombre grabado en relieve en la tarjeta",
-                "important": "Importante"
+                "delivery": "Entrega"
             },
             "Confirm": {
                 "title": "Confirma tu pedido",
@@ -3684,12 +3664,7 @@
                 "deliveryTime": "Tiempo de entrega",
                 "shippingCost": "Costo de envío",
                 "shippingAddress": "Dirección de envío",
-                "placeOrder": "Realizar pedido",
-                "important": "Importante",
-                "bullet1": "Tu tarjeta virtual permanecerá activa mientras esperas la tarjeta física",
-                "bullet2": "Necesitarás activar tu tarjeta física cuando llegue",
-                "bullet3": "Ambas tarjetas tendrán el mismo número y detalles",
-                "bullet4": "La dirección de envío no se puede cambiar después de realizar el pedido"
+                "placeOrder": "Realizar pedido"
             },
             "errors": {
                 "createFailed": "No se pudo ordenar tu tarjeta física. Por favor, inténtalo de nuevo."

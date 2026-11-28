@@ -3543,7 +3543,20 @@
             },
             "noPOBoxes": "私書箱には配達できません",
             "signatureRequired": "配達時に署名が必要な場合があります",
-            "supportedRegions": "配送対応地域内の住所である必要があります"
+            "supportedRegions": "配送対応地域内の住所である必要があります",
+            "useKycAddress": "KYCの住所を配送先住所として使用",
+            "kycAddress": "KYCの住所",
+            "PrivacyTip": {
+                "title": "プライバシーのヒント",
+                "description": "カードは目立たない封筒でこの住所に送られます。プライバシーを守るため、ご自宅以外の住所に送ることもご検討ください。"
+            }
+        },
+        "Delivery": {
+            "courier": "宅配便",
+            "snailMail": "普通郵便",
+            "snailMailUnavailable": "信頼性が低いため対応していません",
+            "businessDays": "{day1}-{day2} 営業日",
+            "free": "無料"
         },
         "PinScreens": {
             "common": {
@@ -3606,14 +3619,7 @@
             },
             "Delivery": {
                 "title": "配送速度を選択",
-                "subtitle": "新しいカードをどのくらい早く受け取りたいかを選択してください",
-                "standardDelivery": "通常配送",
-                "expressDelivery": "速達配送",
-                "businessDays": "{day1}〜{day2}営業日",
-                "free": "無料",
-                "shippingAddress": "配送先住所",
-                "useRegisteredAddress": "登録住所を配送先住所として使用",
-                "chooseDeliverySpeed": "配送速度を選択"
+                "subtitle": "新しいカードをどのくらい早く受け取りたいかを選択してください"
             },
             "Confirm": {
                 "title": "リクエストを確認",
@@ -3624,22 +3630,13 @@
                 "deliveryTime": "配達時間",
                 "shippingCost": "配送料",
                 "importantInformation": "重要な情報",
-                "DamagedInfo": {
-                    "bullet1": "現在のカードは新しいカードが届くまでアクティブなままです",
-                    "bullet2": "新しいカードには新しいカード番号が付きます",
-                    "bullet3": "新しいカードが届いたら破損したカードを破棄してください"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "お客様の保護のためカードがロックされました",
-                    "bullet2": "新しいカードには新しいカード番号が付きます",
-                    "bullet3": "古いカードは永久にキャンセルされます"
-                },
+                "samePin": "新しいカードのPINは変わりません",
                 "submitRequest": "リクエストを送信"
             },
             "Status": {
                 "title": "新しいカードが届きます！",
                 "subtitle": "Blinkカードの配送注文が送信されました。",
-                "buttonLabel": "ダッシュボード"
+                "buttonLabel": "ダッシュボードに戻る"
             },
             "errors": {
                 "lockFailed": "カードのロックに失敗しました。もう一度お試しください。",
@@ -3656,24 +3653,7 @@
             "Shipping": {
                 "title": "物理カードを注文",
                 "subtitle": "Blink Visaカードを住所へお届けします。",
-                "registeredAddress": "登録済み住所",
-                "useRegisteredAddress": "登録済み住所を配送先住所として使用",
-                "delivery": "配送",
-                "standardDelivery": "通常配送",
-                "expressDelivery": "速達配送",
-                "businessDays": "{day1}-{day2} 営業日",
-                "free": "無料",
-                "deliveryInformation": "配送情報",
-                "bullet1": "追跡情報はメールで届きます",
-                "bullet2": "配達時に署名が必要になる場合があります",
-                "bullet3": "カードは目立たない梱包で発送されます",
-                "bullet4": "到着したらカードを有効化してください",
-                "cardFeatures": "カードの機能",
-                "feature1": "タッチ決済技術",
-                "feature2": "セキュリティ強化のためのEMVチップ",
-                "feature3": "世界中で使える磁気ストライプ",
-                "feature4": "カードに名前がエンボス加工されます",
-                "important": "重要"
+                "delivery": "配送"
             },
             "Confirm": {
                 "title": "注文を確認",
@@ -3684,12 +3664,7 @@
                 "deliveryTime": "配送時間",
                 "shippingCost": "送料",
                 "shippingAddress": "配送先住所",
-                "placeOrder": "注文する",
-                "important": "重要",
-                "bullet1": "物理カードを待っている間もバーチャルカードは有効です",
-                "bullet2": "物理カードが届いたら有効化が必要です",
-                "bullet3": "両方のカードは同じカード番号と詳細になります",
-                "bullet4": "注文後に配送先住所を変更することはできません"
+                "placeOrder": "注文する"
             },
             "errors": {
                 "createFailed": "物理カードの注文に失敗しました。もう一度お試しください。"

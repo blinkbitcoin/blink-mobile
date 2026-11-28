@@ -3543,7 +3543,20 @@
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
-      "supportedRegions": "Address must be within supported shipping regions"
+      "supportedRegions": "Address must be within supported shipping regions",
+      "useKycAddress": "Sebenzisa idilesi ye-KYC njengedilesi yokuthumela",
+      "kycAddress": "Idilesi ye-KYC",
+      "PrivacyTip": {
+        "title": "Icebiso lobumfihlo",
+        "description": "Ikhadi liza kuthunyelwa kule dilesi kwimvulophu engabonakaliyo. Ukuze ube nobumfihlo obungakumbi, unokufuna ukulithumela kwidilesi engeyiyo eyasekhaya."
+      }
+    },
+    "Delivery": {
+      "courier": "Ukuhanjiswa ngumthunywa",
+      "snailMail": "Ukuthunyelwa ngeposi eqhelekileyo",
+      "snailMailUnavailable": "Ayithembeki ngokwaneleyo ukuba siyixhase",
+      "businessDays": "{day1}-{day2} iintsuku zomsebenzi",
+      "free": "SIMAHLA"
     },
     "PinScreens": {
       "common": {
@@ -3605,14 +3618,7 @@
       },
       "Delivery": {
         "title": "Khetha isantya sokuhanjiswa",
-        "subtitle": "Khetha ukuba ufuna ukufumana ikhadi lakho elitsha ngokukhawuleza kangakanani",
-        "standardDelivery": "Ukuhanjiswa okuqhelekileyo",
-        "expressDelivery": "Ukuhanjiswa okukhawulezayo",
-        "businessDays": "Iintsuku {day1}-{day2} zomsebenzi",
-        "free": "SIMAHLA",
-        "shippingAddress": "Idilesi yokuthumela",
-        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela",
-        "chooseDeliverySpeed": "Khetha isantya sokuhanjiselwa"
+        "subtitle": "Khetha ukuba ufuna ukufumana ikhadi lakho elitsha ngokukhawuleza kangakanani"
       },
       "Confirm": {
         "title": "Phonononga isicelo sakho",
@@ -3621,24 +3627,15 @@
         "delivery": "Ukuhanjiswa",
         "submitRequest": "Ngenisa isicelo",
         "importantInformation": "Ulwazi olubalulekileyo",
+        "samePin": "Ikhadi lakho elitsha liya kuba nePIN efanayo",
         "issueType": "Isizathu",
         "deliveryTime": "Ixesha lokunikezela",
-        "shippingCost": "Iindleko zokuhanjiswa",
-        "DamagedInfo": {
-          "bullet1": "Ikhadi lakho langoku liya kuhlala lisebenza de kufike elitsha",
-          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
-          "bullet3": "Tshabalalisa ikhadi lakho elonakalisiweyo xa kufika elitsha"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Ikhadi lakho litshixiwe ukukhusela wena",
-          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
-          "bullet3": "Ikhadi lakho elidala liya kurhoxiswa ngokupheleleyo"
-        }
+        "shippingCost": "Iindleko zokuhanjiswa"
       },
       "Status": {
         "title": "Ikhadi lakho elitsha lisendleleni!",
         "subtitle": "Iodolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
-        "buttonLabel": "Ideshibhodi"
+        "buttonLabel": "Buyela kwideshibhodi"
       },
       "title": "Tshintsha ikhadi",
       "errors": {
@@ -3656,24 +3653,7 @@
       "Shipping": {
         "title": "Odola ikhadi lakho elibonakalayo",
         "subtitle": "Fumana ikhadi lakho le-Blink Visa lilayishwa kwidilesi yakho.",
-        "registeredAddress": "Idilesi ebhalisiweyo",
-        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengedilesi yokuhanjiswa",
-        "delivery": "Ukuhanjiswa",
-        "standardDelivery": "Ukuhanjiswa okuqhelekileyo",
-        "expressDelivery": "Ukuhanjiswa okukhawulezayo",
-        "businessDays": "{day1}-{day2} iintsuku zomsebenzi",
-        "free": "SIMAHLA",
-        "deliveryInformation": "Ulwazi lokuhanjiswa",
-        "bullet1": "Uya kufumana ulwazi lokulandela nge-imeyile",
-        "bullet2": "Inokusetyenziswa isayini xa kuhanjiswa",
-        "bullet3": "Ikhadi liya kuthunyelwa kwipakethe efihlakeleyo",
-        "bullet4": "Yenza ikhadi lakho lisebenze xa lifika",
-        "cardFeatures": "Iimpawu zekhadi",
-        "feature1": "Itekhnoloji yokuhlawula ngaphandle kokuchukumisa",
-        "feature2": "I-EMV chip yokhuseleko olungcono",
-        "feature3": "Umtya wemagnethi wokwamkelwa jikelele",
-        "feature4": "Igama lakho liya kufakwa ngombhalo ophakamileyo ekhadini",
-        "important": "Kubalulekile"
+        "delivery": "Ukuhanjiswa"
       },
       "Confirm": {
         "title": "Qinisekisa iodolo yakho",
@@ -3684,12 +3664,7 @@
         "deliveryTime": "Ixesha lokuhanjiswa",
         "shippingCost": "Iindleko zokuhanjiswa",
         "shippingAddress": "Idilesi yokuhanjiswa",
-        "placeOrder": "Beka iodolo",
-        "important": "Kubalulekile",
-        "bullet1": "Ikhadi lakho le-virtual liza kuhlala lisebenza ngexesha olinde ikhadi elibonakalayo",
-        "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
-        "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha",
-        "bullet4": "Idilesi yokuhanjiswa ayinakutshintshwa emva kokuba iodolo ithunyelwe"
+        "placeOrder": "Beka iodolo"
       },
       "errors": {
         "createFailed": "Ayiphumelelanga ukuodola ikhadi lakho lokwenyani. Nceda uzame kwakhona."

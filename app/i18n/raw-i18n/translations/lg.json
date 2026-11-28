@@ -3543,7 +3543,20 @@
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
-      "supportedRegions": "Address must be within supported shipping regions"
+      "supportedRegions": "Address must be within supported shipping regions",
+      "useKycAddress": "Kozesa endagiriro ya KYC ng'endagiriro y'okutuusibwako",
+      "kycAddress": "Endagiriro ya KYC",
+      "PrivacyTip": {
+        "title": "Amagezi ku by'ekyama",
+        "description": "Kaadi ejja kuweerezebwa ku ndagiriro eno mu bbaasa etali ya kweyoleka. Okwongera ku by'ekyama, oyinza okugiweereza ku ndagiriro etali ya waka wo."
+      }
+    },
+    "Delivery": {
+      "courier": "Okutuusibwa kuliya",
+      "snailMail": "Okutuusibwa mu posita eya bulijjo",
+      "snailMailUnavailable": "Tekyesigika kimala okukikozesa",
+      "businessDays": "{day1}-{day2} ennaku z'emirimu",
+      "free": "BWERERE"
     },
     "PinScreens": {
       "common": {
@@ -3605,14 +3618,7 @@
       },
       "Delivery": {
         "title": "Londa embiro z'okutwala",
-        "subtitle": "Londa bw'omanyi oyagala okufuna kaadi yo empya",
-        "standardDelivery": "Okutwala okwa bulijjo",
-        "expressDelivery": "Okutwala okw'amangu",
-        "businessDays": "Ennaku {day1}-{day2} ez'omulimu",
-        "free": "BWEREERE",
-        "shippingAddress": "Endagiriro y'okutuma",
-        "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma",
-        "chooseDeliverySpeed": "Londa embiro y'okutumya"
+        "subtitle": "Londa bw'omanyi oyagala okufuna kaadi yo empya"
       },
       "Confirm": {
         "title": "Kebera okusaba kwo",
@@ -3621,24 +3627,15 @@
         "delivery": "Okutwala",
         "submitRequest": "Weereza okusaba",
         "importantInformation": "Amawulire ag'omugaso",
+        "samePin": "Kaadi yo empya ejja kuba ne PIN y'emu",
         "issueType": "Ensonga",
         "deliveryTime": "Obudde bw'okutuusa",
-        "shippingCost": "Bbeeyi y'okutwala",
-        "DamagedInfo": {
-          "bullet1": "Kaadi yo ey'obukakafu ejja kusigala nga ekola okutuusa empya lw'ejja",
-          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
-          "bullet3": "Zikiriza kaadi yo eyonoonese empya bw'ejja"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kaadi yo ekkomeddwa okukulabirira",
-          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
-          "bullet3": "Kaadi yo enkadde ejja kusazibwamu ddala"
-        }
+        "shippingCost": "Bbeeyi y'okutwala"
       },
       "Status": {
         "title": "Kaadi yo empya eri mu kkubo!",
         "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
-        "buttonLabel": "Dashiboodi"
+        "buttonLabel": "Ddayo ku dashiboodi"
       },
       "title": "Kyusa kaadi",
       "errors": {
@@ -3656,24 +3653,7 @@
       "Shipping": {
         "title": "Saba kaadi yo ey'omubiri",
         "subtitle": "Funa kaadi yo eya Blink Visa ekutuuke ku ndagiriro yo.",
-        "registeredAddress": "Endagiriro eyateekebwa",
-        "useRegisteredAddress": "Kozesa endagiriro eyateekebwa ng'ey'okutwalirako",
-        "delivery": "Okutuusa",
-        "standardDelivery": "Okutuusa kwa bulijjo",
-        "expressDelivery": "Okutuusa kw'amangu",
-        "businessDays": "{day1}-{day2} ennaku z'emirimu",
-        "free": "BWERERE",
-        "deliveryInformation": "Obubaka ku kutuusa",
-        "bullet1": "Ojja kufuna ebikwata ku kulondoola ku email",
-        "bullet2": "Obubonero buyinza okwetaagisa wakati w'okutuusa",
-        "bullet3": "Kaadi erisindikibwa mu pakka etaboneka",
-        "bullet4": "Aktiva kaadi yo ng'etuuse",
-        "cardFeatures": "Ebintu ebiri ku kaadi",
-        "feature1": "Tekinologiya y'okusasula nga togukwata",
-        "feature2": "EMV chip olw'obukuumi obulungi",
-        "feature3": "Magnetic stripe olw'okukkirizibwa buli wansi",
-        "feature4": "Erinnya lyo liryanga ku kaadi",
-        "important": "Kikulu"
+        "delivery": "Okutuusa"
       },
       "Confirm": {
         "title": "Kakasa oda yo",
@@ -3684,12 +3664,7 @@
         "deliveryTime": "Obudde bw'okutuusa",
         "shippingCost": "Ebyetaagisa okutuusa",
         "shippingAddress": "Endagiriro y'okutuusa",
-        "placeOrder": "Teeka oda",
-        "important": "Kikulu",
-        "bullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
-        "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
-        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu",
-        "bullet4": "Endereesi y'okutumira tesobola kukyusibwa oluvannyuma lw'okuteeka ekiragiro"
+        "placeOrder": "Teeka oda"
       },
       "errors": {
         "createFailed": "Tekulemezeka kuteekawo kaadi yo eyiriimu. Gezaako nate."
