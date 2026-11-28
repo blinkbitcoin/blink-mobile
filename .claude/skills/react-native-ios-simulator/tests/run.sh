@@ -233,7 +233,7 @@ check "leaves another agent's process alone" "alive" \
 check "release without a claim fails loudly" "1" "$?"
 
 echo
-echo "24h retention"
+echo "72h retention"
 
 # --- default release keeps the device and stamps it for the reaper ----------
 reset_world
@@ -248,6 +248,30 @@ eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
 check "re-claim clears the released-at stamp" "absent" \
   "$([ -f "$DEMO_SESSION_DIR/released-at" ] && echo present || echo absent)"
 check "re-claim within the TTL reuses the kept device" "Booted" "$(device_state "$DEMO_UDID")"
+
+# --- the 72h default is real, not just documented ----------------------------
+# Every other retention test ages a stamp with `echo 1` (expired under ANY
+# ttl), so these two are the only assertions that notice the default silently
+# reverting to 24h (48h-old must survive) or drifting to forever (73h-old
+# must not).
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+echo $(( $(date +%s) - 48 * 3600 )) > "$DEMO_SESSION_DIR/released-at"
+"$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "a session released 48h ago survives the default TTL" "Shutdown" \
+  "$(device_state "$DEMO_UDID")"
+echo $(( $(date +%s) - 73 * 3600 )) > "$DEMO_SESSION_DIR/released-at"
+"$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "a session released 73h ago is reaped" "" "$(device_state "$DEMO_UDID")"
+
+# --- DEMO_SIM_TTL_HOURS still overrides the default --------------------------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+echo $(( $(date +%s) - 2 * 3600 )) > "$DEMO_SESSION_DIR/released-at"
+DEMO_SIM_TTL_HOURS=1 "$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "DEMO_SIM_TTL_HOURS=1 reaps a 2h-old session" "" "$(device_state "$DEMO_UDID")"
 
 # --- reaper removes only expired sessions -----------------------------------
 reset_world
@@ -455,9 +479,472 @@ check "reset without a port writes no defaults" "no" \
 "$SCRIPTS/release-session.sh" 622 --delete >/dev/null 2>&1
 
 echo
+echo "native-build staleness stamp (native-stamp.sh)"
+
+NS="$SCRIPTS/native-stamp.sh"
+NS_APP="$WORK/lock-app"; mkdir -p "$NS_APP/ios"
+echo "PODS v1" > "$NS_APP/ios/Podfile.lock"
+NS_STAMP="$WORK/native-stamp"
+echo "sha=abc" > "$NS_STAMP"
+
+(cd "$NS_APP" && "$NS" write "$NS_STAMP") >/dev/null 2>&1
+check "write records a podfile-lock-hash" "yes" \
+  "$(grep -q '^podfile-lock-hash=' "$NS_STAMP" && echo yes || echo no)"
+check "write preserves the stamp's other keys" "yes" \
+  "$(grep -q '^sha=abc' "$NS_STAMP" && echo yes || echo no)"
+
+(cd "$NS_APP" && "$NS" check "$NS_STAMP") >/dev/null 2>&1
+check "check passes while the lockfile is unchanged" "0" "$?"
+
+echo "PODS v2 - a native module renamed" > "$NS_APP/ios/Podfile.lock"
+out=$(cd "$NS_APP" && "$NS" check "$NS_STAMP" 2>&1); rc=$?
+check "check fails once the lockfile changed" "1" "$rc"
+check "the failure says STALE and names Podfile.lock" "yes" \
+  "$(echo "$out" | grep -q "STALE" && echo "$out" | grep -q "Podfile.lock" && echo yes || echo no)"
+
+(cd "$NS_APP" && "$NS" write "$NS_STAMP") >/dev/null 2>&1
+check "re-write replaces the hash line instead of stacking a second one" "1" \
+  "$(grep -c '^podfile-lock-hash=' "$NS_STAMP" | tr -d ' ')"
+
+# A stamp that cannot vouch for its build must fail, never pass vacuously.
+echo "sha=abc" > "$NS_STAMP"
+(cd "$NS_APP" && "$NS" check "$NS_STAMP") >/dev/null 2>&1
+check "a stamp without a hash demands a re-stamp" "1" "$?"
+
+"$NS" check "$NS_STAMP" --lockfile "$WORK/does-not-exist.lock" >/dev/null 2>&1
+check "a missing lockfile is a loud failure, not a pass" "1" "$?"
+
+echo
+echo "golden simulator (bless + clone)"
+
+# One world for the whole section: a golden is long-lived state by design.
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 700)" >/dev/null 2>&1
+BLESS_UDID="$DEMO_UDID"; BLESS_PORT="$DEMO_PORT"
+mkdir -p "$FAKE_APP_ROOT/$BLESS_UDID"
+cp -R "$APP_SRC" "$FAKE_APP_ROOT/$BLESS_UDID/com.example.demoapp.app"
+"$SCRIPTS/bless-golden.sh" 700 --sha abc123 >/dev/null 2>&1
+check "bless exits zero" "0" "$?"
+check "the blessed device carries the golden name" "rn-demo-golden" \
+  "$(awk -F'|' -v u="$BLESS_UDID" '$1==u {print $2}' "$FAKE_DEVICES")"
+check "the golden is left shutdown (clone requires it)" "Shutdown" \
+  "$(device_state "$BLESS_UDID")"
+GOLDEN_STAMP="$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp"
+check "the stamp records the build sha" "yes" \
+  "$(grep -q '^sha=abc123' "$GOLDEN_STAMP" && echo yes || echo no)"
+check "the stamp records the device type" "yes" \
+  "$(grep -q '^device-type=iPhone 16 Pro' "$GOLDEN_STAMP" && echo yes || echo no)"
+check "bless adopts the session - a later release finds nothing" "1" \
+  "$("$SCRIPTS/release-session.sh" 700 >/dev/null 2>&1; echo $?)"
+check "bless freed the session's port" "absent" \
+  "$([ -d "$DEMO_SIM_REGISTRY/ports/$BLESS_PORT" ] && echo present || echo absent)"
+
+# --- claim clones the golden instead of creating blank -----------------------
+out=$("$SCRIPTS/claim-session.sh" 701) && eval "$out"
+check "claim clones the golden's udid" "yes" \
+  "$(grep -q "clone $BLESS_UDID rn-demo-pr701" "$FAKE_ARGS_LOG" && echo yes || echo no)"
+check "the clone is named for the PR like any other session device" "Booted" \
+  "$(device_state "$DEMO_UDID")"
+check "the clone carries the golden's app container" "present" \
+  "$([ -d "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app" ] && echo present || echo absent)"
+check "claim output surfaces the golden stamp for staleness judgment" "yes" \
+  "$(echo "$out" | grep -q "sha=abc123" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 701 --delete >/dev/null 2>&1
+check "a cloned session releases cleanly" "0" "$?"
+check "releasing the clone leaves the golden alone" "Shutdown" \
+  "$(device_state "$BLESS_UDID")"
+
+# --- the Metro redirect is persisted on clones too ---------------------------
+: > "$FAKE_ARGS_LOG"
+eval "$(DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/claim-session.sh" 702)" >/dev/null 2>&1
+check "a cloned claim still persists the Metro redirect" "yes" \
+  "$(grep -q "spawn $DEMO_UDID defaults write com.example.demoapp RCT_jsLocation localhost:$DEMO_PORT" "$FAKE_ARGS_LOG" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 702 --delete >/dev/null 2>&1
+
+# --- every ineligibility falls back to a blank create ------------------------
+# The fake's clone verb errors on a booted source, so this cannot pass against
+# a clone that "succeeded" anyway.
+xcrun simctl boot "$BLESS_UDID"
+eval "$("$SCRIPTS/claim-session.sh" 703)" >/dev/null 2>&1
+check "a booted golden falls back to create" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr703/origin")"
+"$SCRIPTS/release-session.sh" 703 --delete >/dev/null 2>&1
+xcrun simctl shutdown "$BLESS_UDID"
+
+eval "$("$SCRIPTS/claim-session.sh" 704 "iPhone SE (3rd generation)")" >/dev/null 2>&1
+check "a device-type mismatch falls back to create (a clone would lie about hardware)" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr704/origin")"
+"$SCRIPTS/release-session.sh" 704 --delete >/dev/null 2>&1
+
+eval "$("$SCRIPTS/claim-session.sh" 705 "iPhone 16 Pro" "iOS 18.6")" >/dev/null 2>&1
+check "an explicit runtime mismatch falls back to create" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr705/origin")"
+"$SCRIPTS/release-session.sh" 705 --delete >/dev/null 2>&1
+
+eval "$(DEMO_SIM_GOLDEN=none "$SCRIPTS/claim-session.sh" 706)" >/dev/null 2>&1
+check "DEMO_SIM_GOLDEN=none disables cloning" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr706/origin")"
+"$SCRIPTS/release-session.sh" 706 --delete >/dev/null 2>&1
+
+# --- the reaper never touches the golden -------------------------------------
+# Including via a hostile session manifest pointing at the golden's udid: the
+# reaper's name gate must hold for the golden exactly as for the user's sim.
+eval "$("$SCRIPTS/claim-session.sh" 707)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 707 >/dev/null 2>&1
+echo 1 > "$DEMO_SIM_REGISTRY/rn-demo-pr707/released-at"
+echo "$BLESS_UDID" > "$DEMO_SIM_REGISTRY/rn-demo-pr707/udid"
+"$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "the reaper refuses a manifest pointing at the golden" "Shutdown" \
+  "$(device_state "$BLESS_UDID")"
+rm -rf "$DEMO_SIM_REGISTRY/rn-demo-pr707"
+
+# --- re-bless swaps atomically: exactly one golden survives ------------------
+out=$("$SCRIPTS/claim-session.sh" 708) && eval "$out"
+NEW_UDID="$DEMO_UDID"
+"$SCRIPTS/bless-golden.sh" 708 --sha def456 >/dev/null 2>&1
+check "re-bless exits zero" "0" "$?"
+check "exactly one device carries the golden name after a re-bless" "1" \
+  "$(awk -F'|' '$2=="rn-demo-golden"' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
+check "the new device is the golden now" "rn-demo-golden" \
+  "$(awk -F'|' -v u="$NEW_UDID" '$1==u {print $2}' "$FAKE_DEVICES")"
+check "the retired golden is deleted, not orphaned" "" \
+  "$(device_state "$BLESS_UDID")"
+check "the stamp now describes the new golden" "yes" \
+  "$(grep -q '^sha=def456' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+# --- a golden re-blessed while a claim waits on the lock is re-checked -------
+# The claim's eligibility check reads the stamp unlocked; if the golden is
+# swapped for different hardware before the claim gets the lock, the clone
+# must be judged by the stamp snapshotted WITH it - and refused. Isolated
+# world; the golden lock is held by a live sleeper, the stamp rewritten
+# underneath the waiting claim, then the sleeper dies.
+(
+  export DEMO_SIM_REGISTRY="$WORK/rebless-registry" FAKE_DEVICES="$WORK/rebless-devices.txt"
+  export WITH_LOCK_POLL_SECONDS=1
+  : > "$FAKE_DEVICES"
+  eval "$("$SCRIPTS/claim-session.sh" 730 2>/dev/null)"
+  "$SCRIPTS/bless-golden.sh" 730 --sha 1111 >/dev/null 2>&1
+  STAMP="$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp"
+  sleep 60 & HOLDER=$!
+  mkdir -p "$DEMO_SIM_REGISTRY/locks/golden"; echo "$HOLDER" > "$DEMO_SIM_REGISTRY/locks/golden/pid"
+  "$SCRIPTS/claim-session.sh" 731 > "$WORK/rebless-claim.out" 2> "$WORK/rebless-claim.err" &
+  CLAIM=$!
+  # The claim silences with-lock's stderr, so detect the blocked clone by its
+  # waiting with-lock process rather than by a message it never shows.
+  WAITED=no
+  for _ in $(seq 50); do pgrep -f "with-lock.sh golden 300" >/dev/null 2>&1 && { WAITED=yes; break; }; sleep 0.2; done
+  echo "waited=$WAITED"
+  sed -i '' 's/^device-type=.*/device-type=iPhone 15/' "$STAMP"
+  kill "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null
+  wait "$CLAIM"; echo "rc=$?"
+  echo "origin=$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr731/origin" 2>/dev/null)"
+  echo "snapshot=$([ -f "$DEMO_SIM_REGISTRY/rn-demo-pr731/golden-stamp" ] && echo kept || echo dropped)"
+  echo "clones=$(awk -F'|' '$2=="rn-demo-pr731"' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
+) > "$WORK/rebless.out" 2>/dev/null
+check "the claim was blocked on the golden lock when the golden changed" "yes" \
+  "$(sed -n 's/^waited=//p' "$WORK/rebless.out")"
+check "a claim racing a re-bless still succeeds" "yes" \
+  "$(grep -q '^rc=0' "$WORK/rebless.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/rebless.out"))")"
+check "it refuses the clone whose locked stamp no longer matches" "created" \
+  "$(sed -n 's/^origin=//p' "$WORK/rebless.out")"
+check "and keeps no stale golden snapshot" "dropped" "$(sed -n 's/^snapshot=//p' "$WORK/rebless.out")"
+check "leaving exactly one device for the session" "1" "$(sed -n 's/^clones=//p' "$WORK/rebless.out")"
+
+# --- a stamp that cannot be written aborts the swap before any rename --------
+(
+  export DEMO_SIM_REGISTRY="$WORK/stampfail-registry" FAKE_DEVICES="$WORK/stampfail-devices.txt"
+  : > "$FAKE_DEVICES"
+  eval "$("$SCRIPTS/claim-session.sh" 740 2>/dev/null)"; FIRST="$DEMO_UDID"
+  "$SCRIPTS/bless-golden.sh" 740 --sha aaaa >/dev/null 2>&1
+  eval "$("$SCRIPTS/claim-session.sh" 741 2>/dev/null)"; SECOND="$DEMO_UDID"
+  # stamp.new as a dangling symlink into a missing dir: the staging copy
+  # fails even for root, where a read-only chmod would not stop the write.
+  ln -s "$WORK/no-such-dir/stamp" "$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp.new"
+  "$SCRIPTS/bless-golden.sh" 741 --sha bbbb >/dev/null 2>&1; echo "rc=$?"
+  rm -f "$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp.new"
+  echo "golden=$(awk -F'|' '$2=="rn-demo-golden" {print $1}' "$FAKE_DEVICES" | tr '\n' ' ')"
+  echo "first=$FIRST"
+  echo "retired=$(awk -F'|' '$2 ~ /-retired$/' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
+  echo "stamp=$(sed -n 's/^sha=//p' "$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp")"
+) > "$WORK/stampfail.out" 2>/dev/null
+check "a re-bless whose stamp cannot be written fails" "yes" \
+  "$(grep -q '^rc=[1-9]' "$WORK/stampfail.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/stampfail.out"))")"
+check "and leaves the old golden and its stamp in place" "yes" \
+  "$(f=$(sed -n 's/^first=//p' "$WORK/stampfail.out"); grep -q "^golden=$f $" "$WORK/stampfail.out" && grep -q '^stamp=aaaa$' "$WORK/stampfail.out" && grep -q '^retired=0$' "$WORK/stampfail.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/stampfail.out"))")"
+
+# --- a bless that trips the collateral check still adopts its session ---------
+# The device is already the golden by then; a surviving manifest would point
+# at it and make every later release of this PR fail its ownership gate.
+# Isolated world: this test shuts down the user's simulator on purpose.
+(
+  export DEMO_SIM_REGISTRY="$WORK/collateral-registry" FAKE_DEVICES="$WORK/collateral-devices.txt"
+  printf 'USER-SIM|iPhone 16 Pro|Booted\n' > "$FAKE_DEVICES"
+  eval "$("$SCRIPTS/claim-session.sh" 720 2>/dev/null)"
+  xcrun simctl shutdown USER-SIM
+  "$SCRIPTS/bless-golden.sh" 720 --sha c0ffee >/dev/null 2>&1
+  echo "rc=$? session=$([ -d "$DEMO_SESSION_DIR" ] && echo kept || echo adopted) port=$([ -d "$DEMO_SIM_REGISTRY/ports/$DEMO_PORT" ] && echo held || echo freed)"
+) > "$WORK/collateral-bless.out" 2>/dev/null
+check "bless still fails loudly on collateral damage" "yes" \
+  "$(grep -q '^rc=1 ' "$WORK/collateral-bless.out" && echo yes || echo "no ($(cat "$WORK/collateral-bless.out"))")"
+check "a failed bless still adopts its session and frees its port" "yes" \
+  "$(grep -q 'session=adopted port=freed' "$WORK/collateral-bless.out" && echo yes || echo "no ($(cat "$WORK/collateral-bless.out"))")"
+
+# --- the stamp's lockfile hash gives claim an instant staleness verdict ------
+VERDICT_APP="$WORK/verdict-app"; mkdir -p "$VERDICT_APP/ios"
+echo "PODS blessed" > "$VERDICT_APP/ios/Podfile.lock"
+"$NS" write "$GOLDEN_STAMP" --lockfile "$VERDICT_APP/ios/Podfile.lock" >/dev/null 2>&1
+out=$(cd "$VERDICT_APP" && "$SCRIPTS/claim-session.sh" 709)
+check "claim reports a matching native build from the worktree root" "yes" \
+  "$(echo "$out" | grep -q "native build matches" && echo yes || echo no)"
+(cd "$VERDICT_APP" && "$SCRIPTS/release-session.sh" 709 --delete) >/dev/null 2>&1
+
+echo "PODS newer - native module changed" > "$VERDICT_APP/ios/Podfile.lock"
+out=$(cd "$VERDICT_APP" && "$SCRIPTS/claim-session.sh" 712)
+check "claim warns NATIVE BUILD STALE when the lockfile moved on" "yes" \
+  "$(echo "$out" | grep -q "NATIVE BUILD STALE" && echo yes || echo no)"
+(cd "$VERDICT_APP" && "$SCRIPTS/release-session.sh" 712 --delete) >/dev/null 2>&1
+
+# --- bless records the lockfile hash only for a build no older than it -------
+# simctl install keeps a build's mtimes, so the installed bundle dates the
+# build; the fake app's container mtime plays that role here.
+touch -t 202601010000 "$VERDICT_APP/ios/Podfile.lock"
+out=$("$SCRIPTS/claim-session.sh" 713) && eval "$out"
+mkdir -p "$FAKE_APP_ROOT/$DEMO_UDID"; cp -R "$APP_SRC" "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"
+touch -t 202602010000 "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"     # built after the lockfile
+DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/bless-golden.sh" 713 --sha bbb222 --lockfile "$VERDICT_APP/ios/Podfile.lock" >/dev/null 2>&1
+check "bless with a lockfile exits zero" "0" "$?"
+check "the blessed stamp carries the lockfile hash" "yes" \
+  "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+# An old install blessed from a newer worktree: the lockfile moved on after
+# the build, so the stamp must not vouch for it.
+out=$("$SCRIPTS/claim-session.sh" 714) && eval "$out"
+mkdir -p "$FAKE_APP_ROOT/$DEMO_UDID"; cp -R "$APP_SRC" "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"
+touch -t 202512010000 "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"     # built BEFORE the lockfile
+out=$(DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/bless-golden.sh" 714 --sha ccc333 --lockfile "$VERDICT_APP/ios/Podfile.lock" 2>&1)
+check "bless of an older build than the lockfile still succeeds" "0" "$?"
+check "but its stamp carries no lockfile hash" "no" \
+  "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
+check "and the bless says why" "yes" \
+  "$(echo "$out" | grep -q "changed after the installed build" && echo yes || echo no)"
+
+# A build bless cannot find cannot be vouched for either.
+out=$("$SCRIPTS/claim-session.sh" 715) && eval "$out"
+out=$("$SCRIPTS/bless-golden.sh" 715 --sha ddd444 --lockfile "$VERDICT_APP/ios/Podfile.lock" 2>&1)
+check "a bless that cannot date the build stamps no hash" "no" \
+  "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+echo
+echo "credential precheck"
+
+# The wall this removes: an agent discovering forty minutes into a session
+# that a required login credential was never set on this machine. Claim reports the gap
+# up front - and never blocks, because most demos need no account at all.
+reset_world
+export FAKE_CRED_PRESENT=some-value
+out=$(DEMO_REQUIRED_ENV="FAKE_CRED_PRESENT FAKE_CRED_ABSENT" "$SCRIPTS/claim-session.sh" 720); rc=$?
+check "a claim with missing credentials still succeeds" "0" "$rc"
+check "claim names each missing credential up front" "yes" \
+  "$(echo "$out" | grep "missing credentials" | grep -q "FAKE_CRED_ABSENT" && echo yes || echo no)"
+check "a present credential is not reported missing" "no" \
+  "$(echo "$out" | grep "missing credentials" | grep -q "FAKE_CRED_PRESENT" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 720 --delete >/dev/null 2>&1
+
+out=$(DEMO_REQUIRED_ENV="FAKE_CRED_PRESENT" "$SCRIPTS/claim-session.sh" 721)
+check "no note when every required credential is present" "no" \
+  "$(echo "$out" | grep -q "missing credentials" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 721 --delete >/dev/null 2>&1
+unset FAKE_CRED_PRESENT
+
+# --- bless safety gates ------------------------------------------------------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 710)" >/dev/null 2>&1
+echo "OTHER-AGENT" > "$DEMO_SESSION_DIR/udid"      # manifest points at someone else
+"$SCRIPTS/bless-golden.sh" 710 >/dev/null 2>&1
+check "bless refuses a device not named for the session" "1" "$?"
+check "the foreign device survives the refused bless" "Booted" \
+  "$(device_state OTHER-AGENT)"
+rm -rf "$DEMO_SIM_REGISTRY/rn-demo-pr710"
+
+"$SCRIPTS/bless-golden.sh" 9999 >/dev/null 2>&1
+check "bless without a claimed session fails loudly" "1" "$?"
+
+# The golden race window (a clone of a golden being swapped mid-bless) is
+# closed by the shared lock; these go red if either side sheds it.
+check "claim's clone step runs under the golden lock" "yes" \
+  "$(grep -q 'with-lock.sh" golden' "$SCRIPTS/claim-session.sh" && echo yes || echo no)"
+check "bless's swap runs under the golden lock" "yes" \
+  "$(grep -q 'with-lock.sh" golden' "$SCRIPTS/bless-golden.sh" && echo yes || echo no)"
+
+echo
+echo "shared metro transform cache (metro-demo.config.js)"
+
+DEMO_CFG="$SCRIPTS/metro-demo.config.js"
+
+# The probe loads the wrapper the way Metro would and reports what came out.
+# The stub store classes stand in for metro-cache, which the wrapper must only
+# ever receive through the function-form cacheStores - never require itself.
+cat > "$WORK/metro-probe.js" <<'EOF'
+const cfg = require(process.argv[2])
+const Stub = class { constructor(o) { this.root = o.root } }
+const stores = typeof cfg.cacheStores === "function"
+  ? cfg.cacheStores({ AutoCleanFileStore: Stub, FileStore: Stub })
+  : []
+console.log(JSON.stringify({
+  sourceExts: (cfg.resolver || {}).sourceExts || [],
+  transformerSentinel: (cfg.transformer || {}).sentinelField || "",
+  asyncRequireModulePath: (cfg.transformer || {}).asyncRequireModulePath || "",
+  storeCount: stores.length,
+  root: stores.length ? stores[0].root : "",
+}))
+EOF
+
+FAKE_APP="$WORK/fake-app"
+mkdir -p "$FAKE_APP"
+cat > "$FAKE_APP/metro.config.js" <<'EOF'
+module.exports = {
+  resolver: { sourceExts: ["ts", "tsx", "svg-sentinel"] },
+  transformer: {
+    sentinelField: "transformer-sentinel",
+    // Models what @react-native/metro-config really does: a require.resolve()d
+    // per-worktree ABSOLUTE path. Hashed into the global transform-cache key,
+    // it silently reduces cross-worktree sharing to zero.
+    asyncRequireModulePath: "/private/tmp/some-worktree/node_modules/metro-runtime/src/modules/asyncRequire",
+  },
+}
+EOF
+
+out=$(cd "$FAKE_APP" && DEMO_METRO_CACHE_ROOT="$WORK/cache-root" node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1)
+check "app config fields survive the demo wrapper" "yes" \
+  "$(echo "$out" | grep -q "svg-sentinel" && echo yes || echo no)"
+check "wrapper installs exactly one shared cache store" "yes" \
+  "$(echo "$out" | grep -q '"storeCount":1' && echo yes || echo no)"
+check "cache root honors DEMO_METRO_CACHE_ROOT" "yes" \
+  "$(echo "$out" | grep -qF "\"root\":\"$WORK/cache-root\"" && echo yes || echo no)"
+check "app transformer fields survive the wrapper" "yes" \
+  "$(echo "$out" | grep -q "transformer-sentinel" && echo yes || echo no)"
+# Verified live: with the app's absolute asyncRequireModulePath in the hashed
+# transformer config, cross-worktree sharing was exactly 0%; pinned to the bare
+# specifier, a second worktree's first bundle went from 39s to 4s.
+check "asyncRequireModulePath is pinned to the worktree-independent specifier" "yes" \
+  "$(echo "$out" | grep -q '"asyncRequireModulePath":"metro-runtime/src/modules/asyncRequire"' && echo yes || echo no)"
+
+# The fixture app deliberately has no node_modules: together with the loads
+# above this is what fails if anyone turns the function-form cacheStores into
+# a top-level require of metro-cache.
+check "fixture app carries no node_modules for the wrapper to lean on" "absent" \
+  "$([ -d "$FAKE_APP/node_modules" ] && echo present || echo absent)"
+
+out=$(cd "$FAKE_APP" && env -u DEMO_METRO_CACHE_ROOT node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1)
+check "default cache root expands to an absolute path under \$HOME" "yes" \
+  "$(echo "$out" | grep -qF "\"root\":\"$HOME/" && echo yes || echo no)"
+
+EMPTY_APP="$WORK/empty-app"
+mkdir -p "$EMPTY_APP"
+out=$(cd "$EMPTY_APP" && node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1); rc=$?
+check "wrapper fails loudly when cwd has no metro.config.js" "nonzero" \
+  "$([ "$rc" -ne 0 ] && echo nonzero || echo zero)"
+# Suffix match: node reports the symlink-resolved cwd (/private/var/...) while
+# bash's $WORK keeps the /var/... spelling on macOS.
+check "the failure names the missing config path" "yes" \
+  "$(echo "$out" | grep -qF "empty-app/metro.config.js" && echo yes || echo no)"
+
+FN_APP="$WORK/fn-app"
+mkdir -p "$FN_APP"
+echo "module.exports = () => ({})" > "$FN_APP/metro.config.js"
+out=$(cd "$FN_APP" && node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1); rc=$?
+check "wrapper refuses a function-form app config rather than dropping it" "nonzero" \
+  "$([ "$rc" -ne 0 ] && echo nonzero || echo zero)"
+check "the refusal says object-form only" "yes" \
+  "$(echo "$out" | grep -qi "object" && echo yes || echo no)"
+
+echo
+echo "js reload flip (reload-app.sh)"
+
+# One fake dev server per scenario: fresh port, fresh observation log.
+start_ws_fake() { # start_ws_fake <mode>; sets WS_PORT, WS_LOG, WS_PID
+  WS_LOG="$WORK/ws-$1.log"; : > "$WS_LOG"
+  rm -f "$WORK/ws-port"
+  FAKE_WS_MODE="$1" FAKE_WS_LOG="$WS_LOG" FAKE_WS_PORT_FILE="$WORK/ws-port" \
+    python3 "$TESTS_DIR/fixtures/ws-fake.py" &
+  WS_PID=$!; STRAYS+=($WS_PID); disown $WS_PID 2>/dev/null
+  for _ in $(seq 50); do [ -s "$WORK/ws-port" ] && break; sleep 0.1; done
+  WS_PORT=$(cat "$WORK/ws-port" 2>/dev/null || echo "")
+}
+
+# --- happy path: broadcast on /message, confirmation via /events -------------
+start_ws_fake bundle-done
+"$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 10 >/dev/null 2>&1
+check "reload exits zero once bundle activity is observed" "0" "$?"
+check "the broadcast lands on /message after a real handshake" "yes" \
+  "$(grep -q "^connect /message" "$WS_LOG" && echo yes || echo no)"
+check "the confirmation listener opens /events" "yes" \
+  "$(grep -q "^connect /events" "$WS_LOG" && echo yes || echo no)"
+FRAME=$(grep "^frame path=/message" "$WS_LOG" | head -1)
+check "payload is the version-2 reload method" "yes" \
+  "$(echo "$FRAME" | grep -q '"method": "reload"' && echo "$FRAME" | grep -q '"version": 2' && echo yes || echo no)"
+check "payload carries no id/target (broadcast, not a directed request)" "yes" \
+  "$(echo "$FRAME" | grep -qv '"id"' && echo "$FRAME" | grep -qv '"target"' && echo yes || echo no)"
+check "the client frame is masked as RFC 6455 requires" "yes" \
+  "$(echo "$FRAME" | grep -q "masked=1" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+# --- no app connected: the silent-no-op broadcast must not report success ----
+# This is the assertion that dies if the /events wait is ever skipped: a
+# fire-and-forget mutant exits 0 here and ships identical before/after pairs.
+start_ws_fake silent
+out=$("$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 3 2>&1); rc=$?
+check "no bundle activity within the timeout fails the reload" "1" "$rc"
+check "the failure points at the terminate+launch fallback" "yes" \
+  "$(echo "$out" | grep -qi "terminate" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+# --- a broken bundle is a failure, not a confirmed flip ----------------------
+start_ws_fake bundle-fail
+out=$("$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 10 2>&1); rc=$?
+check "a failed bundle build fails the reload" "1" "$rc"
+kill "$WS_PID" 2>/dev/null
+
+# --- --no-wait is explicit fire-and-forget -----------------------------------
+start_ws_fake silent
+"$SCRIPTS/reload-app.sh" --port "$WS_PORT" --no-wait >/dev/null 2>&1
+check "--no-wait fires the broadcast and exits zero unconfirmed" "0" "$?"
+check "--no-wait still delivered the reload frame" "yes" \
+  "$(for _ in $(seq 20); do grep -q "reload" "$WS_LOG" && break; sleep 0.1; done; grep -q "reload" "$WS_LOG" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+# --- dead port and missing port fail fast, never hang ------------------------
+FREE_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
+"$SCRIPTS/reload-app.sh" --port "$FREE_PORT" --timeout 3 >/dev/null 2>&1
+check "nothing listening on the port is an immediate failure" "1" "$?"
+
+out=$(DEMO_PORT= "$SCRIPTS/reload-app.sh" 2>&1); rc=$?
+check "reload refuses to run without a port" "1" "$rc"
+check "the refusal names the 8081 hazard" "yes" \
+  "$(echo "$out" | grep -q "8081" && echo yes || echo no)"
+
+echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md documents the reload flip" "yes" \
+  "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the golden bless workflow" "yes" \
+  "$(grep -q "bless-golden.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md ties golden staleness to the stamp sha" "yes" \
+  "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the native-stamp verdict" "yes" \
+  "$(grep -q "native-stamp.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the credential precheck" "yes" \
+  "$(grep -q "DEMO_REQUIRED_ENV" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the 72h retention default" "yes" \
+  "$(grep -q "72h" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md carries no stale 24h default" "no" \
+  "$(grep -q "24h" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md step 4 starts Metro with the demo cache config" "yes" \
+  "$(grep -q "metro-demo.config.js" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md forbids --reset-cache against the shared store" "yes" \
+  "$(grep -q -- "--reset-cache" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md carries no BLINK_ residue" "no" \
   "$(grep -q "BLINK_" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents reset-app.sh for reinstall state" "yes" \

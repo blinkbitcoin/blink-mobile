@@ -9,7 +9,7 @@
 # Usage: release-session.sh <pr-number> [--delete]
 #   default leaves the simulator shut down but present (cheap to re-use for
 #           retakes); reap-stale.sh removes it automatically once it has sat
-#           released for DEMO_SIM_TTL_HOURS (default 24h)
+#           released for DEMO_SIM_TTL_HOURS (default 72h)
 #   --delete removes it immediately
 
 set -euo pipefail
@@ -73,10 +73,10 @@ if [ -n "$UDID" ]; then
     xcrun simctl delete "$UDID"
     echo "deleted $EXPECTED_NAME ($UDID)"
   else
-    # Stamp for the reaper: kept for DEMO_SIM_TTL_HOURS (default 24h) so
+    # Stamp for the reaper: kept for DEMO_SIM_TTL_HOURS (default 72h) so
     # retakes are cheap, then reap-stale.sh removes it on a later claim/release.
     date +%s > "$SESSION_DIR/released-at"
-    echo "shut down $EXPECTED_NAME ($UDID), kept for ${DEMO_SIM_TTL_HOURS:-24}h"
+    echo "shut down $EXPECTED_NAME ($UDID), kept for ${DEMO_SIM_TTL_HOURS:-72}h"
   fi
 fi
 

@@ -357,6 +357,8 @@ check "SKILL.md carries no BLINK_ residue" "no" \
   "$(grep -q "BLINK_" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md warns clearState wipes the persisted redirect" "yes" \
   "$(grep -i "clearState" "$SKILL_MD" | grep -qi "redirect\|RCT_jsLocation\|8081" && echo yes || echo no)"
+check "SKILL.md before/after section uses the reload flip for JS-only changes" "yes" \
+  "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md teaches the launchApp arguments form" "yes" \
   "$(grep -q "RCT_jsLocation" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md requires eyeballing extracted frames before publishing" "yes" \
