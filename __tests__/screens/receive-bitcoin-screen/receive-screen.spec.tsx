@@ -63,6 +63,7 @@ jest.mock("@app/screens/receive-bitcoin-screen/hooks", () => ({
   useDisplayPaymentRequest: jest.fn(() => ({})),
   useNfcReceive: jest.fn(() => ({})),
   useOnchainResolver: jest.fn(() => ({})),
+  usePaidDismiss: jest.fn(() => ({ completed: false, converting: false })),
   usePaymentRequest: () => mockUsePaymentRequest(),
   useReceiveCarousel: jest.fn(() => ({ items: [], setIndex: jest.fn() })),
   useReceiveFlow: jest.fn(() => ({})),
@@ -88,10 +89,6 @@ jest.mock("@app/hooks", () => ({
         currencyCode: toCurrency,
       }),
     },
-}))
-
-jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => ({
-  withMyLnUpdateSub: (Comp: unknown) => Comp,
 }))
 
 jest.mock("@app/screens/receive-bitcoin-screen/qr-view", () => ({

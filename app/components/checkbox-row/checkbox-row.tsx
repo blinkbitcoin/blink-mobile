@@ -23,6 +23,12 @@ type CheckboxRowProps = {
   centered?: boolean
   disabled?: boolean
   testID?: string
+  /** For a coloured ground: border, label and checked fill. Defaults to the theme's. */
+  color?: string
+  /** The tick's colour on a `color` fill. Defaults to the theme's text-on-accent. */
+  checkColor?: string
+  /** Keeps the label on one line. Translations are written to fit; this is the guard. */
+  singleLine?: boolean
   /** The space between the box and its label. */
   gap?: number
   labelLineHeight?: number
@@ -56,6 +62,9 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   centered,
   disabled,
   testID,
+  color,
+  checkColor,
+  singleLine,
   gap = DEFAULT_GAP,
   labelLineHeight = DEFAULT_LABEL_LINE_HEIGHT,
 }) => {
@@ -70,10 +79,24 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
     centered && styles.centered,
     disabled && styles.disabled,
   ]
-  const labelStyle = [styles.label, centered && styles.labelCentered]
+  const labelStyle = [
+    styles.label,
+    centered && styles.labelCentered,
+    singleLine && styles.labelSingleLine,
+    color ? { color } : undefined,
+  ]
   const box = (
-    <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-      {isChecked && <GaloyIcon name="check" size={14} color={colors.textOnAccent} />}
+    <View
+      style={[
+        styles.checkbox,
+        isChecked && styles.checkboxChecked,
+        color ? { borderColor: color } : undefined,
+        color && isChecked ? { backgroundColor: color } : undefined,
+      ]}
+    >
+      {isChecked && (
+        <GaloyIcon name="check" size={14} color={checkColor ?? colors.textOnAccent} />
+      )}
     </View>
   )
 
@@ -111,7 +134,13 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       testID={testID}
     >
       {box}
-      <Text style={labelStyle}>{label}</Text>
+      <Text
+        style={labelStyle}
+        numberOfLines={singleLine ? 1 : undefined}
+        adjustsFontSizeToFit={singleLine}
+      >
+        {label}
+      </Text>
     </Pressable>
   )
 }
@@ -147,6 +176,9 @@ const useStyles = makeStyles(({ colors }, { gap, labelLineHeight }: StyleProps) 
   },
   labelCentered: {
     flex: 0,
+  },
+  labelSingleLine: {
+    flexShrink: 1,
   },
   disabled: {
     opacity: 0.5,

@@ -22,6 +22,10 @@ type SuccessGlowProps = {
   centerY: number
   /** Radius at full bloom. */
   radius: number
+  /** Overrides for a coloured ground (Received): the clear middle and the rim. Default to
+   *  the screen's ground and `grey6`. */
+  innerColor?: string
+  rimColor?: string
 }
 
 /**
@@ -39,8 +43,10 @@ const SuccessGlowBase: React.FC<SuccessGlowProps> = ({
   centerX,
   centerY,
   radius,
+  innerColor,
+  rimColor,
 }) => {
-  const styles = useStyles()
+  const styles = useStyles({ innerColor, rimColor })
 
   const bloomStyle = useAnimatedStyle(
     () => ({ transform: [{ scale: Math.max(progress.value, MIN_SCALE) }] }),
@@ -66,14 +72,20 @@ const SuccessGlowBase: React.FC<SuccessGlowProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
-  bloom: {
-    position: "absolute",
-    // React Native names its gradient style this way; it is not ours to rename.
-    // eslint-disable-next-line camelcase
-    experimental_backgroundImage: `radial-gradient(circle farthest-corner, ${colors.backgroundDefault} 0%, ${colors.backgroundDefault} ${percent(CLEAR_STOP * RIM_STOP)}, ${colors.surfacePressed} ${percent(RIM_STOP)}, transparent ${percent(RIM_STOP)})`,
-  },
-}))
+type GlowColors = Pick<SuccessGlowProps, "innerColor" | "rimColor">
+
+const useStyles = makeStyles(({ colors }, { innerColor, rimColor }: GlowColors) => {
+  const inner = innerColor ?? colors.backgroundDefault
+  const rim = rimColor ?? colors.surfacePressed
+  return {
+    bloom: {
+      position: "absolute",
+      // React Native names its gradient style this way; it is not ours to rename.
+      // eslint-disable-next-line camelcase
+      experimental_backgroundImage: `radial-gradient(circle farthest-corner, ${inner} 0%, ${inner} ${percent(CLEAR_STOP * RIM_STOP)}, ${rim} ${percent(RIM_STOP)}, transparent ${percent(RIM_STOP)})`,
+    },
+  }
+})
 
 /** Memoised so a parent re-render mid-bloom (a balance sync landing) does not rebuild the
  *  gradient. */

@@ -1,4 +1,5 @@
 import * as React from "react"
+import { TextInput } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
@@ -17,6 +18,13 @@ import { ListItem, makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
+import { radius } from "@app/rne-theme/radius"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+import {
+  toastSplashSetting,
+  useSplashSettings,
+} from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/use-splash-settings"
+import { logIncomingTransactionSplashOptedOut } from "@app/utils/analytics"
 import { SettingsGroup } from "./group"
 
 gql`
@@ -231,17 +239,141 @@ export const NotificationSettingsScreen: React.FC = () => {
   return (
     <Screen style={styles.container} preset="scroll">
       <SettingsGroup items={pushNotificationSettings} />
+      <SettingsGroup
+        name={LL.NotificationSettingsScreen.splashGroup()}
+        items={[SplashToggleRow, SplashMinimumRow]}
+      />
     </Screen>
+  )
+}
+
+export const SplashToggleRow: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const { enabled, setEnabled } = useSplashSettings()
+
+  return (
+    <ListItem containerStyle={styles.listItemContainer}>
+      <GaloyIcon name="receive" size={24} />
+      <ListItem.Content>
+        <ListItem.Title>
+          <Text type="p2">
+            {LL.NotificationSettingsScreen.incomingTransactionSplash()}
+          </Text>
+        </ListItem.Title>
+      </ListItem.Content>
+      <Switch
+        value={enabled}
+        onValueChange={(value) => {
+          setEnabled(value)
+          toastSplashSetting({ enabled: value, LL })
+          if (!value) logIncomingTransactionSplashOptedOut({ source: "settings" })
+        }}
+      />
+    </ListItem>
+  )
+}
+
+/** A whole number of sats, or null for text that is not one. */
+const toMinimum = (text: string): number | null => {
+  const value = Number.parseInt(text, 10)
+  return Number.isFinite(value) && value >= 0 ? value : null
+}
+
+/** `SettingsGroup` also calls each row as a plain function to drop the null ones, so
+ *  these hooks run as the group's own too. Every hook must come before the early return. */
+export const SplashMinimumRow: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const { enabled, minSats, setMinSats } = useSplashSettings()
+  const [draft, setDraft] = React.useState(String(minSats))
+  /** The text when the field took focus, or null while it has none. */
+  const focusedDraft = React.useRef<string | null>(null)
+
+  /** Remote config can resolve after the screen opens: follow it, but never over a
+   *  value being typed, and never by writing it back as the user's own. */
+  React.useEffect(() => {
+    if (focusedDraft.current === null) setDraft(String(minSats))
+  }, [minSats])
+
+  /** Leaving the screen mid-edit (Android back) unmounts the field before its end-editing
+   *  event reaches it: what was typed is saved here instead of lost. */
+  const latest = React.useRef({ draft, minSats, setMinSats })
+  latest.current = { draft, minSats, setMinSats }
+  React.useEffect(
+    () => () => {
+      const started = focusedDraft.current
+      const { draft: typed, minSats: saved, setMinSats: save } = latest.current
+      if (started === null || typed === started) return
+      const value = toMinimum(typed)
+      if (value !== null && value !== saved) save(value)
+    },
+    [],
+  )
+
+  const commit = () => {
+    const untouched = draft === focusedDraft.current
+    focusedDraft.current = null
+    /** Focused and left as it was: whatever remote config settled on in between stands. */
+    if (untouched) {
+      setDraft(String(minSats))
+      return
+    }
+    const value = toMinimum(draft)
+    if (value !== null) {
+      if (value !== minSats) setMinSats(value)
+      return
+    }
+    setDraft(String(minSats))
+  }
+
+  if (!enabled) return null
+
+  return (
+    <ListItem containerStyle={styles.listItemContainer}>
+      <ListItem.Content>
+        <ListItem.Title>
+          <Text type="p2">{LL.NotificationSettingsScreen.splashMinimum()}</Text>
+        </ListItem.Title>
+      </ListItem.Content>
+      <TextInput
+        style={styles.minimumInput}
+        value={draft}
+        onChangeText={setDraft}
+        onFocus={() => {
+          focusedDraft.current = draft
+        }}
+        onEndEditing={commit}
+        keyboardType="number-pad"
+        returnKeyType="done"
+        selectTextOnFocus
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+        /* The title beside it is a sibling: without a name of its own the field reads
+           as a bare number. */
+        accessibilityLabel={LL.NotificationSettingsScreen.splashMinimum()}
+      />
+    </ListItem>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     paddingVertical: 20,
+    gap: 20,
   },
   listItemContainer: {
     backgroundColor: colors.transparent,
+  },
+  minimumInput: {
+    minWidth: 72,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: radius.default,
+    backgroundColor: colors.surfaceInteractive,
+    color: colors.textOnBackground,
+    fontSize: 16,
+    textAlign: "right",
   },
 }))
 
