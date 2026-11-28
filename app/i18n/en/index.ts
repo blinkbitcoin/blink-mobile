@@ -3684,6 +3684,12 @@ const en: BaseTranslation = {
         skip: "Skip top-up",
       },
     },
+    CardBalanceTransfer: {
+      waitAndRetry: "Please wait {seconds: number} seconds and try again.",
+      tooManyPending: "You have too many top-ups waiting. Try again later.",
+      insufficient: "Your Card Balance doesn't cover this amount.",
+      inReview: "We're checking this transfer. Contact support if it doesn't arrive soon.",
+    },
     ShippingAddress: {
       title: "Shipping address",
       firstName: "First name",

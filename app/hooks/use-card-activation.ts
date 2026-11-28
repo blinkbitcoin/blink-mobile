@@ -73,6 +73,28 @@ type LearnedFacts = Partial<
 >
 type OrderPlacedParams = RootStackParamList["cardStatusScreen"]
 
+/** A screen opened over the dashboard once the activation is complete, with the params
+ *  its route takes. */
+export type ActivationThen = {
+  [Name in keyof RootStackParamList]: undefined extends RootStackParamList[Name]
+    ? { name: Name; params?: RootStackParamList[Name] }
+    : { name: Name; params: RootStackParamList[Name] }
+}[keyof RootStackParamList]
+
+/** A route shown to a member at a place of the flow, and what opens over it. */
+type ShownRoute = {
+  route: FlowRoute
+  place: ActivationPlace
+  facts: CardActivationFacts
+  then?: FlowRoute
+}
+
+type CompleteOptions = {
+  /** The way the member chose to go on with: opened over the dashboard, so leaving it
+   *  lands on the dashboard. */
+  then?: ActivationThen
+}
+
 /** The facts of a member whose activation has started. Cards come newest first, the
  *  order the rest of the app reads them in, so the first is the card it shows. */
 const activationFacts = (
@@ -154,13 +176,10 @@ export const useCardActivation = ({
     })
 
   const show = useCallback(
-    (route: FlowRoute, routePlace: ActivationPlace, routeFacts: CardActivationFacts) => {
+    ({ then, ...destination }: ShownRoute) => {
       navigation.dispatch((state) => {
-        const routes = routesTo<FlowRoute>(state.routes, {
-          route,
-          place: routePlace,
-          facts: routeFacts,
-        })
+        const flowRoutes = routesTo<FlowRoute>(state.routes, destination)
+        const routes = then ? [...flowRoutes, then] : flowRoutes
         return CommonActions.reset({ ...state, routes, index: routes.length - 1 })
       })
     },
@@ -168,8 +187,13 @@ export const useCardActivation = ({
   )
 
   const showPlace = useCallback(
-    (routePlace: ActivationPlace, routeFacts: CardActivationFacts) => {
-      show({ name: activationScreen(routePlace, routeFacts) }, routePlace, routeFacts)
+    (routePlace: ActivationPlace, routeFacts: CardActivationFacts, then?: FlowRoute) => {
+      show({
+        route: { name: activationScreen(routePlace, routeFacts) },
+        place: routePlace,
+        facts: routeFacts,
+        then,
+      })
     },
     [show],
   )
@@ -218,7 +242,11 @@ export const useCardActivation = ({
         return
       }
       const nextFacts = { ...facts, hasPhysicalCard: true, isPinSet: false }
-      show({ name: "cardStatusScreen", params }, CardActivationStep.Pin, nextFacts)
+      show({
+        route: { name: "cardStatusScreen", params },
+        place: CardActivationStep.Pin,
+        facts: nextFacts,
+      })
     },
     [facts, navigation, show],
   )
@@ -226,7 +254,7 @@ export const useCardActivation = ({
   /** One completion at a time: a second tap before the first answers would land the
    *  member on the dashboard twice. */
   const complete = useCallback(
-    () =>
+    ({ then }: CompleteOptions = {}) =>
       run(async () => {
         try {
           await completeActivation()
@@ -237,9 +265,10 @@ export const useCardActivation = ({
         }
         if (!facts) {
           navigation.replace("cardDashboardScreen")
+          if (then) navigation.navigate(then)
           return
         }
-        showPlace(ACTIVATION_DONE, facts)
+        showPlace(ACTIVATION_DONE, facts, then)
       }),
     [run, completeActivation, facts, navigation, showPlace, LL],
   )

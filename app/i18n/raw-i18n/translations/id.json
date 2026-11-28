@@ -3526,6 +3526,12 @@
         "skip": "Lewati isi ulang"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Harap tunggu {seconds} detik lalu coba lagi.",
+      "tooManyPending": "Terlalu banyak isi ulang yang menunggu. Coba lagi nanti.",
+      "insufficient": "Saldo kartu Anda tidak mencukupi jumlah ini.",
+      "inReview": "Kami sedang memeriksa transfer ini. Hubungi dukungan jika belum tiba dalam waktu dekat."
+    },
     "ShippingAddress": {
       "title": "Alamat pengiriman",
       "firstName": "Nama depan",

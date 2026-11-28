@@ -3526,6 +3526,12 @@
         "skip": "Opwaarderen overslaan"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Wacht {seconds} seconden en probeer het opnieuw.",
+      "tooManyPending": "Je hebt te veel opwaarderingen in afwachting. Probeer het later opnieuw.",
+      "insufficient": "Je kaarttegoed dekt dit bedrag niet.",
+      "inReview": "We controleren deze overboeking. Neem contact op met support als die niet snel aankomt."
+    },
     "ShippingAddress": {
       "title": "Verzendadres",
       "firstName": "Voornaam",

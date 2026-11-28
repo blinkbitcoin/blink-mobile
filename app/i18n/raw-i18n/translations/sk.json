@@ -3526,6 +3526,12 @@
         "skip": "Preskočiť dobitie"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Počkajte {seconds} sekúnd a skúste to znova.",
+      "tooManyPending": "Máte príliš veľa čakajúcich dobití. Skúste to neskôr.",
+      "insufficient": "Zostatok karty nepokryje túto sumu.",
+      "inReview": "Tento prevod kontrolujeme. Ak čoskoro nepríde, kontaktujte podporu."
+    },
     "ShippingAddress": {
       "title": "Doručovacia adresa",
       "firstName": "Meno",

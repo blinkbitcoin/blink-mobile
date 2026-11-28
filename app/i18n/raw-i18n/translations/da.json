@@ -3526,6 +3526,12 @@
         "skip": "Spring opfyldning over"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Vent venligst {seconds} sekunder, og prøv igen.",
+      "tooManyPending": "Du har for mange opfyldninger, der venter. Prøv igen senere.",
+      "insufficient": "Din kortsaldo dækker ikke dette beløb.",
+      "inReview": "Vi tjekker denne overførsel. Kontakt support, hvis den ikke kommer snart."
+    },
     "ShippingAddress": {
       "title": "Leveringsadresse",
       "firstName": "Fornavn",

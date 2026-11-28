@@ -3526,6 +3526,12 @@
                 "skip": "Passer la recharge"
             }
         },
+        "CardBalanceTransfer": {
+            "waitAndRetry": "Veuillez patienter {seconds} secondes et réessayer.",
+            "tooManyPending": "Vous avez trop de recharges en attente. Réessayez plus tard.",
+            "insufficient": "Le solde de votre carte ne couvre pas ce montant.",
+            "inReview": "Nous vérifions ce transfert. Contactez le support s’il n’arrive pas bientôt."
+        },
         "ShippingAddress": {
             "title": "Adresse de livraison",
             "firstName": "Prénom",

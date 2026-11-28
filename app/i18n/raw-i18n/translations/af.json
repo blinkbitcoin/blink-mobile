@@ -3526,6 +3526,12 @@
         "skip": "Slaan oplaai oor"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Wag asseblief {seconds} sekondes en probeer weer.",
+      "tooManyPending": "Jy het te veel aanvullings wat wag. Probeer later weer.",
+      "insufficient": "Jou kaartsaldo dek nie hierdie bedrag nie.",
+      "inReview": "Ons kontroleer hierdie oordrag. Kontak ondersteuning as dit nie gou aankom nie."
+    },
     "ShippingAddress": {
       "title": "Afleweringsadres",
       "firstName": "Voornaam",

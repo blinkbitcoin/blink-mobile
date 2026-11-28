@@ -3526,6 +3526,12 @@
         "skip": "Buuka okuteekako"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Tusaba olinde sekonda {seconds} oddemu ogezeeko.",
+      "tooManyPending": "Olina okujjuzaamu kungi nnyo okulindiridde. Ddamu ogezeeko oluvannyuma.",
+      "insufficient": "Bbalansi ya kaadi yo tetuuka ku ssente zino.",
+      "inReview": "Tukyeekenneenya okuweereza kuno. Tuukirira obuyambi bwe kutatuuka mangu."
+    },
     "ShippingAddress": {
       "title": "Endagiriro y'okutumira",
       "firstName": "Erinnya ery'omu maaso",

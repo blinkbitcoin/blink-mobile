@@ -3526,6 +3526,12 @@
         "skip": "Feltöltés kihagyása"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Kérjük, várj {seconds} másodpercet, és próbáld újra.",
+      "tooManyPending": "Túl sok feltöltésed vár. Próbáld újra később.",
+      "insufficient": "A kártyaegyenleged nem fedezi ezt az összeget.",
+      "inReview": "Ellenőrizzük ezt az átutalást. Ha hamarosan nem érkezik meg, fordulj az ügyfélszolgálathoz."
+    },
     "ShippingAddress": {
       "title": "Szállítási cím",
       "firstName": "Keresztnév",

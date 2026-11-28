@@ -3526,6 +3526,12 @@
         "skip": "Tsiba ukufaka imali"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Nceda ulinde imizuzwana eyi-{seconds} uze uzame kwakhona.",
+      "tooManyPending": "Uneentlawulo ezininzi kakhulu zokongeza ezilindileyo. Zama kwakhona kamva.",
+      "insufficient": "Ibhalansi yekhadi lakho ayiyigqumi le mali.",
+      "inReview": "Siyayihlola le ntlawulo. Qhagamshelana nenkxaso ukuba ayifiki kungekudala."
+    },
     "ShippingAddress": {
       "title": "Idilesi yokuthumela",
       "firstName": "Igama lokuqala",

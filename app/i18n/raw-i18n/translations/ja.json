@@ -3526,6 +3526,12 @@
                 "skip": "チャージをスキップ"
             }
         },
+        "CardBalanceTransfer": {
+            "waitAndRetry": "{seconds}秒待ってから、もう一度お試しください。",
+            "tooManyPending": "保留中のチャージが多すぎます。後でもう一度お試しください。",
+            "insufficient": "カード残高がこの金額に足りません。",
+            "inReview": "この送金を確認しています。まもなく届かない場合は、サポートにお問い合わせください。"
+        },
         "ShippingAddress": {
             "title": "配送先住所",
             "firstName": "名",
