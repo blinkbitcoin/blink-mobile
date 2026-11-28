@@ -118,6 +118,13 @@ jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
 
+const mockShowOrderPlaced = jest.fn()
+const mockUseCardActivation = jest.fn()
+jest.mock("@app/hooks/use-card-activation", () => ({
+  useCardActivation: (options?: Record<string, unknown>) =>
+    mockUseCardActivation(options),
+}))
+
 const mockUseShippingAddressData = jest.fn()
 jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
   useShippingAddressData: () => mockUseShippingAddressData(),
@@ -168,6 +175,10 @@ describe("OrderCardScreen", () => {
       loading: false,
       error: undefined,
       refetch: jest.fn(),
+    })
+    mockUseCardActivation.mockReturnValue({
+      isPending: false,
+      showOrderPlaced: mockShowOrderPlaced,
     })
     mockUseShippingAddressData.mockReturnValue({
       initialAddress: mockAddress,
@@ -369,6 +380,40 @@ describe("OrderCardScreen", () => {
       })
     })
 
+    it("hands the confirmation to the card activation while it runs", async () => {
+      mockUseCardActivation.mockReturnValue({
+        isPending: true,
+        showOrderPlaced: mockShowOrderPlaced,
+      })
+      const { getByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      await advanceToStep2(getByText)
+
+      await act(async () => {
+        fireEvent.press(getByText("Place order"))
+      })
+
+      expect(mockShowOrderPlaced).toHaveBeenCalledWith({
+        title: "Your physical card is on the way!",
+        subtitle: "Order for delivery of your Blink Card has been submitted.",
+        buttonLabel: "Create PIN",
+        navigateTo: "cardCreatePinScreen",
+        iconName: "delivery",
+        iconColor: expect.any(String),
+        isWalletPrimary: true,
+        lastFour: "1234",
+        cardId: "new-card",
+      })
+      expect(mockReplace).not.toHaveBeenCalled()
+      expect(mockUseCardActivation).toHaveBeenCalledWith(undefined)
+    })
+
     it("does not navigate when createCard fails", async () => {
       mockCreateCard.mockResolvedValue(null)
 
@@ -388,6 +433,7 @@ describe("OrderCardScreen", () => {
 
       expect(mockCreateCard).toHaveBeenCalled()
       expect(mockReplace).not.toHaveBeenCalled()
+      expect(mockShowOrderPlaced).not.toHaveBeenCalled()
     })
   })
 

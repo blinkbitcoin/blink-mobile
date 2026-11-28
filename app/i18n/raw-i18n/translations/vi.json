@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Chúc mừng!",
         "subtitle": "Thẻ Blink Visa của bạn đã được kích hoạt.",
-        "buttonLabel": "Đặt thẻ vật lý",
-        "buttonLabelDashboard": "Bảng điều khiển"
+        "buttonLabel": "Đặt thẻ vật lý"
       },
       "PhysicalCardOrdered": {
         "title": "Thẻ vật lý của bạn đang trên đường!",
         "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
         "buttonLabel": "Tạo PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Bỏ qua lúc này",
+      "OrderOffer": {
+        "subtitle": "Nhận Blink Card của bạn tại bất kỳ địa chỉ nào bạn chọn."
+      },
+      "TopUp": {
+        "title": "Nạp tiền vào thẻ của bạn",
+        "subtitle": "Nạp tiền ngay bây giờ hoặc sau.",
+        "fromBalance": "Từ số dư Bitcoin hoặc Đô la của bạn",
+        "deposit": "Nạp vào số dư thẻ của bạn",
+        "topUpNow": "Nạp tiền ngay",
+        "skip": "Bỏ qua nạp tiền"
       }
     },
     "ShippingAddress": {

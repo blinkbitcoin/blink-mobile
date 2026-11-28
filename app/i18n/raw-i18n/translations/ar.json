@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "تهانينا!",
         "subtitle": "تم تفعيل بطاقة Blink Visa الخاصة بك.",
-        "buttonLabel": "اطلب البطاقة الفعلية",
-        "buttonLabelDashboard": "لوحة التحكم"
+        "buttonLabel": "اطلب البطاقة الفعلية"
       },
       "PhysicalCardOrdered": {
         "title": "بطاقتك الفعلية في الطريق!",
         "subtitle": "تم تقديم طلب توصيل بطاقة Blink الخاصة بك.",
         "buttonLabel": "إنشاء رمز PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "تخطَّ الآن",
+      "OrderOffer": {
+        "subtitle": "احصل على Blink Card الخاصة بك في أي عنوان تختاره."
+      },
+      "TopUp": {
+        "title": "اشحن بطاقتك",
+        "subtitle": "أضف الأموال الآن أو لاحقًا.",
+        "fromBalance": "من رصيد Bitcoin أو الدولار",
+        "deposit": "إيداع في رصيد بطاقتك",
+        "topUpNow": "اشحن الآن",
+        "skip": "تخطَّ الشحن"
       }
     },
     "ShippingAddress": {

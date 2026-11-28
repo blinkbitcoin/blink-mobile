@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Gratulujeme!",
         "subtitle": "Vaša karta Blink Visa bola aktivovaná.",
-        "buttonLabel": "Objednať fyzickú kartu",
-        "buttonLabelDashboard": "Prehľad"
+        "buttonLabel": "Objednať fyzickú kartu"
       },
       "PhysicalCardOrdered": {
         "title": "Vaša fyzická karta je na ceste!",
         "subtitle": "Objednávka na doručenie vašej karty Blink bola odoslaná.",
         "buttonLabel": "Vytvoriť PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Zatiaľ preskočiť",
+      "OrderOffer": {
+        "subtitle": "Nechajte si doručiť Blink Card na ľubovoľnú adresu podľa vlastného výberu."
+      },
+      "TopUp": {
+        "title": "Dobite si kartu",
+        "subtitle": "Pridajte prostriedky teraz alebo neskôr.",
+        "fromBalance": "Z vášho zostatku v bitcoinoch alebo dolároch",
+        "deposit": "Vklad na zostatok karty",
+        "topUpNow": "Dobiť teraz",
+        "skip": "Preskočiť dobitie"
       }
     },
     "ShippingAddress": {

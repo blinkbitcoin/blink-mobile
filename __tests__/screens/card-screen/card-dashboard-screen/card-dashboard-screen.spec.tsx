@@ -47,6 +47,13 @@ jest.mock("@app/hooks/use-card-balance", () => ({
   useCardBalance: (cardId: string | undefined) => mockUseCardBalance(cardId),
 }))
 
+const mockRedirectToActivation = jest.fn()
+const mockUseCardActivation = jest.fn()
+jest.mock("@app/hooks/use-card-activation", () => ({
+  useCardActivation: (options?: Record<string, unknown>) =>
+    mockUseCardActivation(options),
+}))
+
 const mockUseCardFreeze = jest.fn()
 jest.mock("@app/screens/card-screen/card-dashboard-screen/hooks/use-card-freeze", () => ({
   useCardFreeze: () => mockUseCardFreeze(),
@@ -150,11 +157,18 @@ const defaultFreeze = {
   loading: false,
 }
 
+const defaultActivation = {
+  isPending: false,
+  isWaiting: false,
+  redirect: mockRedirectToActivation,
+}
+
 const setupMocks = (overrides?: {
   cardData?: Partial<typeof defaultCardData>
   balance?: Partial<typeof defaultBalance>
   transactions?: Partial<typeof defaultTransactions>
   freeze?: Partial<typeof defaultFreeze>
+  activation?: Partial<typeof defaultActivation>
 }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
   mockUseCardBalance.mockReturnValue({ ...defaultBalance, ...overrides?.balance })
@@ -163,6 +177,10 @@ const setupMocks = (overrides?: {
     ...overrides?.transactions,
   })
   mockUseCardFreeze.mockReturnValue({ ...defaultFreeze, ...overrides?.freeze })
+  mockUseCardActivation.mockReturnValue({
+    ...defaultActivation,
+    ...overrides?.activation,
+  })
 }
 
 describe("CardDashboardScreen", () => {
@@ -185,6 +203,52 @@ describe("CardDashboardScreen", () => {
       await act(async () => {})
 
       expect(toJSON()).toBeTruthy()
+    })
+  })
+
+  describe("card activation", () => {
+    it("waits for the activation before showing the card", async () => {
+      setupMocks({ activation: { isWaiting: true } })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardDashboardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Details")).toBeNull()
+      expect(mockRedirectToActivation).not.toHaveBeenCalled()
+    })
+
+    it("sends a member still in the activation on to their step", async () => {
+      setupMocks({ activation: { isPending: true } })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardDashboardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Details")).toBeNull()
+      expect(mockRedirectToActivation).toHaveBeenCalledTimes(1)
+    })
+
+    it("opens for a member whose activation is done", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardDashboardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Details")).toBeTruthy()
+      expect(mockRedirectToActivation).not.toHaveBeenCalled()
+      expect(mockUseCardActivation).toHaveBeenCalledWith(undefined)
     })
   })
 

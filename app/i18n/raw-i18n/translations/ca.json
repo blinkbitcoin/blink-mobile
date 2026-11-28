@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Felicitats!",
         "subtitle": "La teva targeta Blink Visa ha estat activada.",
-        "buttonLabel": "Demanar targeta física",
-        "buttonLabelDashboard": "Tauler"
+        "buttonLabel": "Demanar targeta física"
       },
       "PhysicalCardOrdered": {
         "title": "La teva targeta física està en camí!",
         "subtitle": "La comanda per al lliurament de la teva targeta Blink ha estat enviada.",
         "buttonLabel": "Crear PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Omet de moment",
+      "OrderOffer": {
+        "subtitle": "Rep la teva Blink Card a qualsevol adreça que triïs."
+      },
+      "TopUp": {
+        "title": "Recarrega la teva targeta",
+        "subtitle": "Afegeix fons ara o més tard.",
+        "fromBalance": "Des del teu saldo de Bitcoin o de dòlars",
+        "deposit": "Diposita al saldo de la teva targeta",
+        "topUpNow": "Recarrega ara",
+        "skip": "Omet la recàrrega"
       }
     },
     "ShippingAddress": {

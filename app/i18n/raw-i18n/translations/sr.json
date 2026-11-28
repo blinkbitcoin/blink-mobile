@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Честитамо!",
         "subtitle": "Ваша Blink Visa картица је активирана.",
-        "buttonLabel": "Наручи физичку картицу",
-        "buttonLabelDashboard": "Контролна табла"
+        "buttonLabel": "Наручи физичку картицу"
       },
       "PhysicalCardOrdered": {
         "title": "Ваша физичка картица је на путу!",
         "subtitle": "Поруџбина за испоруку ваше Blink картице је послата.",
         "buttonLabel": "Креирај ПИН"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Прескочи за сада",
+      "OrderOffer": {
+        "subtitle": "Нека вам Blink Card стигне на адресу по вашем избору."
+      },
+      "TopUp": {
+        "title": "Допуните своју картицу",
+        "subtitle": "Додајте средства сада или касније.",
+        "fromBalance": "Са вашег Bitcoin или доларског салда",
+        "deposit": "Уплата на салдо картице",
+        "topUpNow": "Допуни сада",
+        "skip": "Прескочи допуну"
       }
     },
     "ShippingAddress": {

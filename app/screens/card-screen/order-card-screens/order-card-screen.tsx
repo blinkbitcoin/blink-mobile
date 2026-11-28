@@ -9,7 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "@app/hooks"
+import { useCardActivation, useCardData } from "@app/hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
 import { ShippingAddress } from "../types"
@@ -55,6 +55,7 @@ export const OrderCardScreen: React.FC = () => {
     loading: addressLoading,
   } = useShippingAddressData()
   const { createCard, loading: createLoading } = useCreateCard()
+  const { isPending: isActivationPending, showOrderPlaced } = useCardActivation()
   const [isFormValid, setIsFormValid] = useState(false)
   const hasHandledErrorRef = useRef(false)
 
@@ -106,7 +107,7 @@ export const OrderCardScreen: React.FC = () => {
     if (!result) return
 
     completeFlow()
-    navigation.replace("cardStatusScreen", {
+    const orderPlaced: RootStackParamList["cardStatusScreen"] = {
       title: LL.CardFlow.CardStatus.PhysicalCardOrdered.title(),
       subtitle: LL.CardFlow.CardStatus.PhysicalCardOrdered.subtitle(),
       buttonLabel: LL.CardFlow.CardStatus.PhysicalCardOrdered.buttonLabel(),
@@ -116,13 +117,20 @@ export const OrderCardScreen: React.FC = () => {
       isWalletPrimary: true,
       lastFour: result.lastFour,
       cardId: result.id,
-    })
+    }
+    if (isActivationPending) {
+      showOrderPlaced(orderPlaced)
+      return
+    }
+    navigation.replace("cardStatusScreen", orderPlaced)
   }, [
     applicationId,
     shippingAddress,
     phone,
     createCard,
     completeFlow,
+    isActivationPending,
+    showOrderPlaced,
     navigation,
     LL,
     colors.success,

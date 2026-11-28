@@ -3504,13 +3504,26 @@
             "CardApproved": {
                 "title": "おめでとうございます！",
                 "subtitle": "Blink Visaカードが有効化されました。",
-                "buttonLabel": "物理カードを注文",
-                "buttonLabelDashboard": "ダッシュボード"
+                "buttonLabel": "物理カードを注文"
             },
             "PhysicalCardOrdered": {
                 "title": "物理カードは配送中です！",
                 "subtitle": "Blinkカードの配送注文が送信されました。",
                 "buttonLabel": "PINを作成"
+            }
+        },
+        "Activation": {
+            "skipForNow": "今はスキップ",
+            "OrderOffer": {
+                "subtitle": "Blink Cardをお好きな住所にお届けします。"
+            },
+            "TopUp": {
+                "title": "カードにチャージ",
+                "subtitle": "今すぐ、または後で入金できます。",
+                "fromBalance": "ビットコインまたはドル残高から",
+                "deposit": "カード残高に入金",
+                "topUpNow": "今すぐチャージ",
+                "skip": "チャージをスキップ"
             }
         },
         "ShippingAddress": {

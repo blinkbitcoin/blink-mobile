@@ -2,6 +2,7 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { CardActivationStep } from "@app/graphql/generated"
 import { CardApprovedScreen } from "@app/screens/card-screen/onboarding/approved-screen"
 import { ContextForScreen } from "../../helper"
 
@@ -18,6 +19,8 @@ type LayoutProps = {
   subtitle: string
   buttonLabel: string
   onPrimaryButtonPress: () => void
+  secondaryButtonLabel: string
+  onSecondaryButtonPress: () => void
   cardId?: string
   cardNumber?: string
   showAddToWallet?: boolean
@@ -38,6 +41,9 @@ jest.mock("@app/components/card-screen", () => {
           <TouchableOpacity onPress={props.onPrimaryButtonPress}>
             <Text>{props.buttonLabel}</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={props.onSecondaryButtonPress}>
+            <Text>{props.secondaryButtonLabel}</Text>
+          </TouchableOpacity>
         </View>
       )
     },
@@ -54,23 +60,32 @@ jest.mock("@app/screens/card-screen/hooks/use-add-to-wallet", () => ({
 const lastLayoutProps = (): LayoutProps =>
   mockLayoutProps.mock.calls[mockLayoutProps.mock.calls.length - 1][0]
 
-const mockDispatch = jest.fn()
+const mockNavigate = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
     useNavigation: () => ({
-      dispatch: mockDispatch,
+      navigate: mockNavigate,
     }),
-    CommonActions: {
-      navigate: (screen: string, params?: object) => ({
-        type: "NAVIGATE",
-        payload: { name: screen, params },
-      }),
-    },
   }
 })
+
+const mockRedirect = jest.fn()
+const mockMoveOn = jest.fn()
+let mockIsActivationComplete = false
+const mockUseCardActivation = jest.fn()
+jest.mock("@app/hooks/use-card-activation", () => ({
+  useCardActivation: (options: Record<string, unknown>) => {
+    mockUseCardActivation(options)
+    return {
+      isComplete: mockIsActivationComplete,
+      redirect: mockRedirect,
+      moveOn: mockMoveOn,
+    }
+  },
+}))
 
 let mockHasPhysicalCard = false
 let mockCardLastFour: string | undefined = "1234"
@@ -88,6 +103,7 @@ describe("CardApprovedScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockHasPhysicalCard = false
+    mockIsActivationComplete = false
     mockCardLastFour = "1234"
     mockUseAddToWallet.mockReturnValue({
       canAddToWallet: true,
@@ -132,6 +148,20 @@ describe("CardApprovedScreen", () => {
     expect(getByText("Your Blink Visa Card has been activated.")).toBeTruthy()
   })
 
+  it("stands for the first step of the card activation", async () => {
+    render(
+      <ContextForScreen>
+        <CardApprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(mockUseCardActivation).toHaveBeenCalledWith({
+      step: CardActivationStep.Activated,
+    })
+  })
+
   describe("without physical card", () => {
     it("shows Order physical card button label", async () => {
       const { getByText } = render(
@@ -158,31 +188,10 @@ describe("CardApprovedScreen", () => {
         fireEvent.press(getByText("Order physical card"))
       })
 
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: "NAVIGATE",
-        payload: { name: "orderCardScreen", params: undefined },
-      })
-    })
-  })
-
-  describe("with physical card", () => {
-    beforeEach(() => {
-      mockHasPhysicalCard = true
+      expect(mockNavigate).toHaveBeenCalledWith("orderCardScreen")
     })
 
-    it("shows Dashboard button label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardApprovedScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Dashboard")).toBeTruthy()
-    })
-
-    it("navigates to cardDashboardScreen on button press", async () => {
+    it("moves the activation on when the member skips for now", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardApprovedScreen />
@@ -192,13 +201,52 @@ describe("CardApprovedScreen", () => {
       await act(async () => {})
 
       await act(async () => {
-        fireEvent.press(getByText("Dashboard"))
+        fireEvent.press(getByText("Skip for now"))
       })
 
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: "NAVIGATE",
-        payload: { name: "cardDashboardScreen", params: undefined },
-      })
+      expect(mockMoveOn).toHaveBeenCalledWith(CardActivationStep.Activated)
+    })
+
+    it("stays while no way has been taken yet", async () => {
+      render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockRedirect).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("once a way has been taken", () => {
+    it("sends a member with a physical card on, rather than offering a second order", async () => {
+      mockHasPhysicalCard = true
+
+      render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockRedirect).toHaveBeenCalledTimes(1)
+    })
+
+    it("sends a member whose activation is done on", async () => {
+      mockIsActivationComplete = true
+
+      render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockRedirect).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -229,6 +277,16 @@ describe("CardApprovedScreen", () => {
           onAddToWallet: mockAddToWallet,
           isAddingToWallet: false,
         }),
+      )
+    })
+
+    it("draws no frozen card while the card is still loading", async () => {
+      mockCardLastFour = undefined
+
+      await renderScreen()
+
+      expect(lastLayoutProps()).toEqual(
+        expect.objectContaining({ cardId: undefined, isFrozen: false }),
       )
     })
 

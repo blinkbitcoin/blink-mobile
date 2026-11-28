@@ -1,3 +1,5 @@
+import { getStateFromPath } from "@react-navigation/native"
+
 import { DEEP_LINK_SCREENS } from "@app/navigation/deep-link-screens"
 
 /**
@@ -96,6 +98,29 @@ describe("deep-linkable routes", () => {
     expect(DEEP_LINK_SCREENS.cardOnboardingDeclinedScreen).toBe(
       "card/onboarding/declined",
     )
+  })
+
+  /**
+   * The approved bulletin opens card/onboarding/approved, a path core's notifications
+   * send for the approved deep link screen. Where a member belongs in the card
+   * activation is only known once it is read, so the approval and activation links open
+   * the dashboard, which sends a member still in the activation on to their step.
+   */
+  it("opens the card activation's links on the dashboard, which knows the step", () => {
+    const config = { screens: DEEP_LINK_SCREENS }
+    const paths = ["card", "card/activate", "card/onboarding/approved"]
+
+    const openedScreens = paths.map((path) => {
+      const routes = getStateFromPath(path, config)?.routes ?? []
+      return routes[routes.length - 1]?.name
+    })
+
+    expect(openedScreens).toEqual([
+      "cardDashboardScreen",
+      "cardDashboardScreen",
+      "cardDashboardScreen",
+    ])
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingApprovedScreen")
   })
 
   /**

@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Շնորհավորում ենք!",
         "subtitle": "Ձեր Blink Visa քարտն ակտիվացվել է։",
-        "buttonLabel": "Պատվիրել ֆիզիկական քարտ",
-        "buttonLabelDashboard": "Վահանակ"
+        "buttonLabel": "Պատվիրել ֆիզիկական քարտ"
       },
       "PhysicalCardOrdered": {
         "title": "Ձեր ֆիզիկական քարտը ճանապարհին է!",
         "subtitle": "Ձեր Blink քարտի առաքման պատվերը ներկայացվել է։",
         "buttonLabel": "Ստեղծել PIN կոդ"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Առայժմ բաց թողնել",
+      "OrderOffer": {
+        "subtitle": "Ստացեք ձեր Blink Card-ը ձեր ընտրած ցանկացած հասցեով։"
+      },
+      "TopUp": {
+        "title": "Լիցքավորեք ձեր քարտը",
+        "subtitle": "Ավելացրեք միջոցներ հիմա կամ ավելի ուշ։",
+        "fromBalance": "Ձեր Bitcoin կամ դոլարային մնացորդից",
+        "deposit": "Մուտքագրել քարտի մնացորդին",
+        "topUpNow": "Լիցքավորել հիմա",
+        "skip": "Բաց թողնել լիցքավորումը"
       }
     },
     "ShippingAddress": {

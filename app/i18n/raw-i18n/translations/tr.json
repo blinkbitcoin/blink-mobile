@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Tebrikler!",
         "subtitle": "Blink Visa kartınız etkinleştirildi.",
-        "buttonLabel": "Fiziksel kart sipariş et",
-        "buttonLabelDashboard": "Gösterge Paneli"
+        "buttonLabel": "Fiziksel kart sipariş et"
       },
       "PhysicalCardOrdered": {
         "title": "Fiziksel kartınız yolda!",
         "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
         "buttonLabel": "PIN oluştur"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Şimdilik atla",
+      "OrderOffer": {
+        "subtitle": "Blink Card'ını seçtiğin herhangi bir adrese teslim ettir."
+      },
+      "TopUp": {
+        "title": "Kartına bakiye yükle",
+        "subtitle": "Şimdi ya da daha sonra para ekle.",
+        "fromBalance": "Bitcoin veya Dolar bakiyenden",
+        "deposit": "Kart bakiyene yatır",
+        "topUpNow": "Şimdi yükle",
+        "skip": "Yüklemeyi atla"
       }
     },
     "ShippingAddress": {

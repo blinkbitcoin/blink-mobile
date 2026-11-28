@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Weebale!",
         "subtitle": "Kaadi yo eya Blink Visa etandise okukola.",
-        "buttonLabel": "Tegeka kaadi ey'ekikula",
-        "buttonLabelDashboard": "Dashiboodi"
+        "buttonLabel": "Tegeka kaadi ey'ekikula"
       },
       "PhysicalCardOrdered": {
         "title": "Kaadi yo ey'ekikula eri mu kkubo!",
         "subtitle": "Order yo ey'okutwala kaadi yo eya Blink eweereddwa.",
         "buttonLabel": "Teekawo PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Buuka kaakano",
+      "OrderOffer": {
+        "subtitle": "Funa Blink Card yo ku ndagiriro yonna gy'olonze."
+      },
+      "TopUp": {
+        "title": "Teeka ssente ku kaadi yo",
+        "subtitle": "Yongera sente kaakano oba oluvannyuma.",
+        "fromBalance": "Okuva ku bbalansi yo eya Bitcoin oba eya Ddoola",
+        "deposit": "Teeka ku bbalansi ya kaadi yo",
+        "topUpNow": "Teekako kaakano",
+        "skip": "Buuka okuteekako"
       }
     },
     "ShippingAddress": {

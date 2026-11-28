@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "ยินดีด้วย!",
         "subtitle": "บัตร Blink Visa ของคุณได้รับการเปิดใช้งานแล้ว",
-        "buttonLabel": "สั่งบัตรจริง",
-        "buttonLabelDashboard": "แดชบอร์ด"
+        "buttonLabel": "สั่งบัตรจริง"
       },
       "PhysicalCardOrdered": {
         "title": "บัตรจริงของคุณกำลังจัดส่ง!",
         "subtitle": "คำสั่งซื้อสำหรับการจัดส่งบัตร Blink ของคุณถูกส่งแล้ว",
         "buttonLabel": "สร้าง PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "ข้ามไปก่อน",
+      "OrderOffer": {
+        "subtitle": "รับ Blink Card ของคุณที่ที่อยู่ใดก็ได้ตามที่คุณเลือก"
+      },
+      "TopUp": {
+        "title": "เติมเงินเข้าบัตรของคุณ",
+        "subtitle": "เติมเงินตอนนี้ หรือภายหลังก็ได้",
+        "fromBalance": "จากยอด Bitcoin หรือยอดดอลลาร์ของคุณ",
+        "deposit": "ฝากเข้ายอดเงินในบัตรของคุณ",
+        "topUpNow": "เติมเงินตอนนี้",
+        "skip": "ข้ามการเติมเงิน"
       }
     },
     "ShippingAddress": {

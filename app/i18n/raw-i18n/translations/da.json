@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Tillykke!",
         "subtitle": "Dit Blink Visa-kort er blevet aktiveret.",
-        "buttonLabel": "Bestil fysisk kort",
-        "buttonLabelDashboard": "Oversigt"
+        "buttonLabel": "Bestil fysisk kort"
       },
       "PhysicalCardOrdered": {
         "title": "Dit fysiske kort er på vej!",
         "subtitle": "Bestilling af levering af dit Blink-kort er blevet indsendt.",
         "buttonLabel": "Opret PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Spring over for nu",
+      "OrderOffer": {
+        "subtitle": "Få dit Blink Card leveret til en adresse efter eget valg."
+      },
+      "TopUp": {
+        "title": "Fyld dit kort op",
+        "subtitle": "Tilføj midler nu eller senere.",
+        "fromBalance": "Fra din Bitcoin- eller dollarsaldo",
+        "deposit": "Indbetal til din kortsaldo",
+        "topUpNow": "Fyld op nu",
+        "skip": "Spring opfyldning over"
       }
     },
     "ShippingAddress": {

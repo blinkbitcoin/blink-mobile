@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Čestitamo!",
         "subtitle": "Vaša Blink Visa kartica je aktivirana.",
-        "buttonLabel": "Naruči fizičku karticu",
-        "buttonLabelDashboard": "Nadzorna ploča"
+        "buttonLabel": "Naruči fizičku karticu"
       },
       "PhysicalCardOrdered": {
         "title": "Vaša fizička kartica je na putu!",
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
         "buttonLabel": "Kreiraj PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Preskoči za sada",
+      "OrderOffer": {
+        "subtitle": "Neka vam Blink Card stigne na adresu po vašem izboru."
+      },
+      "TopUp": {
+        "title": "Nadoplatite svoju karticu",
+        "subtitle": "Dodajte sredstva sada ili kasnije.",
+        "fromBalance": "S vašeg Bitcoin ili dolarskog salda",
+        "deposit": "Uplata na saldo kartice",
+        "topUpNow": "Nadoplati sada",
+        "skip": "Preskoči nadoplatu"
       }
     },
     "ShippingAddress": {

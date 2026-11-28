@@ -55,6 +55,30 @@ describe("card onboarding header controls in root-navigator", () => {
     })
   })
 
+  /** The activation's steps sit over the Home the member came from. Leaving keeps their
+   *  step for later, so the X pops back to that Home instead of stacking a second one over
+   *  steps the member could swipe back into. */
+  it("closes the card activation's steps onto the Home under them", () => {
+    const ACTIVATION_ROUTES = [
+      "cardOnboardingApprovedScreen",
+      "cardActivationTopUpScreen",
+    ]
+
+    ACTIVATION_ROUTES.forEach((route) => {
+      expect(registration(route)).toContain(
+        "...headerCloseControlOptions({ shouldPopTo: true })",
+      )
+    })
+  })
+
+  /** The design leaves the order offer with its way back alone: skipping is how the
+   *  member moves on without the physical card. */
+  it("leaves the order offer without a close button", () => {
+    expect(registration("cardActivationOrderOfferScreen")).not.toContain(
+      "headerCloseControlOptions",
+    )
+  })
+
   it("keeps the way back next to the close button on the steps that can go back", () => {
     const BACK_AND_CLOSE_ROUTES = [
       "cardOnboardingIntroducingScreen",

@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Selamat!",
         "subtitle": "Kartu Blink Visa Anda telah diaktifkan.",
-        "buttonLabel": "Pesan kartu fisik",
-        "buttonLabelDashboard": "Dasbor"
+        "buttonLabel": "Pesan kartu fisik"
       },
       "PhysicalCardOrdered": {
         "title": "Kartu fisik Anda sedang dalam perjalanan!",
         "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
         "buttonLabel": "Buat PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Lewati untuk saat ini",
+      "OrderOffer": {
+        "subtitle": "Kirim Blink Card Anda ke alamat mana pun pilihan Anda."
+      },
+      "TopUp": {
+        "title": "Isi ulang kartu Anda",
+        "subtitle": "Tambahkan dana sekarang atau nanti.",
+        "fromBalance": "Dari saldo Bitcoin atau Dolar Anda",
+        "deposit": "Setor ke saldo kartu Anda",
+        "topUpNow": "Isi ulang sekarang",
+        "skip": "Lewati isi ulang"
       }
     },
     "ShippingAddress": {

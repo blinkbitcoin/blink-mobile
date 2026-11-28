@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Gratulálunk!",
         "subtitle": "A Blink Visa kártyád aktiválva lett.",
-        "buttonLabel": "Fizikai kártya rendelése",
-        "buttonLabelDashboard": "Irányítópult"
+        "buttonLabel": "Fizikai kártya rendelése"
       },
       "PhysicalCardOrdered": {
         "title": "A fizikai kártyád úton van!",
         "subtitle": "A Blink kártyád kiszállítási rendelése beküldésre került.",
         "buttonLabel": "PIN létrehozása"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Kihagyás egyelőre",
+      "OrderOffer": {
+        "subtitle": "Kérje Blink Card kártyáját bármely Ön által választott címre."
+      },
+      "TopUp": {
+        "title": "Töltse fel kártyáját",
+        "subtitle": "Adjon hozzá pénzt most vagy később.",
+        "fromBalance": "Bitcoin- vagy dolláregyenlegéből",
+        "deposit": "Befizetés a kártyaegyenlegre",
+        "topUpNow": "Feltöltés most",
+        "skip": "Feltöltés kihagyása"
       }
     },
     "ShippingAddress": {

@@ -26,7 +26,7 @@ type CardStatusLayoutProps = {
   validThruDate?: string | Date
   isFrozen?: boolean
   showAddToWallet?: boolean
-  onAddToWallet: () => void
+  onAddToWallet?: () => void
   isAddingToWallet?: boolean
 }
 
@@ -54,6 +54,7 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   } = useTheme()
 
   const resolvedIconColor = iconColor ?? colors.success
+  const isAddToWalletShown = showAddToWallet && onAddToWallet !== undefined
 
   return (
     <Screen style={styles.screen}>
@@ -82,7 +83,7 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
 
       {/* The wallet button sits right above the screen's action, as the designs do. */}
       <View style={styles.bottomSection} testID="card-status-actions">
-        {showAddToWallet ? (
+        {isAddToWalletShown ? (
           <AddToWalletButton onPress={onAddToWallet} disabled={isAddingToWallet} />
         ) : null}
         {buttonLabel ? (

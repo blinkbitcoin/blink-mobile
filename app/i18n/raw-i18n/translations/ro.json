@@ -3504,13 +3504,26 @@
       "CardApproved": {
         "title": "Felicitări!",
         "subtitle": "Cardul tău Blink Visa a fost activat.",
-        "buttonLabel": "Comandă card fizic",
-        "buttonLabelDashboard": "Panou"
+        "buttonLabel": "Comandă card fizic"
       },
       "PhysicalCardOrdered": {
         "title": "Cardul tău fizic este pe drum!",
         "subtitle": "Comanda pentru livrarea cardului Blink a fost trimisă.",
         "buttonLabel": "Creează PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Omite deocamdată",
+      "OrderOffer": {
+        "subtitle": "Primiți Blink Card la orice adresă alegeți."
+      },
+      "TopUp": {
+        "title": "Reîncărcați-vă cardul",
+        "subtitle": "Adăugați fonduri acum sau mai târziu.",
+        "fromBalance": "Din soldul dumneavoastră în Bitcoin sau dolari",
+        "deposit": "Depuneți în soldul cardului",
+        "topUpNow": "Reîncarcă acum",
+        "skip": "Omite reîncărcarea"
       }
     },
     "ShippingAddress": {

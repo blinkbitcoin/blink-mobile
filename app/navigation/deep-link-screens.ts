@@ -42,7 +42,12 @@ export const DEEP_LINK_SCREENS: NonNullable<
   notificationSettingsScreen: "settings/notifications",
   emailRegistrationInitiate: "settings/email",
   settings: "settings",
-  cardDashboardScreen: "card",
+  /** The approval and activation links open the dashboard, which sends a member still
+   *  in the activation on to the step they are at, or to the step they left. */
+  cardDashboardScreen: {
+    path: "card",
+    alias: ["card/activate", "card/onboarding/approved"],
+  },
   cardDetailsScreen: "card/details",
   cardLimitsScreen: "card/limits",
   cardSettingsScreen: "card/settings",
@@ -56,7 +61,6 @@ export const DEEP_LINK_SCREENS: NonNullable<
   cardOnboardingLoadingScreen: "card/onboarding/loading",
   cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
   cardOnboardingDeclinedScreen: "card/onboarding/declined",
-  cardOnboardingApprovedScreen: "card/onboarding/approved",
   transactionDetail: {
     path: "transaction/:txid",
   },
