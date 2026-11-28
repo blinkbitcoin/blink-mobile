@@ -1,11 +1,17 @@
+/**
+ * @jest-environment ./jest.timezone-environment
+ */
+
 import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
 import {
+  formatCalendarDate,
   formatCardType,
   formatIssuedDate,
   isCardFrozen,
   isCardUsable,
   mapTransactionStatus,
+  merchantIcon,
 } from "@app/screens/card-screen/utils/card-display"
 
 describe("card-display utils", () => {
@@ -107,6 +113,48 @@ describe("card-display utils", () => {
       expect(result).toContain("enero")
       expect(result).toContain("15")
       expect(result).toContain("2025")
+    })
+  })
+
+  describe("merchantIcon", () => {
+    it("shows the fork and knife for eating places, bars and fast food", () => {
+      expect(merchantIcon("5812")).toBe("fork-knife")
+      expect(merchantIcon("5813")).toBe("fork-knife")
+      expect(merchantIcon("5814")).toBe("fork-knife")
+    })
+
+    it("shows the car for commuter transport, taxis, rideshare and buses", () => {
+      expect(merchantIcon("4111")).toBe("car")
+      expect(merchantIcon("4121")).toBe("car")
+      expect(merchantIcon("4131")).toBe("car")
+    })
+
+    it("shows the store for codes next to those groups and for any other code", () => {
+      expect(merchantIcon("5811")).toBe("storefront")
+      expect(merchantIcon("5815")).toBe("storefront")
+      expect(merchantIcon("4110")).toBe("storefront")
+      expect(merchantIcon("4132")).toBe("storefront")
+      expect(merchantIcon("5411")).toBe("storefront")
+    })
+
+    it("shows the store without a code", () => {
+      expect(merchantIcon(undefined)).toBe("storefront")
+      expect(merchantIcon(null)).toBe("storefront")
+      expect(merchantIcon("")).toBe("storefront")
+      expect(merchantIcon("not-a-code")).toBe("storefront")
+    })
+  })
+
+  describe("formatCalendarDate", () => {
+    it("writes the calendar date out in the locale", () => {
+      expect(formatCalendarDate("2026-07-01", "en")).toBe("July 1, 2026")
+      expect(formatCalendarDate("2026-07-01", "es")).toBe("1 de julio de 2026")
+    })
+
+    /** The file runs six hours west of Greenwich, where the device's midnight of New
+     *  Year's Day is still the last day of the year before in UTC. */
+    it("keeps the day as set, whatever the device's time zone", () => {
+      expect(formatCalendarDate("2026-01-01", "en")).toBe("January 1, 2026")
     })
   })
 })

@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Jadual yuran Kad Blink",
-      "effectiveDate": "Berkuat kuasa mulai 1 Julai 2026",
+      "effectiveDate": "Berkuat kuasa mulai {date}",
       "sections": {
         "cardFees": "Yuran kad",
         "transactionFees": "Yuran transaksi",
@@ -3326,13 +3326,9 @@
           "title": "Yuran transaksi asing",
           "subtitle": "Dikenakan pada setiap transaksi dalam mata wang selain dolar AS"
         },
-        "maximumOverdraft": {
-          "title": "Overdraf maksimum",
-          "subtitle": "Mesti dibayar balik dalam 7 hari"
-        },
-        "lateRepaymentFee": {
-          "title": "Yuran pembayaran lewat",
-          "subtitle": "Dikenakan jika overdraf tidak dibayar balik dalam 7 hari"
+        "noOverdraft": {
+          "title": "Overdraf tidak dibenarkan",
+          "value": "T/B"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Apabila transaksi memerlukan penukaran BTC kepada USD, penukaran dilaksanakan pada kadar pertukaran semasa, yang mungkin termasuk spread yang mencerminkan kos penukaran."
       },
       "feesUpdateNotice": {
-        "text": "Yuran boleh dikemas kini dari semasa ke semasa. Blink akan memberi notis sekurang-kurangnya 30 hari sebelum sebarang perubahan yuran berkuat kuasa, selaras dengan",
+        "text": "Yuran keahlian Blink Orange, jika ada, adalah milik Blink dan bukan sebahagian daripada jadual ini. Yuran kad boleh dikemas kini dari semasa ke semasa dengan notis sekurang-kurangnya 30 hari, selaras dengan",
         "linkText": "Perjanjian Pemegang Kad"
       },
       "creditModeNotice": "Mod Kredit tidak aktif buat masa ini. Jika Mod Kredit diaktifkan, kadar faedah, yuran dan pendedahan hak pengebilan yang berkenaan akan disediakan sebelum pengaktifan.",
       "additionalDetails": {
         "title": "Butiran yuran tambahan",
-        "overdraft": {
-          "label": "Overdraf",
-          "text": ". Dalam keadaan tertentu, transaksi mungkin diluluskan yang menyebabkan Baki Kad anda jatuh di bawah sifar. Overdraf maksimum ialah {maxOverdraft: string}. Anda mesti membayar balik overdraf dalam 7 hari dengan memindahkan dana tambahan ke Baki Kad anda."
-        },
         "foreignCurrency": {
           "label": "Mata wang asing",
           "text": ". Jika anda membuat transaksi dalam mata wang asing, rangkaian kad menukarkannya kepada USD menggunakan prosedur penukarannya sendiri. Kadar pada tarikh pemprosesan mungkin berbeza daripada tarikh transaksi."
@@ -3442,6 +3434,7 @@
       "time": "Masa",
       "transactionId": "ID",
       "cardUsed": "Kad digunakan",
+      "cardUsedValue": "Kad Blink •••• {lastFour}",
       "paymentMethod": "Kaedah pembayaran",
       "merchantInformation": "Maklumat peniaga",
       "merchant": "Peniaga",
@@ -3489,14 +3482,7 @@
       "title": "Tambah ke dompet mudah alih",
       "addYourCard": "Tambah kad anda",
       "addYourCardDescription": "Tambah Kad Blink ke dompet mudah alih untuk pembayaran pantas dan selamat",
-      "addTo": "Tambah ke",
-      "Benefits": {
-        "title": "Manfaat dompet mudah alih",
-        "contactless": "Pembayaran tanpa sentuh di jutaan lokasi",
-        "security": "Keselamatan dipertingkat dengan pengesahan biometrik",
-        "noPhysicalCard": "Tidak perlu membawa kad fizikal",
-        "worksLocked": "Berfungsi walaupun telefon dikunci"
-      }
+      "addTo": "Tambah ke"
     },
     "CardStatus": {
       "title": "Kad Blink",

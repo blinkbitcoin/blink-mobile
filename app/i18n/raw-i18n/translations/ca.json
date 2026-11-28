@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Programa de tarifes de la targeta Blink",
-      "effectiveDate": "Vigent des de l'1 de juliol de 2026",
+      "effectiveDate": "Data d'entrada en vigor: {date}",
       "sections": {
         "cardFees": "Tarifes de la targeta",
         "transactionFees": "Tarifes de transacció",
@@ -3326,13 +3326,9 @@
           "title": "Tarifa de transacció estrangera",
           "subtitle": "Aplicada a cada transacció en una moneda diferent del dòlar dels EUA"
         },
-        "maximumOverdraft": {
-          "title": "Descobert màxim",
-          "subtitle": "S'ha de reemborsar en un termini de 7 dies"
-        },
-        "lateRepaymentFee": {
-          "title": "Tarifa per pagament tardà",
-          "subtitle": "Es cobra si el descobert no es reemborsa en un termini de 7 dies"
+        "noOverdraft": {
+          "title": "No es permet cap descobert",
+          "value": "N/A"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Quan una transacció requereix la conversió de BTC a USD, la conversió s'executa al tipus de canvi vigent, que pot incloure un marge que reflecteix el cost de la conversió."
       },
       "feesUpdateNotice": {
-        "text": "Les tarifes es poden actualitzar de tant en tant. Blink avisarà amb almenys 30 dies d'antelació abans que qualsevol canvi de tarifes entri en vigor, d'acord amb l'",
+        "text": "La quota de soci de Blink Orange, si n'hi ha, és de Blink i no forma part d'aquesta taula. Les tarifes de la targeta es poden actualitzar de tant en tant amb almenys 30 dies d'avís, d'acord amb l'",
         "linkText": "Acord del titular de la targeta"
       },
       "creditModeNotice": "El Mode Crèdit no està actiu actualment. Si s'activa el Mode Crèdit, els tipus d'interès, les tarifes i les divulgacions de drets de facturació aplicables es proporcionaran abans de l'activació.",
       "additionalDetails": {
         "title": "Detalls addicionals de tarifes",
-        "overdraft": {
-          "label": "Descobert",
-          "text": ". En determinades circumstàncies, es pot aprovar una transacció que faci que el saldo de la teva targeta caigui per sota de zero. El descobert màxim és de {maxOverdraft: string}. Has de reemborsar el descobert en un termini de 7 dies transferint fons addicionals al saldo de la teva targeta."
-        },
         "foreignCurrency": {
           "label": "Moneda estrangera",
           "text": ". Si fas una transacció en una moneda estrangera, la xarxa de la targeta la converteix a USD amb els seus propis procediments de conversió. El tipus a la data de processament pot diferir de la data de la transacció."
@@ -3442,6 +3434,7 @@
       "time": "Hora",
       "transactionId": "ID",
       "cardUsed": "Targeta utilitzada",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Mètode de pagament",
       "merchantInformation": "Informació del comerciant",
       "merchant": "Comerciant",
@@ -3489,14 +3482,7 @@
       "title": "Afegir a la cartera mobil",
       "addYourCard": "Afegeix la teva targeta",
       "addYourCardDescription": "Afegeix la teva Blink Card a la cartera mòbil per a pagaments ràpids i segurs",
-      "addTo": "Afegir a",
-      "Benefits": {
-        "title": "Avantatges de la cartera mobil",
-        "contactless": "Pagaments sense contacte en milions de llocs",
-        "security": "Seguretat millorada amb autenticacio biometrica",
-        "noPhysicalCard": "No cal portar la targeta fisica",
-        "worksLocked": "Funciona fins i tot amb el telefon bloquejat"
-      }
+      "addTo": "Afegir a"
     },
     "CardStatus": {
       "title": "Blink Card",

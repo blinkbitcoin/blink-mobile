@@ -1,12 +1,13 @@
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { CardTransactionUiStatus } from "./types"
 
 type CardTransactionItemProps = {
+  icon: IconNamesType
   merchantName: string
   timeAgo: string
   amount: string
@@ -15,6 +16,7 @@ type CardTransactionItemProps = {
 }
 
 export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
+  icon,
   merchantName,
   timeAgo,
   amount,
@@ -50,7 +52,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
   const content = (
     <>
       <View style={styles.iconContainer}>
-        <GaloyIcon name="storefront" size={20} color={colors.accent} />
+        <GaloyIcon name={icon} size={20} color={colors.accent} />
       </View>
       <View style={styles.detailsColumn}>
         <Text type="p3" bold numberOfLines={1} style={styles.merchantName}>

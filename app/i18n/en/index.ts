@@ -3441,7 +3441,7 @@ const en: BaseTranslation = {
     },
     CardFeeSchedule: {
       title: "Blink Card Fee Schedule",
-      effectiveDate: "Effective July 1, 2026",
+      effectiveDate: "Effective {date: string}",
       sections: {
         cardFees: "Card fees",
         transactionFees: "Transaction fees",
@@ -3463,13 +3463,9 @@ const en: BaseTranslation = {
           title: "Foreign transaction fee",
           subtitle: "Applied to each transaction in a currency other than U.S. dollars",
         },
-        maximumOverdraft: {
-          title: "Maximum overdraft",
-          subtitle: "Must be repaid within 7 days",
-        },
-        lateRepaymentFee: {
-          title: "Late Repayment Fee",
-          subtitle: "Charged if overdraft is not repaid within 7 days",
+        noOverdraft: {
+          title: "No overdraft permitted",
+          value: "N/A",
         },
       },
       btcConversion: {
@@ -3477,17 +3473,13 @@ const en: BaseTranslation = {
         body: "When a transaction requires conversion of BTC to USD, the conversion is executed at the prevailing exchange rate, which may include a spread reflecting the cost of conversion.",
       },
       feesUpdateNotice: {
-        text: "Fees may be updated from time to time. Blink will provide at least 30 days' notice before any fee changes take effect, in accordance with the",
+        text: "Blink Orange’s membership fee, if any, is Blink’s and is not part of this schedule. Card fees may be updated from time to time with at least 30 days’ notice, in accordance with the",
         linkText: "Cardholder Agreement",
       },
       creditModeNotice:
         "Credit Mode is not currently active. If Credit Mode is activated, the applicable interest rates, fees, and billing rights disclosures will be provided before activation.",
       additionalDetails: {
         title: "Additional fee details",
-        overdraft: {
-          label: "Overdraft",
-          text: ". In certain circumstances, a transaction may be approved that causes your Card Balance to fall below zero. The maximum overdraft is {maxOverdraft: string}. You must repay the overdraft within 7 days by transferring additional funds to your Card Balance.",
-        },
         foreignCurrency: {
           label: "Foreign currency",
           text: ". If you make a transaction in a foreign currency, the card network converts it to USD using its own conversion procedures. The rate on the processing date may differ from the transaction date.",
@@ -3648,13 +3640,6 @@ const en: BaseTranslation = {
       addYourCardDescription:
         "Add your Blink Card to your mobile wallet for quick and secure payments",
       addTo: "Add to",
-      Benefits: {
-        title: "Benefits of mobile wallet",
-        contactless: "Contactless payments at millions of locations",
-        security: "Enhanced security with biometric authentication",
-        noPhysicalCard: "No need to carry your physical card",
-        worksLocked: "Works even when your phone is locked",
-      },
     },
     CardStatus: {
       title: "Blink Card",
@@ -3709,6 +3694,7 @@ const en: BaseTranslation = {
       time: "Time",
       transactionId: "ID",
       cardUsed: "Card used",
+      cardUsedValue: "Blink Card •••• {lastFour: string}",
       paymentMethod: "Payment method",
       merchantInformation: "Merchant information",
       merchant: "Merchant",

@@ -22,7 +22,7 @@ jest.mock("@rn-vui/themed", () => ({
   makeStyles: () => () => ({
     container: {},
     balanceColumn: {},
-    balanceUsd: {},
+    balancePrimary: {},
     balanceSecondary: {},
     addFundsButton: {},
     addFundsDisabled: {},
@@ -39,8 +39,8 @@ describe("CardBalanceSection", () => {
   const mockOnAddFunds = jest.fn()
 
   const defaultProps = {
-    balanceUsd: "$29.42",
-    balanceSecondary: "~ Kč576.44",
+    balancePrimary: "29,420 SAT",
+    balanceSecondary: "~ $17.12",
     isDisabled: false,
     onAddFunds: mockOnAddFunds,
   }
@@ -56,16 +56,16 @@ describe("CardBalanceSection", () => {
       expect(toJSON()).toBeTruthy()
     })
 
-    it("displays the USD balance correctly", () => {
+    it("displays the bitcoin balance first", () => {
       const { getByText } = renderWithProviders(<CardBalanceSection {...defaultProps} />)
 
-      expect(getByText("$29.42")).toBeTruthy()
+      expect(getByText("29,420 SAT")).toBeTruthy()
     })
 
-    it("displays the secondary balance correctly", () => {
+    it("displays the display currency under it", () => {
       const { getByText } = renderWithProviders(<CardBalanceSection {...defaultProps} />)
 
-      expect(getByText("~ Kč576.44")).toBeTruthy()
+      expect(getByText("~ $17.12")).toBeTruthy()
     })
 
     it("displays the add funds button text", () => {
@@ -78,25 +78,25 @@ describe("CardBalanceSection", () => {
       const { getByText } = renderWithProviders(
         <CardBalanceSection
           {...defaultProps}
-          balanceUsd="$1,234.56"
-          balanceSecondary="~ €1,100.00"
+          balancePrimary="1,234,560 SAT"
+          balanceSecondary="~ €690.00"
         />,
       )
 
-      expect(getByText("$1,234.56")).toBeTruthy()
-      expect(getByText("~ €1,100.00")).toBeTruthy()
+      expect(getByText("1,234,560 SAT")).toBeTruthy()
+      expect(getByText("~ €690.00")).toBeTruthy()
     })
 
     it("renders with zero balance", () => {
       const { getByText } = renderWithProviders(
         <CardBalanceSection
           {...defaultProps}
-          balanceUsd="$0.00"
+          balancePrimary="0 SAT"
           balanceSecondary="~ €0.00"
         />,
       )
 
-      expect(getByText("$0.00")).toBeTruthy()
+      expect(getByText("0 SAT")).toBeTruthy()
       expect(getByText("~ €0.00")).toBeTruthy()
     })
   })
@@ -148,8 +148,8 @@ describe("CardBalanceSection", () => {
         <CardBalanceSection {...defaultProps} isDisabled={true} />,
       )
 
-      expect(getByText("$29.42")).toBeTruthy()
-      expect(getByText("~ Kč576.44")).toBeTruthy()
+      expect(getByText("29,420 SAT")).toBeTruthy()
+      expect(getByText("~ $17.12")).toBeTruthy()
     })
 
     it("still displays add funds button when disabled", () => {

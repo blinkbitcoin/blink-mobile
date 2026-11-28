@@ -293,7 +293,8 @@ export type RootStackParamList = {
   cardPersonalDetailsScreen: undefined
   cardSettingsScreen: undefined
   cardStatementsScreen: undefined
-  cardTransactionDetailsScreen: { transactionId: string }
+  /** `cardId` is the card whose list the transaction was opened from; a link carries none. */
+  cardTransactionDetailsScreen: { transactionId: string; cardId?: string }
   cardStatusScreen: {
     title: string
     subtitle: string

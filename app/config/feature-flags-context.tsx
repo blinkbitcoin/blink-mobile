@@ -49,8 +49,7 @@ const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardReplacementFeeUsdKey = "cardReplacementFeeUsd"
 const CardUsdTransactionFeePercentKey = "cardUsdTransactionFeePercent"
 const CardForeignTransactionFeePercentKey = "cardForeignTransactionFeePercent"
-const CardMaxOverdraftUsdKey = "cardMaxOverdraftUsd"
-const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
+const CardFeeScheduleEffectiveDateKey = "cardFeeScheduleEffectiveDate"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
@@ -129,8 +128,7 @@ type RemoteConfig = {
   [CardReplacementFeeUsdKey]: number
   [CardUsdTransactionFeePercentKey]: number
   [CardForeignTransactionFeePercentKey]: number
-  [CardMaxOverdraftUsdKey]: number
-  [CardLateRepaymentFeeUsdKey]: number
+  [CardFeeScheduleEffectiveDateKey]: string
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
   [CardInvestmentDepositBtcWalletIdKey]: string
@@ -260,8 +258,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardReplacementFeeUsd: 10,
   cardUsdTransactionFeePercent: 1.21,
   cardForeignTransactionFeePercent: 2.21,
-  cardMaxOverdraftUsd: 200,
-  cardLateRepaymentFeeUsd: 25,
+  cardFeeScheduleEffectiveDate: "2026-07-01",
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
   /** The receiving account's BITCOIN wallet, named by id so a rename cannot redirect the
@@ -454,6 +451,24 @@ const readParsedNumber = (key: string, fallback: number): number => {
 const readString = (key: string, fallback: string): string =>
   activatedValue(key)?.asString() ?? fallback
 
+const ISO_CALENDAR_DATE = /^\d{4}-\d{2}-\d{2}$/
+
+/** A day that exists, written as the console sets it, such as 2026-07-01. The round trip
+ *  refuses 2026-02-30, which the engine would otherwise roll into March. */
+const isCalendarDate = (value: string): boolean => {
+  if (!ISO_CALENDAR_DATE.test(value)) return false
+  const day = new Date(`${value}T00:00:00Z`)
+  if (Number.isNaN(day.getTime())) return false
+  return day.toISOString().startsWith(value)
+}
+
+/** Anything but a calendar date keeps the shipped date, so a screen never shows a
+ *  malformed one. */
+const readCalendarDate = (key: string, fallback: string): string => {
+  const raw = activatedValue(key)?.asString().trim() ?? ""
+  return isCalendarDate(raw) ? raw : fallback
+}
+
 /** Whether Firebase holds a value the console set for the key, activated on this
  *  launch or an earlier one, rather than the shipped default. */
 const isFromConsole = (key: string): boolean =>
@@ -578,14 +593,9 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.cardForeignTransactionFeePercent,
   )
 
-  const cardMaxOverdraftUsd = readNumber(
-    CardMaxOverdraftUsdKey,
-    defaultRemoteConfig.cardMaxOverdraftUsd,
-  )
-
-  const cardLateRepaymentFeeUsd = readNumber(
-    CardLateRepaymentFeeUsdKey,
-    defaultRemoteConfig.cardLateRepaymentFeeUsd,
+  const cardFeeScheduleEffectiveDate = readCalendarDate(
+    CardFeeScheduleEffectiveDateKey,
+    defaultRemoteConfig.cardFeeScheduleEffectiveDate,
   )
 
   const sparkCompatibleWalletsUrl = readString(
@@ -752,8 +762,7 @@ const readRemoteConfig = (): RemoteConfig => {
     cardReplacementFeeUsd,
     cardUsdTransactionFeePercent,
     cardForeignTransactionFeePercent,
-    cardMaxOverdraftUsd,
-    cardLateRepaymentFeeUsd,
+    cardFeeScheduleEffectiveDate,
     replaceCardDeliveryConfig,
     sparkCompatibleWalletsUrl,
     cardInvestmentDepositBtcWalletId,

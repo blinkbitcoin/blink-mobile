@@ -33,12 +33,14 @@ export const useCardBalance = (cardId: string | undefined) => {
   const availableSats = data?.cardBalance?.available
   const btcAmount = toBtcMoneyAmount(availableSats ?? 0)
 
+  /** The Card Balance is held in bitcoin, so it reads in bitcoin first, as the wallets on
+   *  Home do, with the display currency under it. */
   const balancePrimary =
-    moneyAmountToDisplayCurrencyString({ moneyAmount: btcAmount, isApproximate: true }) ??
-    ""
+    formatMoneyAmount({ moneyAmount: btcAmount, isApproximate: false }) ?? ""
 
   const balanceSecondary =
-    formatMoneyAmount({ moneyAmount: btcAmount, isApproximate: false }) ?? ""
+    moneyAmountToDisplayCurrencyString({ moneyAmount: btcAmount, isApproximate: true }) ??
+    ""
 
   return { balancePrimary, balanceSecondary, availableSats, loading, error, refetch }
 }

@@ -3272,7 +3272,7 @@
         "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",
         "CardFeeSchedule": {
             "title": "Programa de tarifas de la tarjeta Blink",
-            "effectiveDate": "Vigente desde el 1 de julio de 2026",
+            "effectiveDate": "Vigente desde el {date}",
             "sections": {
                 "cardFees": "Tarifas de la tarjeta",
                 "transactionFees": "Tarifas de transacción",
@@ -3294,13 +3294,9 @@
                     "title": "Tarifa de transacción extranjera",
                     "subtitle": "Aplicada a cada transacción en una moneda distinta del dólar estadounidense"
                 },
-                "maximumOverdraft": {
-                    "title": "Sobregiro máximo",
-                    "subtitle": "Debe reembolsarse dentro de 7 días"
-                },
-                "lateRepaymentFee": {
-                    "title": "Tarifa por pago tardío",
-                    "subtitle": "Se cobra si el sobregiro no se reembolsa dentro de 7 días"
+                "noOverdraft": {
+                    "title": "No se permite sobregiro",
+                    "value": "N/A"
                 }
             },
             "btcConversion": {
@@ -3308,16 +3304,12 @@
                 "body": "Cuando una transacción requiere la conversión de BTC a USD, la conversión se ejecuta al tipo de cambio vigente, que puede incluir un margen que refleja el costo de la conversión."
             },
             "feesUpdateNotice": {
-                "text": "Las tarifas pueden actualizarse ocasionalmente. Blink avisará con al menos 30 días de anticipación antes de que cualquier cambio de tarifas entre en vigencia, de acuerdo con el",
+                "text": "La cuota de membresía de Blink Orange, si la hay, es de Blink y no forma parte de este cuadro de tarifas. Las tarifas de la tarjeta pueden actualizarse ocasionalmente con al menos 30 días de aviso, de acuerdo con el",
                 "linkText": "Acuerdo del titular de la tarjeta"
             },
             "creditModeNotice": "El Modo Crédito no está activo actualmente. Si se activa el Modo Crédito, las tasas de interés, tarifas y divulgaciones de derechos de facturación aplicables se proporcionarán antes de la activación.",
             "additionalDetails": {
                 "title": "Detalles adicionales de tarifas",
-                "overdraft": {
-                    "label": "Sobregiro",
-                    "text": ". En ciertas circunstancias, se puede aprobar una transacción que haga que el saldo de tu tarjeta caiga por debajo de cero. El sobregiro máximo es de {maxOverdraft: string}. Debes reembolsar el sobregiro dentro de 7 días transfiriendo fondos adicionales al saldo de tu tarjeta."
-                },
                 "foreignCurrency": {
                     "label": "Moneda extranjera",
                     "text": ". Si realizas una transacción en una moneda extranjera, la red de la tarjeta la convierte a USD usando sus propios procedimientos de conversión. La tasa en la fecha de procesamiento puede diferir de la fecha de la transacción."
@@ -3442,6 +3434,7 @@
             "time": "Hora",
             "transactionId": "ID",
             "cardUsed": "Tarjeta usada",
+            "cardUsedValue": "Blink Card •••• {lastFour}",
             "paymentMethod": "Método de pago",
             "merchantInformation": "Información del comercio",
             "merchant": "Comercio",
@@ -3489,14 +3482,7 @@
             "title": "Agregar a billetera móvil",
             "addYourCard": "Agrega tu tarjeta",
             "addYourCardDescription": "Agrega tu Blink Card a tu billetera móvil para pagos rápidos y seguros",
-            "addTo": "Agregar a",
-            "Benefits": {
-                "title": "Beneficios de la billetera móvil",
-                "contactless": "Pagos sin contacto en millones de ubicaciones",
-                "security": "Seguridad mejorada con autenticación biométrica",
-                "noPhysicalCard": "No necesitas llevar tu tarjeta física",
-                "worksLocked": "Funciona incluso con el teléfono bloqueado"
-            }
+            "addTo": "Agregar a"
         },
         "CardStatus": {
             "title": "Blink Card",

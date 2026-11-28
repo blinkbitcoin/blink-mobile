@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Распоред накнада Blink картице",
-      "effectiveDate": "Важи од 1. јула 2026.",
+      "effectiveDate": "Важи од {date}",
       "sections": {
         "cardFees": "Накнаде за картицу",
         "transactionFees": "Накнаде за трансакције",
@@ -3326,13 +3326,9 @@
           "title": "Накнада за инострану трансакцију",
           "subtitle": "Примењује се на сваку трансакцију у валути различитој од америчког долара"
         },
-        "maximumOverdraft": {
-          "title": "Максимално прекорачење",
-          "subtitle": "Мора се вратити у року од 7 дана"
-        },
-        "lateRepaymentFee": {
-          "title": "Накнада за закаснело враћање",
-          "subtitle": "Наплаћује се ако се прекорачење не врати у року од 7 дана"
+        "noOverdraft": {
+          "title": "Прекорачење није дозвољено",
+          "value": "Н/П"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Када трансакција захтева конверзију BTC у USD, конверзија се извршава по важећем курсу, који може укључивати маржу која одражава трошак конверзије."
       },
       "feesUpdateNotice": {
-        "text": "Накнаде се с времена на време могу ажурирати. Blink ће обавестити најмање 30 дана унапред пре него што било која промена накнада ступи на снагу, у складу са",
+        "text": "Чланарина за Blink Orange, ако постоји, припада Blink-у и није део овог ценовника. Накнаде за картицу се с времена на време могу ажурирати уз обавештење најмање 30 дана унапред, у складу са",
         "linkText": "Уговором о коришћењу картице"
       },
       "creditModeNotice": "Кредитни режим тренутно није активан. Ако се Кредитни режим активира, важеће каматне стопе, накнаде и обелодањивања права наплате биће достављени пре активације.",
       "additionalDetails": {
         "title": "Додатни детаљи о накнадама",
-        "overdraft": {
-          "label": "Прекорачење",
-          "text": ". У одређеним околностима може се одобрити трансакција која доводи до тога да стање ваше картице падне испод нуле. Максимално прекорачење је {maxOverdraft: string}. Прекорачење морате вратити у року од 7 дана преносом додатних средстава на стање ваше картице."
-        },
         "foreignCurrency": {
           "label": "Страна валута",
           "text": ". Ако извршите трансакцију у страној валути, мрежа картице је конвертује у USD користећи сопствене процедуре конверзије. Курс на датум обраде може се разликовати од датума трансакције."
@@ -3442,6 +3434,7 @@
       "time": "Време",
       "transactionId": "ID",
       "cardUsed": "Коришћена картица",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Начин плаћања",
       "merchantInformation": "Информације о трговцу",
       "merchant": "Трговац",
@@ -3489,14 +3482,7 @@
       "title": "Dodaj u mobilni novcanik",
       "addYourCard": "Dodajte svoju karticu",
       "addYourCardDescription": "Додајте своју Blink Card у мобилни новчаник за брза и сигурна плаћања",
-      "addTo": "Dodaj u",
-      "Benefits": {
-        "title": "Prednosti mobilnog novcanika",
-        "contactless": "Beskontaktna placanja na milionima lokacija",
-        "security": "Poboljsana sigurnost sa biometrijskom autentifikacijom",
-        "noPhysicalCard": "Nije potrebno nositi fizicku karticu",
-        "worksLocked": "Radi cak i kada je telefon zakljucan"
-      }
+      "addTo": "Dodaj u"
     },
     "CardStatus": {
       "title": "Blink Card",

@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Enteekera y'ebisale bya kaadi ya Blink",
-      "effectiveDate": "Etandika ku Julaayi 1, 2026",
+      "effectiveDate": "Etandika ku {date}",
       "sections": {
         "cardFees": "Ebisale bya kaadi",
         "transactionFees": "Ebisale by'entambula",
@@ -3326,13 +3326,9 @@
           "title": "Ekisale ky'entambula ey'ebweru",
           "subtitle": "Kikozesebwa ku buli ntambula mu ssente ezitali ddoola za Amerika"
         },
-        "maximumOverdraft": {
-          "title": "Okusukkirira okusinga obungi",
-          "subtitle": "Kiteekwa okusasulwa mu nnaku 7"
-        },
-        "lateRepaymentFee": {
-          "title": "Ekisale ky'okusasula mu kkerezo",
-          "subtitle": "Kisasulwa singa okusukkirira tekusasulwa mu nnaku 7"
+        "noOverdraft": {
+          "title": "Okusukkirira tekukkirizibwa",
+          "value": "Tekikwatagana"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Entambula bw'eyetaagisa okukyusa BTC okudda mu USD, okukyusa kukolebwa ku muwendo gw'okuwanyisiganya oguliwo, oguyinza okuli n'omugabo ogulaga omuwendo gw'okukyusa."
       },
       "feesUpdateNotice": {
-        "text": "Ebisale biyinza okukyusibwa okuva ku kiseera okutuuka ku kiseera. Blink ajja kuwa obubaka nga wakyasigadde ennaku 30 nga tebinnaba kufuuka bikyukakyuka byonna eby'ebisale, okusinziira ku",
+        "text": "Ssente z'obwammemba bwa Blink Orange, bwe ziba nga weeziri, za Blink era teziri mu nteekateeka eno. Ebisale bya kaadi biyinza okukyusibwa okuva ku kiseera okutuuka ku kiseera nga wabaddewo obubaka obw'ennaku 30 waakiri, okusinziira ku",
         "linkText": "Endagaano y'omukozesa wa kaadi"
       },
       "creditModeNotice": "Enkola ya Kredit tekyakola kati. Singa Enkola ya Kredit ekola, emiwendo gy'amagoba, ebisale, n'okubikkula ku ddembe ly'okusasula biraweebwa nga tekinnaba kukola.",
       "additionalDetails": {
         "title": "Ebisingawo ku bisale",
-        "overdraft": {
-          "label": "Okusukkirira",
-          "text": ". Mu mbeera ezimu, entambula eyinza okukkirizibwa ereeta ssente eziri ku kaadi yo okukka wansi wa ziro. Okusukkirira okusinga obungi ye {maxOverdraft: string}. Oteekwa okusasula okusukkirira mu nnaku 7 nga otambuza ssente ezongerezeddwa ku ssente eziri ku kaadi yo."
-        },
         "foreignCurrency": {
           "label": "Ssente z'ebweru",
           "text": ". Bw'okola entambula mu ssente z'ebweru, omukutu gwa kaadi gukyusa mu USD nga gukozesa enkola zaagwo ez'okukyusa. Omuwendo ku lunaku olw'okukola guyinza okuba ogw'enjawulo ku lunaku lw'entambula."
@@ -3442,6 +3434,7 @@
       "time": "Obudde",
       "transactionId": "ID",
       "cardUsed": "Kaadi eyakozesebwa",
+      "cardUsedValue": "Kaadi ya Blink •••• {lastFour}",
       "paymentMethod": "Enkola y'okusasula",
       "merchantInformation": "Ebikwata ku musuubuzi",
       "merchant": "Omusuubuzi",
@@ -3489,14 +3482,7 @@
       "title": "Yongera ku ssaamu ya simu",
       "addYourCard": "Yongera kaadi yo",
       "addYourCardDescription": "Yongera kaadi yo eya Blink ku ssaamu ya simu okusasula amangu era n'obukuumi",
-      "addTo": "Yongera ku",
-      "Benefits": {
-        "title": "Ebirungi by'essaamu ya simu",
-        "contactless": "Okusasula awatali kukwata mu bifo obukadde",
-        "security": "Obukuumi obulungi n'okukakasa kw'omubiri",
-        "noPhysicalCard": "Teweetaaga kutambula na kaadi yo",
-        "worksLocked": "Ekola ne singa simu yo erikuggaliddwa"
-      }
+      "addTo": "Yongera ku"
     },
     "CardStatus": {
       "title": "Kaadi ya Blink",

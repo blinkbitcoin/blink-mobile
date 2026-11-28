@@ -4,14 +4,17 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { formatDateForTransaction } from "@app/components/transaction-date/transaction-date"
 import type { CardTransactionGroup } from "@app/components/card-screen/types"
 import { isToday, isYesterday } from "@app/utils/date"
+import { toMajorUnit } from "@app/utils/helper"
 
-import { mapTransactionStatus } from "../utils/card-display"
+import { mapTransactionStatus, merchantIcon } from "../utils/card-display"
 
 type TransactionNode = {
   readonly id: string
+  /** In cents, as blink-card sends every card amount. */
   readonly amount: number
   readonly currency: string
   readonly merchantName: string
+  readonly merchantCategoryCode?: string | null
   readonly status: TransactionStatus
   readonly createdAt: string
 }
@@ -53,6 +56,7 @@ export const groupCardTransactionsByDate = ({
 
     groupMap[dateLabel].transactions.push({
       id: node.id,
+      icon: merchantIcon(node.merchantCategoryCode),
       merchantName: node.merchantName,
       timeAgo: formatDateForTransaction({
         createdAt: createdAtSeconds,
@@ -60,7 +64,7 @@ export const groupCardTransactionsByDate = ({
         includeTime: false,
       }),
       amount: formatCurrency({
-        amountInMajorUnits: node.amount,
+        amountInMajorUnits: toMajorUnit(node.amount),
         currency: node.currency,
       }),
       status: mapTransactionStatus(node.status),

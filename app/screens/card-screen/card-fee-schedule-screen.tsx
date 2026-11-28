@@ -19,6 +19,8 @@ import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 import { fonts } from "@app/rne-theme/fonts"
 
+import { formatCalendarDate } from "./utils/card-display"
+
 type Fee = {
   title: string
   subtitle?: string
@@ -60,7 +62,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { LL } = useI18nContext()
+  const { LL, locale } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const feeSchedule = LL.CardFlow.CardFeeSchedule
@@ -72,8 +74,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
     cardReplacementFeeUsd,
     cardUsdTransactionFeePercent,
     cardForeignTransactionFeePercent,
-    cardMaxOverdraftUsd,
-    cardLateRepaymentFeeUsd,
+    cardFeeScheduleEffectiveDate,
     cardCardholderAgreementUrl,
   } = useRemoteConfig()
 
@@ -89,8 +90,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
   const cardReplacementAmount = formatUsd(cardReplacementFeeUsd)
   const usdTransactionFeeAmount = `${cardUsdTransactionFeePercent}%`
   const foreignTransactionFeeAmount = `${cardForeignTransactionFeePercent}%`
-  const maximumOverdraftAmount = formatUsd(cardMaxOverdraftUsd)
-  const lateRepaymentFeeAmount = formatUsd(cardLateRepaymentFeeUsd)
+  const effectiveDate = formatCalendarDate(cardFeeScheduleEffectiveDate, locale)
 
   const [isDetailsExpanded, setIsDetailsExpanded] = React.useState(true)
 
@@ -119,21 +119,17 @@ export const CardFeeScheduleScreen: React.FC = () => {
   ]
   const overdraftFees: Fee[] = [
     {
-      title: fees.maximumOverdraft.title(),
-      subtitle: fees.maximumOverdraft.subtitle(),
-      value: maximumOverdraftAmount,
-    },
-    {
-      title: fees.lateRepaymentFee.title(),
-      subtitle: fees.lateRepaymentFee.subtitle(),
-      value: lateRepaymentFeeAmount,
+      title: fees.noOverdraft.title(),
+      value: fees.noOverdraft.value(),
     },
   ]
 
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.effective}>{feeSchedule.effectiveDate()}</Text>
+        <Text style={styles.effective}>
+          {feeSchedule.effectiveDate({ date: effectiveDate })}
+        </Text>
 
         <FeeSection label={sections.cardFees()} fees={cardFees} />
         <FeeSection label={sections.transactionFees()} fees={transactionFees} />
@@ -178,14 +174,6 @@ export const CardFeeScheduleScreen: React.FC = () => {
 
         {isDetailsExpanded ? (
           <View style={styles.detailsCard}>
-            <Text style={styles.detailsParagraph}>
-              <Text style={styles.detailsBold}>
-                {additionalDetails.overdraft.label()}
-              </Text>
-              {additionalDetails.overdraft.text({
-                maxOverdraft: maximumOverdraftAmount,
-              })}
-            </Text>
             <Text style={styles.detailsParagraph}>
               <Text style={styles.detailsBold}>
                 {additionalDetails.foreignCurrency.label()}

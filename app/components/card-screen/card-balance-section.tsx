@@ -7,14 +7,14 @@ import { Text, makeStyles } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 type CardBalanceSectionProps = {
-  balanceUsd: string
+  balancePrimary: string
   balanceSecondary: string
   isDisabled: boolean
   onAddFunds: () => void
 }
 
 export const CardBalanceSection: React.FC<CardBalanceSectionProps> = ({
-  balanceUsd,
+  balancePrimary,
   balanceSecondary,
   isDisabled,
   onAddFunds,
@@ -25,8 +25,8 @@ export const CardBalanceSection: React.FC<CardBalanceSectionProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.balanceColumn}>
-        <Text type="p1" bold style={styles.balanceUsd}>
-          {balanceUsd}
+        <Text type="p1" bold style={styles.balancePrimary}>
+          {balancePrimary}
         </Text>
         <Text type="p4" style={styles.balanceSecondary}>
           {balanceSecondary}
@@ -58,7 +58,7 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceColumn: {
     flexDirection: "column",
   },
-  balanceUsd: {
+  balancePrimary: {
     color: colors.textOnBackground,
   },
   balanceSecondary: {

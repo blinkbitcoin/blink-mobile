@@ -43,6 +43,28 @@ describe("SwitchRow", () => {
     jest.clearAllMocks()
   })
 
+  describe("badge", () => {
+    it("shows the badge beside the switch", () => {
+      const { getByText } = renderWithTheme(
+        <SwitchRow {...defaultProps} badge="Coming soon!" disabled />,
+      )
+
+      expect(getByText("Coming soon!")).toBeTruthy()
+    })
+
+    it("shows no badge unless given one", () => {
+      const { queryByText } = renderWithTheme(<SwitchRow {...defaultProps} />)
+
+      expect(queryByText("Coming soon!")).toBeNull()
+    })
+
+    it("shows no badge for an empty one", () => {
+      const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} badge="" />)
+
+      expect(JSON.stringify(toJSON())).not.toContain('"borderRadius":12')
+    })
+  })
+
   describe("rendering", () => {
     it("pads 14 above and below, as the design system row does", () => {
       const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} />)

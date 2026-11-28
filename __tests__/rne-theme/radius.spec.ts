@@ -250,7 +250,7 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/account-migration/to-non-custodial/merchant-tools-screen.tsx": 1,
   "app/screens/account-type-selection/account-type-selection.tsx": 1,
   "app/screens/card-screen/card-fee-schedule-screen.tsx": 3,
-  "app/screens/card-screen/card-limits-screen/card-limits-screen.tsx": 3,
+  "app/screens/card-screen/card-limits-screen/card-limits-screen.tsx": 1,
   "app/screens/card-screen/card-settings-screen/card-settings-screen.tsx": 1,
   "app/screens/card-screen/card-settings-screen/close-card-modal.tsx": 1,
   "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx": 2,

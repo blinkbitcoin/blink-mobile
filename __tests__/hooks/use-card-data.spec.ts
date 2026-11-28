@@ -55,6 +55,7 @@ describe("useCardData", () => {
     const { result } = renderHook(() => useCardData())
 
     expect(result.current.card).toEqual(mockCard)
+    expect(result.current.cards).toEqual([mockCard])
     expect(result.current.hasLoaded).toBe(true)
     expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeUndefined()

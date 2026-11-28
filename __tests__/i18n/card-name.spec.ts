@@ -33,6 +33,7 @@ const CARD_NAME_KEYS = [
   "CardFlow.CardSettings.closeCardAccountDescription",
   "CardFlow.CardSettings.closeCardWarning",
   "CardFlow.CardSettings.closeCardSuccessSubtitle",
+  "CardFlow.TransactionDetails.cardUsedValue",
 ]
 
 // Visa as the Latin, Arabic and Cyrillic scripts of these files write it.

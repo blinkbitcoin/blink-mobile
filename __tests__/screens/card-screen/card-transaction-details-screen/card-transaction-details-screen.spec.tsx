@@ -50,9 +50,15 @@ jest.mock(
   }),
 )
 
+type CardFixture = { id: string; lastFour: string }
+let mockCards: CardFixture[] = []
+jest.mock("@app/hooks/use-card-data", () => ({
+  useCardData: () => ({ cards: mockCards }),
+}))
+
 const TRANSACTION_1 = {
   id: "txn-001",
-  amount: 12.5,
+  amount: 1250,
   currency: "USD",
   merchantName: "SuperSelectos",
   status: TransactionStatus.Pending,
@@ -61,7 +67,7 @@ const TRANSACTION_1 = {
 
 const TRANSACTION_2 = {
   id: "txn-002",
-  amount: 5.75,
+  amount: 575,
   currency: "USD",
   merchantName: "Starbucks",
   status: TransactionStatus.Completed,
@@ -457,6 +463,102 @@ describe("CardTransactionDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Conversion fee")).toBeTruthy()
+    })
+  })
+
+  describe("merchant and card details", () => {
+    const renderTransaction = async (transaction: Record<string, unknown>) => {
+      mockUseCardTransaction.mockReturnValue({ transaction })
+      const screen = render(
+        <ContextForScreen>
+          <CardTransactionDetailsScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      return screen
+    }
+
+    const detailedTransaction = {
+      ...TRANSACTION_2,
+      enrichedMerchantCategory: "Food & Dining",
+      merchantCategory: "Fast food restaurants",
+      merchantCategoryCode: "5814",
+      merchantCity: "San Salvador",
+      merchantCountry: "SV",
+    }
+
+    beforeEach(() => {
+      mockUseRoute.mockReturnValue({
+        params: { transactionId: "txn-002", cardId: "card-physical" },
+      })
+      mockCards = [
+        { id: "card-physical", lastFour: "4242" },
+        { id: "card-virtual", lastFour: "2121" },
+      ]
+    })
+
+    it("names the card used by its last four digits", async () => {
+      const { getByText } = await renderTransaction(detailedTransaction)
+
+      expect(getByText("Blink Card •••• 4242")).toBeTruthy()
+    })
+
+    it("names no card when opened from a link, which carries none", async () => {
+      mockUseRoute.mockReturnValue({ params: { transactionId: "txn-002" } })
+
+      const { queryByText } = await renderTransaction(detailedTransaction)
+
+      expect(queryByText("Blink Card •••• 4242")).toBeNull()
+      expect(queryByText("Blink Card •••• 2121")).toBeNull()
+    })
+
+    it("shows the enriched category, the city and country, and the MCC", async () => {
+      const { getByText } = await renderTransaction(detailedTransaction)
+
+      expect(getByText("Food & Dining")).toBeTruthy()
+      expect(getByText("San Salvador, El Salvador")).toBeTruthy()
+      expect(getByText("5814")).toBeTruthy()
+    })
+
+    it("falls back to the issuer's category without an enriched one", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        enrichedMerchantCategory: null,
+      })
+
+      expect(getByText("Fast food restaurants")).toBeTruthy()
+    })
+
+    it("falls back to the issuer's category when the enriched one is empty", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        enrichedMerchantCategory: "",
+      })
+
+      expect(getByText("Fast food restaurants")).toBeTruthy()
+    })
+
+    it("shows whichever part of the location it has", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        merchantCity: null,
+      })
+
+      expect(getByText("El Salvador")).toBeTruthy()
+    })
+
+    it("draws the icon of the merchant's category", async () => {
+      const { getByTestId } = await renderTransaction(detailedTransaction)
+
+      expect(getByTestId("icon-fork-knife")).toBeTruthy()
+    })
+
+    it("marks what it does not know as unavailable", async () => {
+      mockCards = []
+      const { getAllByText, getByTestId } = await renderTransaction(TRANSACTION_2)
+
+      expect(getAllByText("---").length).toBeGreaterThanOrEqual(7)
+      expect(getByTestId("icon-storefront")).toBeTruthy()
     })
   })
 })

@@ -37,14 +37,16 @@ const makeNode = (
     amount: number
     currency: string
     merchantName: string
+    merchantCategoryCode: string
     status: TransactionStatus
     createdAt: string
   }> = {},
 ) => ({
   id: overrides.id ?? "tx-1",
-  amount: overrides.amount ?? 10.5,
+  amount: overrides.amount ?? 1050,
   currency: overrides.currency ?? "USD",
   merchantName: overrides.merchantName ?? "Test Store",
+  merchantCategoryCode: overrides.merchantCategoryCode,
   status: overrides.status ?? TransactionStatus.Completed,
   createdAt: overrides.createdAt ?? todayISO,
 })
@@ -105,9 +107,9 @@ describe("groupCardTransactionsByDate", () => {
     expect(result[1].date).toBe("Yesterday")
   })
 
-  it("formats amount using formatCurrency", () => {
+  it("formats the amount in dollars from the cents blink-card sends", () => {
     const result = groupCardTransactionsByDate({
-      nodes: [makeNode({ amount: 25.99, currency: "USD" })],
+      nodes: [makeNode({ amount: 2599, currency: "USD" })],
       LL: mockLL,
       locale: "en",
       formatCurrency: mockFormatCurrency,
@@ -149,6 +151,23 @@ describe("groupCardTransactionsByDate", () => {
     const tx = result[0].transactions[0]
     expect(tx.id).toBe("unique-id")
     expect(tx.merchantName).toBe("Coffee Shop")
+  })
+
+  it("picks each transaction's icon from its merchant category code", () => {
+    const result = groupCardTransactionsByDate({
+      nodes: [
+        makeNode({ id: "meal", merchantCategoryCode: "5814" }),
+        makeNode({ id: "shop" }),
+      ],
+      LL: mockLL,
+      locale: "en",
+      formatCurrency: mockFormatCurrency,
+    })
+
+    const icons = Object.fromEntries(
+      result[0].transactions.map(({ id, icon }) => [id, icon]),
+    )
+    expect(icons).toEqual({ meal: "fork-knife", shop: "storefront" })
   })
 
   it("calls formatDateForTransaction for timeAgo", () => {

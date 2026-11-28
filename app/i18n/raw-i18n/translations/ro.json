@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Grila de taxe a cardului Blink",
-      "effectiveDate": "În vigoare de la 1 iulie 2026",
+      "effectiveDate": "În vigoare de la {date}",
       "sections": {
         "cardFees": "Taxe pentru card",
         "transactionFees": "Taxe de tranzacție",
@@ -3326,13 +3326,9 @@
           "title": "Taxă de tranzacție externă",
           "subtitle": "Aplicată fiecărei tranzacții într-o monedă diferită de dolarul american"
         },
-        "maximumOverdraft": {
-          "title": "Descoperit maxim",
-          "subtitle": "Trebuie rambursat în termen de 7 zile"
-        },
-        "lateRepaymentFee": {
-          "title": "Taxă de rambursare întârziată",
-          "subtitle": "Se percepe dacă descoperitul nu este rambursat în termen de 7 zile"
+        "noOverdraft": {
+          "title": "Descoperitul de cont nu este permis",
+          "value": "N/A"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Când o tranzacție necesită conversia BTC în USD, conversia se execută la cursul de schimb în vigoare, care poate include o marjă ce reflectă costul conversiei."
       },
       "feesUpdateNotice": {
-        "text": "Taxele pot fi actualizate din când în când. Blink va notifica cu cel puțin 30 de zile înainte ca orice modificare a taxelor să intre în vigoare, în conformitate cu",
+        "text": "Taxa de membru Blink Orange, dacă există, aparține Blink și nu face parte din această listă. Taxele cardului pot fi actualizate din când în când cu o notificare de cel puțin 30 de zile, în conformitate cu",
         "linkText": "Acordul deținătorului de card"
       },
       "creditModeNotice": "Modul Credit nu este activ în prezent. Dacă Modul Credit este activat, ratele dobânzii, taxele și informațiile privind drepturile de facturare aplicabile vor fi furnizate înainte de activare.",
       "additionalDetails": {
         "title": "Detalii suplimentare despre taxe",
-        "overdraft": {
-          "label": "Descoperit de cont",
-          "text": ". În anumite circumstanțe, o tranzacție poate fi aprobată, ceea ce face ca soldul cardului tău să scadă sub zero. Descoperitul maxim este de {maxOverdraft: string}. Trebuie să rambursezi descoperitul în termen de 7 zile transferând fonduri suplimentare în soldul cardului tău."
-        },
         "foreignCurrency": {
           "label": "Monedă străină",
           "text": ". Dacă efectuezi o tranzacție într-o monedă străină, rețeaua cardului o convertește în USD folosind propriile proceduri de conversie. Cursul de la data procesării poate diferi de data tranzacției."
@@ -3442,6 +3434,7 @@
       "time": "Ora",
       "transactionId": "ID",
       "cardUsed": "Card folosit",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Metodă de plată",
       "merchantInformation": "Informații comerciant",
       "merchant": "Comerciant",
@@ -3489,14 +3482,7 @@
       "title": "Adauga in portofelul mobil",
       "addYourCard": "Adauga cardul tau",
       "addYourCardDescription": "Adaugă Blink Card-ul în portofelul mobil pentru plăți rapide și sigure",
-      "addTo": "Adauga in",
-      "Benefits": {
-        "title": "Beneficiile portofelului mobil",
-        "contactless": "Plati contactless in milioane de locatii",
-        "security": "Securitate imbunatatita cu autentificare biometrica",
-        "noPhysicalCard": "Nu e nevoie sa porti cardul fizic",
-        "worksLocked": "Functioneaza chiar si cand telefonul e blocat"
-      }
+      "addTo": "Adauga in"
     },
     "CardStatus": {
       "title": "Blink Card",

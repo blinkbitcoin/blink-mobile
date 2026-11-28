@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Blink kártya díjszabása",
-      "effectiveDate": "Hatályos 2026. július 1-jétől",
+      "effectiveDate": "Hatályos: {date}",
       "sections": {
         "cardFees": "Kártyadíjak",
         "transactionFees": "Tranzakciós díjak",
@@ -3326,13 +3326,9 @@
           "title": "Külföldi tranzakciós díj",
           "subtitle": "Minden nem amerikai dollárban végzett tranzakcióra vonatkozik"
         },
-        "maximumOverdraft": {
-          "title": "Maximális folyószámlahitel",
-          "subtitle": "7 napon belül vissza kell fizetni"
-        },
-        "lateRepaymentFee": {
-          "title": "Késedelmes visszafizetési díj",
-          "subtitle": "Felszámításra kerül, ha a folyószámlahitelt nem fizetik vissza 7 napon belül"
+        "noOverdraft": {
+          "title": "Folyószámlahitel nem engedélyezett",
+          "value": "N/A"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Amikor egy tranzakció BTC USD-re való átváltását igényli, az átváltás az aktuális árfolyamon történik, amely tartalmazhat egy felárat, amely az átváltás költségét tükrözi."
       },
       "feesUpdateNotice": {
-        "text": "A díjak időről időre módosulhatnak. A Blink legalább 30 nappal korábban értesítést küld, mielőtt bármely díjváltozás hatályba lépne, a",
+        "text": "A Blink Orange tagsági díja, ha van ilyen, a Blinket illeti, és nem része ennek a díjjegyzéknek. A kártyadíjak időről időre módosulhatnak legalább 30 napos előzetes értesítéssel, a",
         "linkText": "Kártyabirtokosi szerződéssel"
       },
       "creditModeNotice": "A Hitel mód jelenleg nem aktív. Ha a Hitel mód aktiválásra kerül, az alkalmazandó kamatlábak, díjak és számlázási jogokra vonatkozó közlemények az aktiválás előtt kerülnek megadásra.",
       "additionalDetails": {
         "title": "További díjrészletek",
-        "overdraft": {
-          "label": "Folyószámlahitel",
-          "text": ". Bizonyos körülmények között jóváhagyható olyan tranzakció, amely miatt a kártyaegyenlege nulla alá csökken. A maximális folyószámlahitel {maxOverdraft: string}. A folyószámlahitelt 7 napon belül vissza kell fizetnie további összegek átutalásával a kártyaegyenlegére."
-        },
         "foreignCurrency": {
           "label": "Külföldi pénznem",
           "text": ". Ha külföldi pénznemben végez tranzakciót, a kártyahálózat saját átváltási eljárásaival átváltja USD-re. A feldolgozás napján érvényes árfolyam eltérhet a tranzakció dátumától."
@@ -3442,6 +3434,7 @@
       "time": "Idő",
       "transactionId": "ID",
       "cardUsed": "Használt kártya",
+      "cardUsedValue": "Blink kártya •••• {lastFour}",
       "paymentMethod": "Fizetési mód",
       "merchantInformation": "Kereskedő információ",
       "merchant": "Kereskedő",
@@ -3489,14 +3482,7 @@
       "title": "Hozzaadas a mobil tarcahoz",
       "addYourCard": "Add hozza a kartyad",
       "addYourCardDescription": "Add hozzá a Blink kártyádat a mobil tárcádhoz a gyors és biztonságos fizetésekhez",
-      "addTo": "Hozzaadas",
-      "Benefits": {
-        "title": "A mobil tarca elonyei",
-        "contactless": "Erintesmentes fizetes millio helyen",
-        "security": "Fokozott biztonsag biometrikus hitelesitessel",
-        "noPhysicalCard": "Nem kell magadnal hordanod a fizikai kartyat",
-        "worksLocked": "Mukodik meg akkor is ha a telefonod zarolva van"
-      }
+      "addTo": "Hozzaadas"
     },
     "CardStatus": {
       "title": "Blink kártya",

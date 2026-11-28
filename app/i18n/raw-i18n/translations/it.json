@@ -3272,7 +3272,7 @@
         "cardFrozenSubtitle": "La carta è temporaneamente disabilitata",
         "CardFeeSchedule": {
             "title": "Programma tariffe della carta Blink",
-            "effectiveDate": "In vigore dal 1° luglio 2026",
+            "effectiveDate": "In vigore dal {date}",
             "sections": {
                 "cardFees": "Costi della carta",
                 "transactionFees": "Costi di transazione",
@@ -3294,13 +3294,9 @@
                     "title": "Costo di transazione estera",
                     "subtitle": "Applicato a ogni transazione in una valuta diversa dal dollaro statunitense"
                 },
-                "maximumOverdraft": {
-                    "title": "Scoperto massimo",
-                    "subtitle": "Deve essere rimborsato entro 7 giorni"
-                },
-                "lateRepaymentFee": {
-                    "title": "Costo per rimborso tardivo",
-                    "subtitle": "Addebitato se lo scoperto non viene rimborsato entro 7 giorni"
+                "noOverdraft": {
+                    "title": "Nessuno scoperto consentito",
+                    "value": "N/D"
                 }
             },
             "btcConversion": {
@@ -3308,16 +3304,12 @@
                 "body": "Quando una transazione richiede la conversione da BTC a USD, la conversione viene eseguita al tasso di cambio vigente, che può includere uno spread che riflette il costo della conversione."
             },
             "feesUpdateNotice": {
-                "text": "I costi possono essere aggiornati di volta in volta. Blink fornirà un preavviso di almeno 30 giorni prima che qualsiasi modifica dei costi abbia effetto, in conformità con il",
+                "text": "La quota di iscrizione a Blink Orange, se prevista, spetta a Blink e non fa parte di questo prospetto. I costi della carta possono essere aggiornati di volta in volta con un preavviso di almeno 30 giorni, in conformità con il",
                 "linkText": "Contratto del titolare della carta"
             },
             "creditModeNotice": "La Modalità Credito non è attualmente attiva. Se la Modalità Credito viene attivata, i tassi di interesse, i costi e le informative sui diritti di fatturazione applicabili saranno forniti prima dell'attivazione.",
             "additionalDetails": {
                 "title": "Ulteriori dettagli sui costi",
-                "overdraft": {
-                    "label": "Scoperto",
-                    "text": ". In determinate circostanze, può essere approvata una transazione che fa scendere il saldo della tua Carta sotto lo zero. Lo scoperto massimo è di {maxOverdraft: string}. Devi rimborsare lo scoperto entro 7 giorni trasferendo fondi aggiuntivi sul saldo della tua Carta."
-                },
                 "foreignCurrency": {
                     "label": "Valuta estera",
                     "text": ". Se effettui una transazione in una valuta estera, il circuito della carta la converte in USD utilizzando le proprie procedure di conversione. Il tasso alla data di elaborazione può differire dalla data della transazione."
@@ -3442,6 +3434,7 @@
             "time": "Ora",
             "transactionId": "ID",
             "cardUsed": "Carta utilizzata",
+            "cardUsedValue": "Blink Card •••• {lastFour}",
             "paymentMethod": "Metodo di pagamento",
             "merchantInformation": "Informazioni esercente",
             "merchant": "Esercente",
@@ -3489,14 +3482,7 @@
             "title": "Aggiungi al portafoglio mobile",
             "addYourCard": "Aggiungi la tua carta",
             "addYourCardDescription": "Aggiungi la tua Blink Card al portafoglio mobile per pagamenti rapidi e sicuri",
-            "addTo": "Aggiungi a",
-            "Benefits": {
-                "title": "Vantaggi del portafoglio mobile",
-                "contactless": "Pagamenti contactless in milioni di luoghi",
-                "security": "Sicurezza migliorata con autenticazione biometrica",
-                "noPhysicalCard": "Non serve portare la carta fisica",
-                "worksLocked": "Funziona anche con il telefono bloccato"
-            }
+            "addTo": "Aggiungi a"
         },
         "CardStatus": {
             "title": "Blink Card",

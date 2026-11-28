@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Blink Card-tariefoverzicht",
-      "effectiveDate": "Van kracht vanaf 1 juli 2026",
+      "effectiveDate": "Van kracht vanaf {date}",
       "sections": {
         "cardFees": "Kaartkosten",
         "transactionFees": "Transactiekosten",
@@ -3326,13 +3326,9 @@
           "title": "Buitenlandse transactiekosten",
           "subtitle": "Van toepassing op elke transactie in een andere valuta dan de Amerikaanse dollar"
         },
-        "maximumOverdraft": {
-          "title": "Maximale roodstand",
-          "subtitle": "Moet binnen 7 dagen worden terugbetaald"
-        },
-        "lateRepaymentFee": {
-          "title": "Kosten voor late terugbetaling",
-          "subtitle": "In rekening gebracht als de roodstand niet binnen 7 dagen wordt terugbetaald"
+        "noOverdraft": {
+          "title": "Geen roodstand toegestaan",
+          "value": "N.v.t."
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Wanneer een transactie conversie van BTC naar USD vereist, wordt de conversie uitgevoerd tegen de geldende wisselkoers, die een marge kan bevatten die de conversiekosten weerspiegelt."
       },
       "feesUpdateNotice": {
-        "text": "Kosten kunnen van tijd tot tijd worden bijgewerkt. Blink geeft ten minste 30 dagen van tevoren kennis voordat eventuele kostenwijzigingen van kracht worden, in overeenstemming met de",
+        "text": "Het lidmaatschapsgeld van Blink Orange, indien van toepassing, is van Blink en maakt geen deel uit van dit overzicht. Kaartkosten kunnen van tijd tot tijd worden bijgewerkt met ten minste 30 dagen vooraankondiging, in overeenstemming met de",
         "linkText": "Kaarthouderovereenkomst"
       },
       "creditModeNotice": "Kredietmodus is momenteel niet actief. Als Kredietmodus wordt geactiveerd, worden de toepasselijke rentetarieven, kosten en openbaarmakingen van factureringsrechten vóór activering verstrekt.",
       "additionalDetails": {
         "title": "Aanvullende kostendetails",
-        "overdraft": {
-          "label": "Roodstand",
-          "text": ". In bepaalde omstandigheden kan een transactie worden goedgekeurd waardoor uw kaartsaldo onder nul komt. De maximale roodstand is {maxOverdraft: string}. U moet de roodstand binnen 7 dagen terugbetalen door extra geld naar uw kaartsaldo over te maken."
-        },
         "foreignCurrency": {
           "label": "Vreemde valuta",
           "text": ". Als u een transactie in een vreemde valuta uitvoert, converteert het kaartnetwerk deze naar USD met zijn eigen conversieprocedures. De koers op de verwerkingsdatum kan afwijken van de transactiedatum."
@@ -3442,6 +3434,7 @@
       "time": "Tijd",
       "transactionId": "ID",
       "cardUsed": "Gebruikte kaart",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Betaalmethode",
       "merchantInformation": "Handelaarinformatie",
       "merchant": "Handelaar",
@@ -3489,14 +3482,7 @@
       "title": "Toevoegen aan mobiele portemonnee",
       "addYourCard": "Voeg je kaart toe",
       "addYourCardDescription": "Voeg je Blink Card toe aan je mobiele portemonnee voor snelle en veilige betalingen",
-      "addTo": "Toevoegen aan",
-      "Benefits": {
-        "title": "Voordelen van mobiele portemonnee",
-        "contactless": "Contactloze betalingen op miljoenen locaties",
-        "security": "Verbeterde beveiliging met biometrische authenticatie",
-        "noPhysicalCard": "Geen fysieke kaart nodig",
-        "worksLocked": "Werkt zelfs wanneer je telefoon vergrendeld is"
-      }
+      "addTo": "Toevoegen aan"
     },
     "CardStatus": {
       "title": "Blink Card",

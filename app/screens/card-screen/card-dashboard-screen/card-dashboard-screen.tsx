@@ -144,7 +144,7 @@ const CardDashboardScreenContent: React.FC = () => {
         />
 
         <CardBalanceSection
-          balanceUsd={balancePrimary}
+          balancePrimary={balancePrimary}
           balanceSecondary={balanceSecondary}
           isDisabled={isFrozen}
           onAddFunds={() => console.log("Add funds pressed")}
@@ -162,7 +162,10 @@ const CardDashboardScreenContent: React.FC = () => {
         <CardTransactionsSection
           groups={transactions}
           onTransactionPress={(transactionId) =>
-            navigation.navigate("cardTransactionDetailsScreen", { transactionId })
+            navigation.navigate("cardTransactionDetailsScreen", {
+              transactionId,
+              cardId: card.id,
+            })
           }
         />
 

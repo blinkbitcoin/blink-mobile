@@ -1,6 +1,7 @@
 import React from "react"
 import { Text as RNText } from "react-native"
 import { render } from "@testing-library/react-native"
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 
 import { CardTransactionsSection } from "@app/components/card-screen/card-transactions-section"
 
@@ -75,6 +76,7 @@ type TransactionDetails = {
 
 type Transaction = {
   id: string
+  icon: IconNamesType
   merchantName: string
   timeAgo: string
   amount: string
@@ -112,6 +114,7 @@ describe("CardTransactionsSection", () => {
       transactions: [
         {
           id: "1",
+          icon: "storefront",
           merchantName: "Starbucks",
           timeAgo: "2 minutes ago",
           amount: "-$5.75",
@@ -120,6 +123,7 @@ describe("CardTransactionsSection", () => {
         },
         {
           id: "2",
+          icon: "storefront",
           merchantName: "Amazon",
           timeAgo: "1 hour ago",
           amount: "-$24.99",
@@ -133,6 +137,7 @@ describe("CardTransactionsSection", () => {
       transactions: [
         {
           id: "3",
+          icon: "storefront",
           merchantName: "Netflix",
           timeAgo: "18 hours ago",
           amount: "-$15.99",
@@ -243,6 +248,7 @@ describe("CardTransactionsSection", () => {
         transactions: [
           {
             id: "1",
+            icon: "storefront",
             merchantName: "Coffee Shop",
             timeAgo: "just now",
             amount: "-$4.50",
@@ -271,6 +277,7 @@ describe("CardTransactionsSection", () => {
         transactions: [
           {
             id: "1",
+            icon: "storefront",
             merchantName: "Store A",
             timeAgo: "1 min ago",
             amount: "-$10.00",
@@ -279,6 +286,7 @@ describe("CardTransactionsSection", () => {
           },
           {
             id: "2",
+            icon: "storefront",
             merchantName: "Store B",
             timeAgo: "5 min ago",
             amount: "-$20.00",
@@ -287,6 +295,7 @@ describe("CardTransactionsSection", () => {
           },
           {
             id: "3",
+            icon: "storefront",
             merchantName: "Store C",
             timeAgo: "10 min ago",
             amount: "-$30.00",
@@ -295,6 +304,7 @@ describe("CardTransactionsSection", () => {
           },
           {
             id: "4",
+            icon: "storefront",
             merchantName: "Store D",
             timeAgo: "15 min ago",
             amount: "-$40.00",
@@ -335,6 +345,7 @@ describe("CardTransactionsSection", () => {
         transactions: [
           {
             id: "1",
+            icon: "storefront",
             merchantName: "Shop",
             timeAgo: "2 weeks ago",
             amount: "-$100.00",
@@ -348,6 +359,7 @@ describe("CardTransactionsSection", () => {
         transactions: [
           {
             id: "2",
+            icon: "storefront",
             merchantName: "Gift Store",
             timeAgo: "1 month ago",
             amount: "-$50.00",

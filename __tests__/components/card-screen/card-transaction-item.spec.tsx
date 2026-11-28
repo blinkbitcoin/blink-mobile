@@ -51,6 +51,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 describe("CardTransactionItem", () => {
   describe("rendering with pending status", () => {
     const pendingProps = {
+      icon: "storefront" as const,
       merchantName: "Starbucks",
       timeAgo: "2 minutes ago",
       amount: "-$5.75",
@@ -88,8 +89,23 @@ describe("CardTransactionItem", () => {
     })
   })
 
+  it("shows the icon of the merchant's category", () => {
+    const { getByTestId } = render(
+      <CardTransactionItem
+        icon="car"
+        merchantName="Uber"
+        timeAgo="1 hour ago"
+        amount="-$12.00"
+        status="completed"
+      />,
+    )
+
+    expect(getByTestId("icon-car")).toBeTruthy()
+  })
+
   describe("rendering with completed status", () => {
     const completedProps = {
+      icon: "storefront" as const,
       merchantName: "Amazon",
       timeAgo: "1 hour ago",
       amount: "-$24.99",
@@ -139,6 +155,7 @@ describe("CardTransactionItem", () => {
     it("renders with long merchant name", () => {
       const { getByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="SuperSelectos Mall Plaza Downtown Store"
           timeAgo="5 hours ago"
           amount="-$150.00"
@@ -152,6 +169,7 @@ describe("CardTransactionItem", () => {
     it("renders with small amount", () => {
       const { getByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="Coffee Shop"
           timeAgo="just now"
           amount="-$0.50"
@@ -165,6 +183,7 @@ describe("CardTransactionItem", () => {
     it("renders with large amount", () => {
       const { getByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="Electronics Store"
           timeAgo="2 days ago"
           amount="-$1,299.99"
@@ -178,6 +197,7 @@ describe("CardTransactionItem", () => {
     it("renders with different time formats", () => {
       const { getByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="Restaurant"
           timeAgo="Yesterday at 8:30 PM"
           amount="-$45.00"
@@ -193,6 +213,7 @@ describe("CardTransactionItem", () => {
     it("shows Pending for pending transactions", () => {
       const { getByText, queryByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="Store"
           timeAgo="1 min ago"
           amount="-$10.00"
@@ -207,6 +228,7 @@ describe("CardTransactionItem", () => {
     it("shows Completed for completed transactions", () => {
       const { getByText, queryByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="Store"
           timeAgo="1 min ago"
           amount="-$10.00"
@@ -223,6 +245,7 @@ describe("CardTransactionItem", () => {
     it("displays all transaction details together", () => {
       const { getByText } = renderWithProviders(
         <CardTransactionItem
+          icon="storefront"
           merchantName="Uber Eats"
           timeAgo="3 hours ago"
           amount="-$18.50"
@@ -239,7 +262,12 @@ describe("CardTransactionItem", () => {
 
   // Each status pins its token, so moving one to another live token fails here.
   describe("status colours", () => {
-    const base = { merchantName: "Starbucks", timeAgo: "now", amount: "-$5.75" }
+    const base = {
+      icon: "storefront" as const,
+      merchantName: "Starbucks",
+      timeAgo: "now",
+      amount: "-$5.75",
+    }
 
     it("shows pending in textMuted", () => {
       const { getByText } = render(<CardTransactionItem {...base} status="pending" />)

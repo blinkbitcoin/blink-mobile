@@ -3304,7 +3304,7 @@
     },
     "CardFeeSchedule": {
       "title": "Biểu phí Thẻ Blink",
-      "effectiveDate": "Có hiệu lực từ ngày 1 tháng 7 năm 2026",
+      "effectiveDate": "Có hiệu lực từ {date}",
       "sections": {
         "cardFees": "Phí thẻ",
         "transactionFees": "Phí giao dịch",
@@ -3326,13 +3326,9 @@
           "title": "Phí giao dịch nước ngoài",
           "subtitle": "Áp dụng cho mỗi giao dịch bằng loại tiền tệ khác đô la Mỹ"
         },
-        "maximumOverdraft": {
-          "title": "Thấu chi tối đa",
-          "subtitle": "Phải được hoàn trả trong vòng 7 ngày"
-        },
-        "lateRepaymentFee": {
-          "title": "Phí hoàn trả trễ hạn",
-          "subtitle": "Được tính nếu khoản thấu chi không được hoàn trả trong vòng 7 ngày"
+        "noOverdraft": {
+          "title": "Không cho phép thấu chi",
+          "value": "Không áp dụng"
         }
       },
       "btcConversion": {
@@ -3340,16 +3336,12 @@
         "body": "Khi một giao dịch yêu cầu chuyển đổi BTC sang USD, việc chuyển đổi được thực hiện theo tỷ giá hối đoái hiện hành, có thể bao gồm khoản chênh lệch phản ánh chi phí chuyển đổi."
       },
       "feesUpdateNotice": {
-        "text": "Phí có thể được cập nhật theo thời gian. Blink sẽ thông báo trước ít nhất 30 ngày trước khi bất kỳ thay đổi phí nào có hiệu lực, theo",
+        "text": "Phí thành viên Blink Orange, nếu có, thuộc về Blink và không nằm trong biểu phí này. Phí thẻ có thể được cập nhật theo thời gian với thông báo trước ít nhất 30 ngày, theo",
         "linkText": "Thỏa thuận Chủ thẻ"
       },
       "creditModeNotice": "Chế độ Tín dụng hiện không hoạt động. Nếu Chế độ Tín dụng được kích hoạt, lãi suất, phí và các công bố về quyền lập hóa đơn hiện hành sẽ được cung cấp trước khi kích hoạt.",
       "additionalDetails": {
         "title": "Chi tiết phí bổ sung",
-        "overdraft": {
-          "label": "Thấu chi",
-          "text": ". Trong một số trường hợp nhất định, một giao dịch có thể được chấp thuận khiến Số dư Thẻ của bạn giảm xuống dưới 0. Thấu chi tối đa là {maxOverdraft: string}. Bạn phải hoàn trả khoản thấu chi trong vòng 7 ngày bằng cách chuyển thêm tiền vào Số dư Thẻ của bạn."
-        },
         "foreignCurrency": {
           "label": "Ngoại tệ",
           "text": ". Nếu bạn thực hiện giao dịch bằng ngoại tệ, mạng lưới thẻ sẽ chuyển đổi sang USD bằng quy trình chuyển đổi riêng của mình. Tỷ giá vào ngày xử lý có thể khác với ngày giao dịch."
@@ -3442,6 +3434,7 @@
       "time": "Thời gian",
       "transactionId": "ID",
       "cardUsed": "Thẻ sử dụng",
+      "cardUsedValue": "Thẻ Blink •••• {lastFour}",
       "paymentMethod": "Phương thức thanh toán",
       "merchantInformation": "Thông tin đơn vị",
       "merchant": "Đơn vị",
@@ -3489,14 +3482,7 @@
       "title": "Them vao vi di dong",
       "addYourCard": "Them the cua ban",
       "addYourCardDescription": "Thêm thẻ Blink vào ví di động để thanh toán nhanh chóng và an toàn",
-      "addTo": "Them vao",
-      "Benefits": {
-        "title": "Loi ich cua vi di dong",
-        "contactless": "Thanh toan khong tiep xuc tai hang trieu dia diem",
-        "security": "Bao mat nang cao voi xac thuc sinh trac hoc",
-        "noPhysicalCard": "Khong can mang theo the vat ly",
-        "worksLocked": "Hoat dong ngay ca khi dien thoai bi khoa"
-      }
+      "addTo": "Them vao"
     },
     "CardStatus": {
       "title": "Thẻ Blink",

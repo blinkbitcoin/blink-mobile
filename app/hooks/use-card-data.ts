@@ -52,5 +52,14 @@ export const useCardData = ({ skip = false }: { skip?: boolean } = {}) => {
       (a) => a.applicationStatus === ApplicationStatus.Approved,
     )?.id ?? null
 
-  return { card, hasPhysicalCard, applicationId, hasLoaded, loading, error, refetch }
+  return {
+    card,
+    cards,
+    hasPhysicalCard,
+    applicationId,
+    hasLoaded,
+    loading,
+    error,
+    refetch,
+  }
 }

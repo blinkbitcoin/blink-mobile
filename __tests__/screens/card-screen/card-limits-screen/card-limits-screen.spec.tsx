@@ -488,14 +488,45 @@ describe("CardLimitsScreen", () => {
     })
   })
 
-  describe("coming soon section", () => {
-    it("keeps online and contactless payments as coming soon", () => {
-      const { getByText, getByRole } = renderScreen()
+  describe("transaction types", () => {
+    it("lists online purchases, ATM withdrawals and contactless payments in that order", () => {
+      const { getByText, getAllByRole } = renderScreen()
 
-      expect(getByText("Coming soon!")).toBeTruthy()
       expect(getByText("Transaction types")).toBeTruthy()
-      expect(getByRole("switch", { name: "Online purchases" })).toBeTruthy()
-      expect(getByRole("switch", { name: "Contactless payments" })).toBeTruthy()
+      expect(getAllByRole("switch").map((row) => row.props.accessibilityLabel)).toEqual([
+        "Online purchases",
+        "ATM withdrawals",
+        "Contactless payments",
+      ])
+    })
+
+    it("keeps online and contactless payments coming soon, their switches locked", () => {
+      const { getAllByText, getByRole } = renderScreen()
+
+      expect(getAllByText("Coming soon!")).toHaveLength(2)
+      expect(
+        getByRole("switch", { name: "Online purchases" }).props.accessibilityState
+          .disabled,
+      ).toBe(true)
+      expect(
+        getByRole("switch", { name: "Contactless payments" }).props.accessibilityState
+          .disabled,
+      ).toBe(true)
+      expect(
+        getByRole("switch", { name: "ATM withdrawals" }).props.accessibilityState
+          .disabled,
+      ).toBe(false)
+    })
+
+    it("keeps the coming soon rows while the ATM controls load", () => {
+      setupMocks({ atmControls: { hasAtmControls: false, isAtmControlsLoading: true } })
+
+      const { getAllByRole } = renderScreen()
+
+      expect(getAllByRole("switch").map((row) => row.props.accessibilityLabel)).toEqual([
+        "Online purchases",
+        "Contactless payments",
+      ])
     })
   })
 })
