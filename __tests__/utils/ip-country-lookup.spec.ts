@@ -336,6 +336,22 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
       expect.anything(),
     )
   })
+
+  it("falls back to vpndetection.io when every other adapter fails", async () => {
+    mockedAxios.get
+      .mockRejectedValueOnce(new Error("ipinfo down"))
+      .mockRejectedValueOnce(new Error("proxycheck down"))
+      .mockRejectedValueOnce(new Error("ipapi down"))
+      .mockResolvedValueOnce({ data: { location: { country: "SV" } } })
+
+    const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(result).toBe("SV")
+    expect(mockedAxios.get).toHaveBeenLastCalledWith(
+      "https://api.vpndetection.io/myip",
+      expect.anything(),
+    )
+  })
 })
 
 describe("no-key warning", () => {
