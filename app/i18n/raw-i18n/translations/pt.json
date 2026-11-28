@@ -3261,7 +3261,7 @@
             "emptyTransactions": "Nenhuma transação ainda",
             "addFunds": "Adicionar fundos",
             "transactionsTitle": "Transações",
-            "title": "Cartão Visa",
+            "title": "Cartão Blink",
             "noCardAvailable": "Nenhum cartão disponível",
             "cardNotUsable": "Este cartão não está disponível para uso no momento",
             "cardUpdateError": "Não foi possível atualizar o status do cartão"
@@ -3281,8 +3281,7 @@
             "fees": {
                 "annualFee": {
                     "title": "Tarifa anual",
-                    "subtitle": "Isenta no primeiro ano a partir da data de emissão do Cartão",
-                    "value": "{amount: string} / ano"
+                    "subtitle": "O Cartão Blink não tem tarifa anual"
                 },
                 "cardReplacement": {
                     "title": "Substituição do cartão"
@@ -3421,10 +3420,10 @@
             "termsAndConditions": "Termos e condições do cartão",
             "privacyPolicy": "Política de privacidade do cartão",
             "closeCardAccount": "Encerrar conta do cartão",
-            "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa",
+            "closeCardAccountDescription": "Encerre permanentemente o seu Cartão Blink",
             "addToAppleWallet": "Adicionar ao Apple Wallet",
             "notificationToggleError": "Falha ao atualizar as configurações de notificação",
-            "closeCardWarning": "Esta ação é permanente. Seu cartão Visa será cancelado e não poderá ser reativado.",
+            "closeCardWarning": "Esta ação é permanente. Seu Cartão Blink será cancelado e não poderá ser reativado.",
             "closeCardTypeClose": "Digite \"{close}\" para confirmar",
             "closeCardClose": "fechar",
             "closeCardFinalConfirmTitle": "Confirmação Final",
@@ -3432,7 +3431,7 @@
             "closeCardPendingTransactions": "Você tem transações pendentes. Aguarde até que sejam liquidadas antes de fechar seu cartão.",
             "closeCardBalanceWarning": "Seu cartão tem um saldo de {balance}. Retire seus fundos antes de fechar. Deseja continuar mesmo assim?",
             "closeCardSuccessTitle": "Conta do Cartão Encerrada",
-            "closeCardSuccessSubtitle": "Seu cartão Visa foi encerrado permanentemente.",
+            "closeCardSuccessSubtitle": "Seu Cartão Blink foi encerrado permanentemente.",
             "closeCardSuccessButton": "Voltar ao Início",
             "closeCardError": "Falha ao encerrar a conta do cartão. Entre em contato com o suporte."
         },
@@ -3463,7 +3462,7 @@
         },
         "PersonalDetails": {
             "title": "Dados pessoais",
-            "blinkVisaCardholder": "Titular do cartão Blink Visa",
+            "blinkCardholder": "Titular do Cartão Blink",
             "kycVerifiedInformation": "Informações KYC verificadas",
             "kycVerifiedDescription": "Seu nome, data de nascimento e endereço foram verificados através do nosso processo KYC. Você pode alterar as informações refazendo o processo KYC. Não garantimos aprovação.",
             "changeKycInformation": "Alterar informações KYC",
@@ -3489,7 +3488,7 @@
         "AddToMobileWallet": {
             "title": "Adicionar à carteira móvel",
             "addYourCard": "Adicione seu cartão",
-            "addYourCardDescription": "Adicione seu cartão Blink Visa à sua carteira móvel para pagamentos rápidos e seguros",
+            "addYourCardDescription": "Adicione seu Cartão Blink à sua carteira móvel para pagamentos rápidos e seguros",
             "addTo": "Adicionar a",
             "Benefits": {
                 "title": "Benefícios da carteira móvel",
@@ -3500,10 +3499,10 @@
             }
         },
         "CardStatus": {
-            "title": "Cartão Visa",
+            "title": "Cartão Blink",
             "CardApproved": {
                 "title": "Parabéns!",
-                "subtitle": "Seu cartão Blink Visa foi ativado.",
+                "subtitle": "Seu Cartão Blink foi ativado.",
                 "buttonLabel": "Solicitar cartão físico",
                 "buttonLabelDashboard": "Painel"
             },
@@ -3655,7 +3654,6 @@
             },
             "Shipping": {
                 "title": "Peça o seu cartão físico",
-                "subtitle": "Receba o seu cartão Blink Visa no seu endereço.",
                 "registeredAddress": "Endereço registado",
                 "useRegisteredAddress": "Usar o endereço registado como endereço de envio",
                 "delivery": "Entrega",
@@ -3699,9 +3697,7 @@
             "kycHeaderTitle": "Verificação",
             "CardSubscription": {
                 "subscribeTitle": "Assinar",
-                "paymentTitle": "Pagamento",
                 "acceptButton": "Aceitar",
-                "payButton": "Continuar e Pagar",
                 "cardTitle": "Blink Orange",
                 "free": "Grátis",
                 "forNow": "por enquanto",
@@ -3711,20 +3707,11 @@
                     "memberBenefits": "Outros benefícios de membro"
                 },
                 "status": {
-                    "label": "Estado",
                     "specialOfferLabel": "Oferta especial",
-                    "paymentPending": "Pagamento Pendente",
                     "firstYearFree": "Primeiro ano grátis"
                 },
                 "renewalDate": {
                     "label": "Data de renovação"
-                },
-                "agreement": {
-                    "text": "Eu concordo com os",
-                    "termsOfService": "Termos de Serviço",
-                    "privacyPolicy": "Política de Privacidade",
-                    "cardholderAgreement": "Acordo do Titular do Cartão",
-                    "and": "e"
                 },
                 "feeSchedule": {
                     "text": "Revisei e concordo com a",
@@ -3780,12 +3767,6 @@
                     }
                 },
                 "buttonText": "Vamos lá"
-            },
-            "LoadingCard": {
-                "title": "Estamos trabalhando no seu cartão",
-                "subtitle": "Notificaremos você quando estiver pronto",
-                "codingBackend": "...programando o backend",
-                "buttonText": "Legal"
             },
             "PersonalInformation": {
                 "title": "Último passo",

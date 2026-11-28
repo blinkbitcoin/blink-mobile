@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Belum ada transaksi",
       "addFunds": "Tambah dana",
       "transactionsTitle": "Transaksi",
-      "title": "Kartu Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Tidak ada kartu tersedia",
       "cardNotUsable": "Kartu ini saat ini tidak tersedia untuk digunakan",
       "cardUpdateError": "Tidak dapat memperbarui status kartu"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Biaya tahunan",
-          "subtitle": "Dibebaskan untuk tahun pertama sejak tanggal penerbitan Kartu",
-          "value": "{amount: string} / tahun"
+          "subtitle": "Blink Card tidak memiliki biaya tahunan"
         },
         "cardReplacement": {
           "title": "Penggantian kartu"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Syarat dan ketentuan kartu",
       "privacyPolicy": "Kebijakan privasi kartu",
       "closeCardAccount": "Tutup akun kartu",
-      "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen",
+      "closeCardAccountDescription": "Tutup Blink Card Anda secara permanen",
       "addToAppleWallet": "Tambahkan ke Apple Wallet",
       "notificationToggleError": "Gagal memperbarui pengaturan notifikasi",
-      "closeCardWarning": "Tindakan ini bersifat permanen. Kartu Visa Anda akan dibatalkan dan tidak dapat diaktifkan kembali.",
+      "closeCardWarning": "Tindakan ini bersifat permanen. Blink Card Anda akan dibatalkan dan tidak dapat diaktifkan kembali.",
       "closeCardTypeClose": "Silakan ketik \"{close}\" untuk mengonfirmasi",
       "closeCardClose": "tutup",
       "closeCardFinalConfirmTitle": "Konfirmasi Akhir",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Anda memiliki transaksi tertunda. Harap tunggu sampai diselesaikan sebelum menutup kartu Anda.",
       "closeCardBalanceWarning": "Kartu Anda memiliki saldo {balance}. Harap tarik dana Anda sebelum menutup. Apakah Anda ingin melanjutkan?",
       "closeCardSuccessTitle": "Akun Kartu Ditutup",
-      "closeCardSuccessSubtitle": "Kartu Visa Anda telah ditutup secara permanen.",
+      "closeCardSuccessSubtitle": "Blink Card Anda telah ditutup secara permanen.",
       "closeCardSuccessButton": "Kembali ke Beranda",
       "closeCardError": "Gagal menutup akun kartu. Silakan hubungi dukungan."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Detail pribadi",
-      "blinkVisaCardholder": "Pemegang Kartu Blink Visa",
+      "blinkCardholder": "Pemegang Blink Card",
       "kycVerifiedInformation": "Informasi KYC terverifikasi",
       "kycVerifiedDescription": "Nama, tanggal lahir, dan alamat Anda diverifikasi melalui proses KYC kami. Anda dapat mengubah informasi dengan mengulangi proses KYC. Kami tidak menjamin persetujuan.",
       "changeKycInformation": "Ubah informasi KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Tambahkan ke dompet seluler",
       "addYourCard": "Tambahkan kartu Anda",
-      "addYourCardDescription": "Tambahkan kartu Blink Visa ke dompet seluler untuk pembayaran cepat dan aman",
+      "addYourCardDescription": "Tambahkan Blink Card ke dompet seluler untuk pembayaran cepat dan aman",
       "addTo": "Tambahkan ke",
       "Benefits": {
         "title": "Manfaat dompet seluler",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Kartu Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Selamat!",
-        "subtitle": "Kartu Blink Visa Anda telah diaktifkan.",
+        "subtitle": "Blink Card Anda telah diaktifkan.",
         "buttonLabel": "Pesan kartu fisik",
         "buttonLabelDashboard": "Dasbor"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Pesan kartu fisik Anda",
-        "subtitle": "Dapatkan kartu Blink Visa Anda dikirim ke alamat Anda.",
         "registeredAddress": "Alamat terdaftar",
         "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
         "delivery": "Pengiriman",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Verifikasi",
       "CardSubscription": {
         "subscribeTitle": "Berlangganan",
-        "paymentTitle": "Pembayaran",
         "acceptButton": "Terima",
-        "payButton": "Lanjutkan dan Bayar",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "untuk saat ini",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Manfaat anggota lainnya"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Penawaran khusus",
-          "paymentPending": "Pembayaran Tertunda",
           "firstYearFree": "Tahun pertama gratis"
         },
         "renewalDate": {
           "label": "Tanggal perpanjangan"
-        },
-        "agreement": {
-          "text": "Saya menyetujui",
-          "termsOfService": "Ketentuan Layanan",
-          "privacyPolicy": "Kebijakan Privasi",
-          "cardholderAgreement": "Perjanjian Pemegang Kartu",
-          "and": "dan"
         },
         "feeSchedule": {
           "text": "Saya telah meninjau dan menyetujui",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Ayo mulai"
-      },
-      "LoadingCard": {
-        "title": "Kami sedang mengerjakan kartu Anda",
-        "subtitle": "Kami akan memberitahu Anda setelah siap",
-        "codingBackend": "...membuat kode backend",
-        "buttonText": "Bagus"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

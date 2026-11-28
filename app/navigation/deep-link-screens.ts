@@ -53,8 +53,6 @@ export const DEEP_LINK_SCREENS: NonNullable<
   accountMigrationEntry: "account-migration",
   cardOnboardingWelcomeScreen: "card/onboarding",
   cardOnboardingSubscribeScreen: "card/onboarding/subscribe",
-  cardOnboardingLoadingScreen: "card/onboarding/loading",
-  cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
   cardOnboardingDeclinedScreen: "card/onboarding/declined",
   cardOnboardingApprovedScreen: "card/onboarding/approved",
   transactionDetail: {
@@ -62,3 +60,7 @@ export const DEEP_LINK_SCREENS: NonNullable<
   },
   sendBitcoinDestination: ":payment",
 }
+
+/** Every route linked under "card": the card's own section and its onboarding. */
+export const isCardDeepLinkPath = (path: string): boolean =>
+  path.replace(/^\//, "").split(/[/?#]/)[0] === "card"

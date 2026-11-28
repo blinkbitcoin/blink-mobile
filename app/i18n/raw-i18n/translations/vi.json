@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Chưa có giao dịch",
       "addFunds": "Nạp tiền",
       "transactionsTitle": "Giao dịch",
-      "title": "Thẻ Visa",
+      "title": "Thẻ Blink",
       "noCardAvailable": "Không có thẻ nào khả dụng",
       "cardNotUsable": "Thẻ này hiện không khả dụng để sử dụng",
       "cardUpdateError": "Không thể cập nhật trạng thái thẻ"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Phí thường niên",
-          "subtitle": "Được miễn trong năm đầu tiên kể từ ngày phát hành Thẻ",
-          "value": "{amount: string} / năm"
+          "subtitle": "Thẻ Blink không có phí thường niên"
         },
         "cardReplacement": {
           "title": "Thay thế thẻ"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Điều khoản và điều kiện thẻ",
       "privacyPolicy": "Chính sách bảo mật thẻ",
       "closeCardAccount": "Đóng tài khoản thẻ",
-      "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn",
+      "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Blink của bạn",
       "addToAppleWallet": "Them vao Apple Wallet",
       "notificationToggleError": "Không thể cập nhật cài đặt thông báo",
-      "closeCardWarning": "Hành động này là vĩnh viễn. Thẻ Visa của bạn sẽ bị hủy và không thể kích hoạt lại.",
+      "closeCardWarning": "Hành động này là vĩnh viễn. Thẻ Blink của bạn sẽ bị hủy và không thể kích hoạt lại.",
       "closeCardTypeClose": "Vui lòng nhập \"{close}\" để xác nhận",
       "closeCardClose": "đóng",
       "closeCardFinalConfirmTitle": "Xác Nhận Cuối Cùng",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Bạn có giao dịch đang chờ xử lý. Vui lòng đợi cho đến khi chúng được xử lý trước khi đóng thẻ.",
       "closeCardBalanceWarning": "Thẻ của bạn có số dư {balance}. Vui lòng rút tiền trước khi đóng. Bạn vẫn muốn tiếp tục?",
       "closeCardSuccessTitle": "Tài Khoản Thẻ Đã Đóng",
-      "closeCardSuccessSubtitle": "Thẻ Visa của bạn đã bị đóng vĩnh viễn.",
+      "closeCardSuccessSubtitle": "Thẻ Blink của bạn đã bị đóng vĩnh viễn.",
       "closeCardSuccessButton": "Quay Về Trang Chủ",
       "closeCardError": "Không thể đóng tài khoản thẻ. Vui lòng liên hệ hỗ trợ."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Thông tin cá nhân",
-      "blinkVisaCardholder": "Chủ thẻ Blink Visa",
+      "blinkCardholder": "Chủ thẻ Blink",
       "kycVerifiedInformation": "Thông tin KYC đã xác minh",
       "kycVerifiedDescription": "Tên, ngày sinh và địa chỉ của bạn đã được xác minh qua quy trình KYC của chúng tôi. Bạn có thể thay đổi thông tin bằng cách làm lại quy trình KYC. Chúng tôi không đảm bảo phê duyệt.",
       "changeKycInformation": "Thay đổi thông tin KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Them vao vi di dong",
       "addYourCard": "Them the cua ban",
-      "addYourCardDescription": "Them the Blink Visa vao vi di dong de thanh toan nhanh chong va an toan",
+      "addYourCardDescription": "Thêm thẻ Blink vào ví di động để thanh toán nhanh chóng và an toàn",
       "addTo": "Them vao",
       "Benefits": {
         "title": "Loi ich cua vi di dong",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Thẻ Visa",
+      "title": "Thẻ Blink",
       "CardApproved": {
         "title": "Chúc mừng!",
-        "subtitle": "Thẻ Blink Visa của bạn đã được kích hoạt.",
+        "subtitle": "Thẻ Blink của bạn đã được kích hoạt.",
         "buttonLabel": "Đặt thẻ vật lý",
         "buttonLabelDashboard": "Bảng điều khiển"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Đặt thẻ vật lý của bạn",
-        "subtitle": "Nhận thẻ Blink Visa được giao đến địa chỉ của bạn.",
         "registeredAddress": "Địa chỉ đã đăng ký",
         "useRegisteredAddress": "Dùng địa chỉ đã đăng ký làm địa chỉ giao hàng",
         "delivery": "Giao hàng",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Xác minh",
       "CardSubscription": {
         "subscribeTitle": "Đăng ký",
-        "paymentTitle": "Thanh toán",
         "acceptButton": "Chấp nhận",
-        "payButton": "Tiếp tục và Thanh toán",
         "cardTitle": "Blink Orange",
         "free": "Miễn phí",
         "forNow": "hiện tại",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Các quyền lợi thành viên khác"
         },
         "status": {
-          "label": "Trạng thái",
           "specialOfferLabel": "Ưu đãi đặc biệt",
-          "paymentPending": "Đang Chờ Thanh toán",
           "firstYearFree": "Năm đầu tiên miễn phí"
         },
         "renewalDate": {
           "label": "Ngày gia hạn"
-        },
-        "agreement": {
-          "text": "Tôi đồng ý với",
-          "termsOfService": "Điều khoản Dịch vụ",
-          "privacyPolicy": "Chính sách Quyền riêng tư",
-          "cardholderAgreement": "Thỏa thuận Chủ thẻ",
-          "and": "và"
         },
         "feeSchedule": {
           "text": "Tôi đã xem xét và đồng ý với",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Bắt đầu nào"
-      },
-      "LoadingCard": {
-        "title": "Chúng tôi đang xử lý thẻ của bạn",
-        "subtitle": "Chúng tôi sẽ thông báo khi thẻ sẵn sàng",
-        "codingBackend": "...đang viết mã backend",
-        "buttonText": "Tuyệt"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

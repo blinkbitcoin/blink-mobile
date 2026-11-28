@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Ingen transaktioner endnu",
       "addFunds": "Tilføj midler",
       "transactionsTitle": "Transaktioner",
-      "title": "Visa-kort",
+      "title": "Blink-kort",
       "noCardAvailable": "Ingen kort tilgængelige",
       "cardNotUsable": "Dette kort er ikke tilgængeligt til brug i øjeblikket",
       "cardUpdateError": "Kunne ikke opdatere kortstatus"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Årligt gebyr",
-          "subtitle": "Frafaldes det første år fra datoen for kortudstedelse",
-          "value": "{amount: string} / år"
+          "subtitle": "Blink-kortet har intet årligt gebyr"
         },
         "cardReplacement": {
           "title": "Kortudskiftning"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Kortvilkår og betingelser",
       "privacyPolicy": "Kortets privatlivspolitik",
       "closeCardAccount": "Luk kortkonto",
-      "closeCardAccountDescription": "Luk dit Visa-kort permanent",
+      "closeCardAccountDescription": "Luk dit Blink-kort permanent",
       "addToAppleWallet": "Tilfoej til Apple Wallet",
       "notificationToggleError": "Kunne ikke opdatere notifikationsindstillinger",
-      "closeCardWarning": "Denne handling er permanent. Dit Visa-kort vil blive annulleret og kan ikke genaktiveres.",
+      "closeCardWarning": "Denne handling er permanent. Dit Blink-kort vil blive annulleret og kan ikke genaktiveres.",
       "closeCardTypeClose": "Skriv venligst \"{close}\" for at bekræfte",
       "closeCardClose": "luk",
       "closeCardFinalConfirmTitle": "Endelig Bekræftelse",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Du har ventende transaktioner. Vent venligst, indtil de er afviklet, før du lukker dit kort.",
       "closeCardBalanceWarning": "Dit kort har en saldo på {balance}. Hæv venligst dine midler, før du lukker. Vil du fortsætte alligevel?",
       "closeCardSuccessTitle": "Kortkonto Lukket",
-      "closeCardSuccessSubtitle": "Dit Visa-kort er blevet permanent lukket.",
+      "closeCardSuccessSubtitle": "Dit Blink-kort er blevet permanent lukket.",
       "closeCardSuccessButton": "Tilbage til Startside",
       "closeCardError": "Kunne ikke lukke kortkonto. Kontakt venligst support."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Personlige oplysninger",
-      "blinkVisaCardholder": "Blink Visa-kortholder",
+      "blinkCardholder": "Blink-kortholder",
       "kycVerifiedInformation": "KYC-verificeret information",
       "kycVerifiedDescription": "Dit navn, fødselsdato og adresse er verificeret gennem vores KYC-proces. Du kan ændre oplysningerne ved at gentage KYC-processen. Vi garanterer ikke godkendelse.",
       "changeKycInformation": "Skift KYC-oplysninger",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Tilfoej til mobil tegnebog",
       "addYourCard": "Tilfoej dit kort",
-      "addYourCardDescription": "Tilfoej dit Blink Visa-kort til din mobile tegnebog for hurtige og sikre betalinger",
+      "addYourCardDescription": "Tilføj dit Blink-kort til din mobile tegnebog for hurtige og sikre betalinger",
       "addTo": "Tilfoej til",
       "Benefits": {
         "title": "Fordele ved mobil tegnebog",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa-kort",
+      "title": "Blink-kort",
       "CardApproved": {
         "title": "Tillykke!",
-        "subtitle": "Dit Blink Visa-kort er blevet aktiveret.",
+        "subtitle": "Dit Blink-kort er blevet aktiveret.",
         "buttonLabel": "Bestil fysisk kort",
         "buttonLabelDashboard": "Oversigt"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Bestil dit fysiske kort",
-        "subtitle": "Få dit Blink Visa-kort leveret til din adresse.",
         "registeredAddress": "Registreret adresse",
         "useRegisteredAddress": "Brug registreret adresse som leveringsadresse",
         "delivery": "Levering",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Verifikation",
       "CardSubscription": {
         "subscribeTitle": "Abonner",
-        "paymentTitle": "Betaling",
         "acceptButton": "Acceptér",
-        "payButton": "Fortsæt og Betal",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "indtil videre",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Andre medlemsfordele"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Særtilbud",
-          "paymentPending": "Betaling Afventer",
           "firstYearFree": "Første år gratis"
         },
         "renewalDate": {
           "label": "Fornyelsesdato"
-        },
-        "agreement": {
-          "text": "Jeg accepterer",
-          "termsOfService": "Servicevilkårene",
-          "privacyPolicy": "Privatlivspolitikken",
-          "cardholderAgreement": "Kortholderaftalen",
-          "and": "og"
         },
         "feeSchedule": {
           "text": "Jeg har gennemgået og accepterer",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Lad os gå"
-      },
-      "LoadingCard": {
-        "title": "Vi arbejder på dit kort",
-        "subtitle": "Vi giver dig besked, når det er her",
-        "codingBackend": "...koder backend",
-        "buttonText": "Fedt"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

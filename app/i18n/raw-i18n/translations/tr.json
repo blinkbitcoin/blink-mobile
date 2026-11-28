@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Henüz işlem yok",
       "addFunds": "Para ekle",
       "transactionsTitle": "İşlemler",
-      "title": "Visa Kartı",
+      "title": "Blink Kartı",
       "noCardAvailable": "Kullanılabilir kart yok",
       "cardNotUsable": "Bu kart şu anda kullanım için uygun değil",
       "cardUpdateError": "Kart durumu güncellenemedi"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Yıllık ücret",
-          "subtitle": "Kartın verildiği tarihten itibaren ilk yıl için muaf",
-          "value": "{amount: string} / yıl"
+          "subtitle": "Blink Kart için yıllık ücret alınmaz"
         },
         "cardReplacement": {
           "title": "Kart değişimi"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Kart şartları ve koşulları",
       "privacyPolicy": "Kart gizlilik politikası",
       "closeCardAccount": "Kart hesabını kapat",
-      "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın",
+      "closeCardAccountDescription": "Blink kartınızı kalıcı olarak kapatın",
       "addToAppleWallet": "Apple Wallet'a ekle",
       "notificationToggleError": "Bildirim ayarları güncellenemedi",
-      "closeCardWarning": "Bu işlem kalıcıdır. Visa kartınız iptal edilecek ve yeniden etkinleştirilemez.",
+      "closeCardWarning": "Bu işlem kalıcıdır. Blink kartınız iptal edilecek ve yeniden etkinleştirilemez.",
       "closeCardTypeClose": "Onaylamak için lütfen \"{close}\" yazın",
       "closeCardClose": "kapat",
       "closeCardFinalConfirmTitle": "Son Onay",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Bekleyen işlemleriniz var. Kartınızı kapatmadan önce lütfen bunların tamamlanmasını bekleyin.",
       "closeCardBalanceWarning": "Kartınızda {balance} bakiye var. Lütfen kapatmadan önce paranızı çekin. Yine de devam etmek istiyor musunuz?",
       "closeCardSuccessTitle": "Kart Hesabı Kapatıldı",
-      "closeCardSuccessSubtitle": "Visa kartınız kalıcı olarak kapatıldı.",
+      "closeCardSuccessSubtitle": "Blink kartınız kalıcı olarak kapatıldı.",
       "closeCardSuccessButton": "Ana Sayfaya Dön",
       "closeCardError": "Kart hesabı kapatılamadı. Lütfen destek ile iletişime geçin."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Kişisel bilgiler",
-      "blinkVisaCardholder": "Blink Visa Kart Sahibi",
+      "blinkCardholder": "Blink Kart Sahibi",
       "kycVerifiedInformation": "KYC doğrulanmış bilgiler",
       "kycVerifiedDescription": "Adınız, doğum tarihiniz ve adresiniz KYC sürecimiz aracılığıyla doğrulanmıştır. KYC sürecini tekrarlayarak bilgileri değiştirebilirsiniz. Onay garantisi vermiyoruz.",
       "changeKycInformation": "KYC bilgilerini değiştir",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Mobil cuzdana ekle",
       "addYourCard": "Kartinizi ekleyin",
-      "addYourCardDescription": "Hizli ve guvenli odemeler icin Blink Visa kartinizi mobil cuzdaniniza ekleyin",
+      "addYourCardDescription": "Hızlı ve güvenli ödemeler için Blink kartınızı mobil cüzdanınıza ekleyin",
       "addTo": "Ekle",
       "Benefits": {
         "title": "Mobil cuzdanin avantajlari",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa Kartı",
+      "title": "Blink Kartı",
       "CardApproved": {
         "title": "Tebrikler!",
-        "subtitle": "Blink Visa kartınız etkinleştirildi.",
+        "subtitle": "Blink kartınız etkinleştirildi.",
         "buttonLabel": "Fiziksel kart sipariş et",
         "buttonLabelDashboard": "Gösterge Paneli"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Fiziksel kartını sipariş et",
-        "subtitle": "Blink Visa kartını adresine teslim al.",
         "registeredAddress": "Kayıtlı adres",
         "useRegisteredAddress": "Kayıtlı adresi kargo adresi olarak kullan",
         "delivery": "Teslimat",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Doğrulama",
       "CardSubscription": {
         "subscribeTitle": "Abone Ol",
-        "paymentTitle": "Ödeme",
         "acceptButton": "Kabul Et",
-        "payButton": "Devam Et ve Öde",
         "cardTitle": "Blink Orange",
         "free": "Ücretsiz",
         "forNow": "şimdilik",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Diğer üyelik avantajları"
         },
         "status": {
-          "label": "Durum",
           "specialOfferLabel": "Özel teklif",
-          "paymentPending": "Ödeme Bekliyor",
           "firstYearFree": "İlk yıl ücretsiz"
         },
         "renewalDate": {
           "label": "Yenileme tarihi"
-        },
-        "agreement": {
-          "text": "Kabul ediyorum",
-          "termsOfService": "Hizmet Şartları",
-          "privacyPolicy": "Gizlilik Politikası",
-          "cardholderAgreement": "Kart Sahibi Sözleşmesi",
-          "and": "ve"
         },
         "feeSchedule": {
           "text": "İnceledim ve şunu kabul ediyorum:",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Hadi başlayalım"
-      },
-      "LoadingCard": {
-        "title": "Kartınız üzerinde çalışıyoruz",
-        "subtitle": "Hazır olduğunda size bildireceğiz",
-        "codingBackend": "...backend kodlanıyor",
-        "buttonText": "Güzel"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

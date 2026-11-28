@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Hakuna miamala bado",
       "addFunds": "Ongeza fedha",
       "transactionsTitle": "Miamala",
-      "title": "Kadi ya Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Hakuna kadi zinazopatikana",
       "cardNotUsable": "Kadi hii haipatikani kwa matumizi kwa sasa",
       "cardUpdateError": "Imeshindwa kusasisha hali ya kadi"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Ada ya mwaka",
-          "subtitle": "Imesamehewa mwaka wa kwanza kuanzia tarehe ya kutolewa kwa Kadi",
-          "value": "{amount: string} / mwaka"
+          "subtitle": "Blink Card haina ada ya mwaka"
         },
         "cardReplacement": {
           "title": "Kubadilisha kadi"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Masharti na vigezo vya kadi",
       "privacyPolicy": "Sera ya faragha ya kadi",
       "closeCardAccount": "Funga akaunti ya kadi",
-      "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa",
+      "closeCardAccountDescription": "Funga Blink Card yako kabisa",
       "addToAppleWallet": "Ongeza kwenye Apple Wallet",
       "notificationToggleError": "Imeshindwa kusasisha mipangilio ya arifa",
-      "closeCardWarning": "Kitendo hiki ni cha kudumu. Kadi yako ya Visa itafutwa na haiwezi kuamilishwa tena.",
+      "closeCardWarning": "Kitendo hiki ni cha kudumu. Blink Card yako itafutwa na haiwezi kuamilishwa tena.",
       "closeCardTypeClose": "Tafadhali andika \"{close}\" kuthibitisha",
       "closeCardClose": "funga",
       "closeCardFinalConfirmTitle": "Uthibitisho wa Mwisho",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Una miamala inayosubiri. Tafadhali subiri hadi ikamilike kabla ya kufunga kadi yako.",
       "closeCardBalanceWarning": "Kadi yako ina salio la {balance}. Tafadhali ondoa fedha zako kabla ya kufunga. Je, unataka kuendelea hata hivyo?",
       "closeCardSuccessTitle": "Akaunti ya Kadi Imefungwa",
-      "closeCardSuccessSubtitle": "Kadi yako ya Visa imefungwa kabisa.",
+      "closeCardSuccessSubtitle": "Blink Card yako imefungwa kabisa.",
       "closeCardSuccessButton": "Rudi Nyumbani",
       "closeCardError": "Imeshindwa kufunga akaunti ya kadi. Tafadhali wasiliana na msaada."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Maelezo binafsi",
-      "blinkVisaCardholder": "Mmiliki wa Kadi ya Blink Visa",
+      "blinkCardholder": "Mmiliki wa Blink Card",
       "kycVerifiedInformation": "Maelezo ya KYC yaliyothibitishwa",
       "kycVerifiedDescription": "Jina lako, tarehe ya kuzaliwa na anwani yako yamethibitishwa kupitia mchakato wetu wa KYC. Unaweza kubadilisha maelezo kwa kurudia mchakato wa KYC. Hatuhakikishi idhini.",
       "changeKycInformation": "Badilisha maelezo ya KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Ongeza kwenye pochi ya simu",
       "addYourCard": "Ongeza kadi yako",
-      "addYourCardDescription": "Ongeza kadi yako ya Blink Visa kwenye pochi ya simu kwa malipo ya haraka na salama",
+      "addYourCardDescription": "Ongeza Blink Card yako kwenye pochi ya simu kwa malipo ya haraka na salama",
       "addTo": "Ongeza kwenye",
       "Benefits": {
         "title": "Faida za pochi ya simu",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Kadi ya Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Hongera!",
-        "subtitle": "Kadi yako ya Blink Visa imeamilishwa.",
+        "subtitle": "Blink Card yako imeamilishwa.",
         "buttonLabel": "Agiza kadi halisi",
         "buttonLabelDashboard": "Dashibodi"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Agiza kadi yako ya kimwili",
-        "subtitle": "Pokea kadi yako ya Blink Visa ikipelekwa kwenye anwani yako.",
         "registeredAddress": "Anwani iliyosajiliwa",
         "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
         "delivery": "Uwasilishaji",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Uthibitishaji",
       "CardSubscription": {
         "subscribeTitle": "Jiandikishe",
-        "paymentTitle": "Malipo",
         "acceptButton": "Kubali",
-        "payButton": "Endelea na Kulipa",
         "cardTitle": "Blink Orange",
         "free": "Bure",
         "forNow": "kwa sasa",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Manufaa mengine ya uanachama"
         },
         "status": {
-          "label": "Hali",
           "specialOfferLabel": "Ofa maalum",
-          "paymentPending": "Malipo Yanasubiri",
           "firstYearFree": "Mwaka wa kwanza bure"
         },
         "renewalDate": {
           "label": "Tarehe ya kuhuisha"
-        },
-        "agreement": {
-          "text": "Ninakubali",
-          "termsOfService": "Masharti ya Huduma",
-          "privacyPolicy": "Sera ya Faragha",
-          "cardholderAgreement": "Mkataba wa Mmiliki wa Kadi",
-          "and": "na"
         },
         "feeSchedule": {
           "text": "Nimekagua na ninakubali",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Twende"
-      },
-      "LoadingCard": {
-        "title": "Tunafanya kazi kwenye kadi yako",
-        "subtitle": "Tutakuarifu inapokuwa tayari",
-        "codingBackend": "...kuandika msimbo wa nyuma",
-        "buttonText": "Vizuri"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

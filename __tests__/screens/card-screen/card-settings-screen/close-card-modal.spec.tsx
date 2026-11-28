@@ -74,7 +74,7 @@ describe("CloseCardModal", () => {
 
       expect(
         getByText(
-          "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+          "This action is permanent. Your Blink Card will be canceled and cannot be reactivated.",
         ),
       ).toBeTruthy()
     })

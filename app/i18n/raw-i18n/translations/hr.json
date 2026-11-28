@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Još nema transakcija",
       "addFunds": "Dodaj sredstva",
       "transactionsTitle": "Transakcije",
-      "title": "Visa kartica",
+      "title": "Blink kartica",
       "noCardAvailable": "Nema dostupnih kartica",
       "cardNotUsable": "Ova kartica trenutno nije dostupna za upotrebu",
       "cardUpdateError": "Nije moguće ažurirati status kartice"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Godišnja naknada",
-          "subtitle": "Oslobođena prve godine od datuma izdavanja kartice",
-          "value": "{amount: string} / godišnje"
+          "subtitle": "Blink kartica nema godišnju naknadu"
         },
         "cardReplacement": {
           "title": "Zamjena kartice"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Uvjeti i odredbe kartice",
       "privacyPolicy": "Politika privatnosti kartice",
       "closeCardAccount": "Zatvori račun kartice",
-      "closeCardAccountDescription": "Trajno zatvorite svoju Visa karticu",
+      "closeCardAccountDescription": "Trajno zatvorite svoju Blink karticu",
       "addToAppleWallet": "Dodaj u Apple Wallet",
       "notificationToggleError": "Ažuriranje postavki obavijesti nije uspjelo",
-      "closeCardWarning": "Ova radnja je trajna. Tvoja Visa kartica bit će otkazana i ne može se ponovno aktivirati.",
+      "closeCardWarning": "Ova radnja je trajna. Tvoja Blink kartica bit će otkazana i ne može se ponovno aktivirati.",
       "closeCardTypeClose": "Upiši \"{close}\" za potvrdu",
       "closeCardClose": "zatvori",
       "closeCardFinalConfirmTitle": "Završna Potvrda",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Imaš transakcije na čekanju. Pričekaj da se obrade prije zatvaranja kartice.",
       "closeCardBalanceWarning": "Tvoja kartica ima stanje od {balance}. Povuci sredstva prije zatvaranja. Želiš li ipak nastaviti?",
       "closeCardSuccessTitle": "Račun Kartice Zatvoren",
-      "closeCardSuccessSubtitle": "Tvoja Visa kartica je trajno zatvorena.",
+      "closeCardSuccessSubtitle": "Tvoja Blink kartica je trajno zatvorena.",
       "closeCardSuccessButton": "Natrag na Početnu",
       "closeCardError": "Zatvaranje računa kartice nije uspjelo. Kontaktiraj podršku."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Osobni podaci",
-      "blinkVisaCardholder": "Vlasnik Blink Visa kartice",
+      "blinkCardholder": "Vlasnik Blink kartice",
       "kycVerifiedInformation": "KYC verificirane informacije",
       "kycVerifiedDescription": "Vaše ime, datum rođenja i adresa verificirani su putem našeg KYC procesa. Informacije možete promijeniti ponovnim KYC procesom. Ne jamčimo odobrenje.",
       "changeKycInformation": "Promijeni KYC informacije",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Dodaj u mobilni novcanik",
       "addYourCard": "Dodajte svoju karticu",
-      "addYourCardDescription": "Dodajte svoju Blink Visa karticu u mobilni novcanik za brza i sigurna placanja",
+      "addYourCardDescription": "Dodajte svoju Blink karticu u mobilni novčanik za brza i sigurna plaćanja",
       "addTo": "Dodaj u",
       "Benefits": {
         "title": "Prednosti mobilnog novcanika",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa kartica",
+      "title": "Blink kartica",
       "CardApproved": {
         "title": "Čestitamo!",
-        "subtitle": "Vaša Blink Visa kartica je aktivirana.",
+        "subtitle": "Vaša Blink kartica je aktivirana.",
         "buttonLabel": "Naruči fizičku karticu",
         "buttonLabelDashboard": "Nadzorna ploča"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Naručite svoju fizičku karticu",
-        "subtitle": "Neka vam se Blink Visa kartica dostavi na adresu.",
         "registeredAddress": "Registrirana adresa",
         "useRegisteredAddress": "Koristi registriranu adresu kao adresu dostave",
         "delivery": "Dostava",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Verifikacija",
       "CardSubscription": {
         "subscribeTitle": "Pretplatiti se",
-        "paymentTitle": "Plaćanje",
         "acceptButton": "Prihvati",
-        "payButton": "Nastavi i Plati",
         "cardTitle": "Blink Orange",
         "free": "Besplatno",
         "forNow": "za sada",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Ostale članske pogodnosti"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Posebna ponuda",
-          "paymentPending": "Plaćanje na Čekanju",
           "firstYearFree": "Prva godina besplatno"
         },
         "renewalDate": {
           "label": "Datum obnove"
-        },
-        "agreement": {
-          "text": "Prihvaćam",
-          "termsOfService": "Uvjete korištenja",
-          "privacyPolicy": "Politiku privatnosti",
-          "cardholderAgreement": "Ugovor vlasnika kartice",
-          "and": "i"
         },
         "feeSchedule": {
           "text": "Pregledao sam i slažem se s dokumentom",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Idemo"
-      },
-      "LoadingCard": {
-        "title": "Radimo na vašoj kartici",
-        "subtitle": "Obavijestit ćemo vas kad bude gotova",
-        "codingBackend": "...kodiramo backend",
-        "buttonText": "Super"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

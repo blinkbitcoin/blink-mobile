@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Nog geen transacties",
       "addFunds": "Tegoed toevoegen",
       "transactionsTitle": "Transacties",
-      "title": "Visa-kaart",
+      "title": "Blink Card",
       "noCardAvailable": "Geen kaarten beschikbaar",
       "cardNotUsable": "Deze kaart is momenteel niet beschikbaar voor gebruik",
       "cardUpdateError": "Kon kaartstatus niet bijwerken"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Jaarlijkse kosten",
-          "subtitle": "Kwijtgescholden voor het eerste jaar vanaf de uitgiftedatum van de kaart",
-          "value": "{amount: string} / jaar"
+          "subtitle": "Aan de Blink Card zijn geen jaarlijkse kosten verbonden"
         },
         "cardReplacement": {
           "title": "Kaartvervanging"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Kaartvoorwaarden",
       "privacyPolicy": "Privacybeleid kaart",
       "closeCardAccount": "Kaartaccount sluiten",
-      "closeCardAccountDescription": "Sluit uw Visa-kaart permanent",
+      "closeCardAccountDescription": "Sluit uw Blink Card permanent",
       "addToAppleWallet": "Toevoegen aan Apple Wallet",
       "notificationToggleError": "Kan meldingsinstellingen niet bijwerken",
-      "closeCardWarning": "Deze actie is permanent. Je Visa-kaart wordt geannuleerd en kan niet opnieuw worden geactiveerd.",
+      "closeCardWarning": "Deze actie is permanent. Je Blink Card wordt geannuleerd en kan niet opnieuw worden geactiveerd.",
       "closeCardTypeClose": "Typ \"{close}\" om te bevestigen",
       "closeCardClose": "sluiten",
       "closeCardFinalConfirmTitle": "Laatste Bevestiging",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Je hebt openstaande transacties. Wacht tot deze zijn verwerkt voordat je je kaart sluit.",
       "closeCardBalanceWarning": "Je kaart heeft een saldo van {balance}. Neem je geld op voordat je sluit. Wil je toch doorgaan?",
       "closeCardSuccessTitle": "Kaartaccount Gesloten",
-      "closeCardSuccessSubtitle": "Je Visa-kaart is permanent gesloten.",
+      "closeCardSuccessSubtitle": "Je Blink Card is permanent gesloten.",
       "closeCardSuccessButton": "Terug naar Home",
       "closeCardError": "Kan kaartaccount niet sluiten. Neem contact op met ondersteuning."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Persoonlijke gegevens",
-      "blinkVisaCardholder": "Blink Visa-kaarthouder",
+      "blinkCardholder": "Blink Card-houder",
       "kycVerifiedInformation": "KYC-geverifieerde informatie",
       "kycVerifiedDescription": "Uw naam, geboortedatum en adres zijn geverifieerd via ons KYC-proces. U kunt de informatie wijzigen door het KYC-proces opnieuw te doorlopen. We garanderen geen goedkeuring.",
       "changeKycInformation": "KYC-informatie wijzigen",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Toevoegen aan mobiele portemonnee",
       "addYourCard": "Voeg je kaart toe",
-      "addYourCardDescription": "Voeg je Blink Visa-kaart toe aan je mobiele portemonnee voor snelle en veilige betalingen",
+      "addYourCardDescription": "Voeg je Blink Card toe aan je mobiele portemonnee voor snelle en veilige betalingen",
       "addTo": "Toevoegen aan",
       "Benefits": {
         "title": "Voordelen van mobiele portemonnee",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa-kaart",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Gefeliciteerd!",
-        "subtitle": "Je Blink Visa-kaart is geactiveerd.",
+        "subtitle": "Je Blink Card is geactiveerd.",
         "buttonLabel": "Fysieke kaart bestellen",
         "buttonLabelDashboard": "Overzicht"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Bestel je fysieke kaart",
-        "subtitle": "Ontvang je Blink Visa-kaart op je adres.",
         "registeredAddress": "Geregistreerd adres",
         "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres",
         "delivery": "Levering",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Verificatie",
       "CardSubscription": {
         "subscribeTitle": "Abonneren",
-        "paymentTitle": "Betaling",
         "acceptButton": "Accepteren",
-        "payButton": "Doorgaan en Betalen",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "voorlopig",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Andere ledenvoordelen"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Speciale aanbieding",
-          "paymentPending": "Betaling in Afwachting",
           "firstYearFree": "Eerste jaar gratis"
         },
         "renewalDate": {
           "label": "Verlengingsdatum"
-        },
-        "agreement": {
-          "text": "Ik ga akkoord met de",
-          "termsOfService": "Servicevoorwaarden",
-          "privacyPolicy": "Privacybeleid",
-          "cardholderAgreement": "Kaarthouderovereenkomst",
-          "and": "en"
         },
         "feeSchedule": {
           "text": "Ik heb beoordeeld en ga akkoord met het",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Laten we gaan"
-      },
-      "LoadingCard": {
-        "title": "We werken aan je kaart",
-        "subtitle": "We laten je weten zodra het klaar is",
-        "codingBackend": "...backend coderen",
-        "buttonText": "Mooi"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

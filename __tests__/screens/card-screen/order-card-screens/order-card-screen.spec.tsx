@@ -165,6 +165,19 @@ describe("OrderCardScreen", () => {
       expect(getByText("Order your physical card")).toBeTruthy()
     })
 
+    /** The design draws the shipping step with its title alone. */
+    it("shows the shipping step without a subtitle", async () => {
+      const { queryByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByText(/delivered to your address/)).toBeNull()
+    })
+
     it("displays continue button", async () => {
       const { getByText } = render(
         <ContextForScreen>

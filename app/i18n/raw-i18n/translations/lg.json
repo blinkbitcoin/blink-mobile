@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Tewali byokukola ku nsimbi",
       "addFunds": "Yongera sente",
       "transactionsTitle": "Ebyokukola ku nsimbi",
-      "title": "Kaadi ya Visa",
+      "title": "Kaadi ya Blink",
       "noCardAvailable": "Tewali kaadi zikola",
       "cardNotUsable": "Kaadi eno tekulinkwa kukozesebwa kati",
       "cardUpdateError": "Tekisobose kukyusa embeera ya kaadi"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Ekisale ky'omwaka",
-          "subtitle": "Kisonyiyiddwa omwaka ogusooka okuva ku lunaku kaadi lwe yaweebwa",
-          "value": "{amount: string} / omwaka"
+          "subtitle": "Kaadi ya Blink terina kisale kya mwaka"
         },
         "cardReplacement": {
           "title": "Okuzza kaadi"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Amateeka g ekkaadi",
       "privacyPolicy": "Enkola y ekyama ey ekkaadi",
       "closeCardAccount": "Ggala akawunti y ekkaadi",
-      "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna",
+      "closeCardAccountDescription": "Ggala ekkaadi yo eya Blink emirembe gyonna",
       "addToAppleWallet": "Yongera ku Apple Wallet",
       "notificationToggleError": "Ensobi okukyusa entegeka z'obubaka",
-      "closeCardWarning": "Ekikolwa kino kya bwereere. Kaadi yo eya Visa ejja kusazibwamu era tesobola kuddamu kugikozeesa.",
+      "closeCardWarning": "Ekikolwa kino kya bwereere. Kaadi yo eya Blink ejja kusazibwamu era tesobola kuddamu kugikozeesa.",
       "closeCardTypeClose": "Wandiika \"{close}\" okukakasa",
       "closeCardClose": "ggala",
       "closeCardFinalConfirmTitle": "Okukakasa Okusembayo",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Olina eby'enfuna ebyali bitannatuukirizibwa. Linda okutuukiririzibwa nga tonnaba kuggala kaadi yo.",
       "closeCardBalanceWarning": "Kaadi yo erina ebbikka eby'obuwuuzi {balance}. Ggyamu ssente zo nga tonnaba kuggala. Oyagala okweyongera?",
       "closeCardSuccessTitle": "Akawunti ya Kaadi Eggadde",
-      "closeCardSuccessSubtitle": "Kaadi yo eya Visa eggaddwa bwereere.",
+      "closeCardSuccessSubtitle": "Kaadi yo eya Blink eggaddwa bwereere.",
       "closeCardSuccessButton": "Ddayo ku Maka",
       "closeCardError": "Tewaasobodde kuggala akawunti ya kaadi. Tuukiriza obuyambi."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Ebikwata ku muntu",
-      "blinkVisaCardholder": "Nannyini kaadi ya Blink Visa",
+      "blinkCardholder": "Nannyini kaadi ya Blink",
       "kycVerifiedInformation": "Ebikwata ku KYC ebikakasiddwa",
       "kycVerifiedDescription": "Erinnya lyo, ennaku z'okuzaalibwa n'endagiriro bikakasiddwa okuyita mu nkola yaffe eya KYC. Osobola okukyusa ebikwata ku by'okolera KYC buto. Tetukakasa kwemesa.",
       "changeKycInformation": "Kyusa ebikwata ku KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Yongera ku ssaamu ya simu",
       "addYourCard": "Yongera kaadi yo",
-      "addYourCardDescription": "Yongera kaadi yo eya Blink Visa ku ssaamu ya simu okusasula amangu era n'obukuumi",
+      "addYourCardDescription": "Yongera kaadi yo eya Blink ku ssaamu ya simu okusasula amangu era n'obukuumi",
       "addTo": "Yongera ku",
       "Benefits": {
         "title": "Ebirungi by'essaamu ya simu",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Kaadi ya Visa",
+      "title": "Kaadi ya Blink",
       "CardApproved": {
         "title": "Weebale!",
-        "subtitle": "Kaadi yo eya Blink Visa etandise okukola.",
+        "subtitle": "Kaadi yo eya Blink etandise okukola.",
         "buttonLabel": "Tegeka kaadi ey'ekikula",
         "buttonLabelDashboard": "Dashiboodi"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Saba kaadi yo ey'omubiri",
-        "subtitle": "Funa kaadi yo eya Blink Visa ekutuuke ku ndagiriro yo.",
         "registeredAddress": "Endagiriro eyateekebwa",
         "useRegisteredAddress": "Kozesa endagiriro eyateekebwa ng'ey'okutwalirako",
         "delivery": "Okutuusa",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Okukakasa",
       "CardSubscription": {
         "subscribeTitle": "Wewandise",
-        "paymentTitle": "Okusasula",
         "acceptButton": "Kkiriza",
-        "payButton": "Weyongere era Osasula",
         "cardTitle": "Blink Orange",
         "free": "Bwereere",
         "forNow": "kati",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Ebirungi ebirala eby'obwammemba"
         },
         "status": {
-          "label": "Embeera",
           "specialOfferLabel": "Ekirabo eky'enjawulo",
-          "paymentPending": "Okusasula Kulindirira",
           "firstYearFree": "Omwaka ogusooka ogw'obwereere"
         },
         "renewalDate": {
           "label": "Ennaku ey'okuddamu okuwandiisa"
-        },
-        "agreement": {
-          "text": "Nzikiriza",
-          "termsOfService": "Amateeka g'Obuweereza",
-          "privacyPolicy": "Enkola y'Ekyama",
-          "cardholderAgreement": "Endagaano y'Omukozesa Kaadi",
-          "and": "ne"
         },
         "feeSchedule": {
           "text": "Nkakasizza era nkkiriza",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Ka tugende"
-      },
-      "LoadingCard": {
-        "title": "Tukola ku kaadi yo",
-        "subtitle": "Tujja kukumanya nga efunze",
-        "codingBackend": "...kukola backend",
-        "buttonText": "Kirungi"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

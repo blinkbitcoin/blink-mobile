@@ -99,7 +99,7 @@ describe("CardPersonalDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Blink Visa Cardholder")).toBeTruthy()
+      expect(getByText("Blink Cardholder")).toBeTruthy()
     })
 
     it("shows loading state when loading", async () => {

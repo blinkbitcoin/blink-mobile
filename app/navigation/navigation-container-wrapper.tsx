@@ -8,6 +8,7 @@ import { bootSplashGate } from "./boot-splash-gate"
 import analytics from "@react-native-firebase/analytics"
 import {
   createNavigationContainerRef,
+  getStateFromPath,
   LinkingOptions,
   NavigationContainer,
   NavigationState,
@@ -21,10 +22,11 @@ import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useIsCustodialAccountConfirmed } from "@app/hooks/use-is-custodial-account-confirmed"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 
-import { DEEP_LINK_SCREENS } from "./deep-link-screens"
+import { DEEP_LINK_SCREENS, isCardDeepLinkPath } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
 import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
@@ -138,6 +140,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
 }) => {
   const isAuthed = useIsAuthed()
   const { isSelfCustodial } = useActiveWallet()
+  const isCustodialAccountConfirmed = useIsCustodialAccountConfirmed()
   const canHandlePayments = isAuthed || isSelfCustodial
   const [isAppLocked, setIsAppLocked] = React.useState(true)
   const [urlAfterUnlockAndAuth, setUrlAfterUnlockAndAuth] = React.useState<string | null>(
@@ -340,6 +343,18 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     ],
     config: {
       screens: DEEP_LINK_SCREENS,
+    },
+    /** The card exists in custodial mode only, so its links open only for an account
+     *  known to be custodial, as the home shows nothing of it otherwise. It fails closed:
+     *  not while the account registry is loading, nor when the persisted selection
+     *  matches no loaded account, where the wallet's placeholder would read custodial.
+     *  The navigator reads this again after every render, so it follows the account the
+     *  user is in. */
+    getStateFromPath: (path, options) => {
+      const isCardLinkWithoutCard =
+        !isCustodialAccountConfirmed && isCardDeepLinkPath(path)
+      if (isCardLinkWithoutCard) return undefined
+      return getStateFromPath(path, options)
     },
     getInitialURL: async () => {
       const url = await Linking.getInitialURL()

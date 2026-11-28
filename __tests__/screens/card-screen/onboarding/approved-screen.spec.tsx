@@ -129,7 +129,7 @@ describe("CardApprovedScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("Your Blink Visa Card has been activated.")).toBeTruthy()
+    expect(getByText("Your Blink Card has been activated.")).toBeTruthy()
   })
 
   describe("without physical card", () => {

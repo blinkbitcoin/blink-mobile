@@ -112,3 +112,11 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.migrationReceiveDelayedNoticeMs).toBe(60_000)
   })
 })
+
+describe("defaultRemoteConfig: card membership", () => {
+  /** The join flow never names a price or a renewal, so the default is the free offer:
+   *  any other number would put one on screen whenever the fetch fails. */
+  it("cardSubscriptionPriceUsd defaults to the free membership", () => {
+    expect(defaultRemoteConfig.cardSubscriptionPriceUsd).toBe(0)
+  })
+})

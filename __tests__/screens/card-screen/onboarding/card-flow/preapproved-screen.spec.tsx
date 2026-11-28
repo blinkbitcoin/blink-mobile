@@ -1,6 +1,7 @@
 import React from "react"
 import { StyleSheet } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
+import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 
@@ -98,6 +99,30 @@ describe("CardPreapprovedScreen", () => {
     await act(async () => {})
 
     expect(getByTestId("confetti")).toBeTruthy()
+  })
+
+  it("celebrates the approval with one small haptic", async () => {
+    const { rerender } = render(
+      <ContextForScreen>
+        <CardPreapprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    rerender(
+      <ContextForScreen>
+        <CardPreapprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledTimes(1)
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
+      "notificationSuccess",
+      expect.anything(),
+    )
   })
 
   it("goes back to the Home under it on Close, rather than stacking another", async () => {

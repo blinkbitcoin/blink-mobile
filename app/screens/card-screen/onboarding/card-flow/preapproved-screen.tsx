@@ -9,6 +9,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { triggerHapticFeedback } from "@app/utils/helper"
 
 export const CardPreapprovedScreen: React.FC = () => {
   const styles = useStyles()
@@ -18,6 +19,11 @@ export const CardPreapprovedScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  /** A small buzz along with the confetti, once per approval. */
+  React.useEffect(() => {
+    triggerHapticFeedback("notificationSuccess")
+  }, [])
 
   /** Back to the Home under it: navigating would stack a second one on top. */
   const handleNext = () => {

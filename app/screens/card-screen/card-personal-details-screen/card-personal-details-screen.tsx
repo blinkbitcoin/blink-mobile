@@ -80,7 +80,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
           <View style={styles.nameContainer}>
             <Text style={styles.fullName}>{fullName}</Text>
             <Text style={styles.cardholderLabel}>
-              {LLPersonalDetails.blinkVisaCardholder()}
+              {LLPersonalDetails.blinkCardholder()}
             </Text>
           </View>
         </View>

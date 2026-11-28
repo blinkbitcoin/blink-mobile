@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Zatím žádné transakce",
       "addFunds": "Přidat prostředky",
       "transactionsTitle": "Transakce",
-      "title": "Karta Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Žádné karty k dispozici",
       "cardNotUsable": "Tato karta není momentálně k dispozici k použití",
       "cardUpdateError": "Nepodařilo se aktualizovat stav karty"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Roční poplatek",
-          "subtitle": "Prominut na první rok od data vydání karty",
-          "value": "{amount: string} / rok"
+          "subtitle": "Blink Card nemá žádný roční poplatek"
         },
         "cardReplacement": {
           "title": "Výměna karty"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Podmínky karty",
       "privacyPolicy": "Zásady ochrany osobních údajů karty",
       "closeCardAccount": "Zrušit účet karty",
-      "closeCardAccountDescription": "Trvale zrušte svou kartu Visa",
+      "closeCardAccountDescription": "Trvale zrušte svou Blink Card",
       "addToAppleWallet": "Pridat do Apple Wallet",
       "notificationToggleError": "Nepodařilo se aktualizovat nastavení oznámení",
-      "closeCardWarning": "Tato akce je trvalá. Vaše karta Visa bude zrušena a nelze ji znovu aktivovat.",
+      "closeCardWarning": "Tato akce je trvalá. Vaše Blink Card bude zrušena a nelze ji znovu aktivovat.",
       "closeCardTypeClose": "Pro potvrzení napište \"{close}\"",
       "closeCardClose": "zavřít",
       "closeCardFinalConfirmTitle": "Závěrečné potvrzení",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Máte nevyřízené transakce. Počkejte prosím, než budou vyřízeny, než kartu zavřete.",
       "closeCardBalanceWarning": "Vaše karta má zůstatek {balance}. Před zavřením prosím vyberte své prostředky. Chcete přesto pokračovat?",
       "closeCardSuccessTitle": "Karetní účet uzavřen",
-      "closeCardSuccessSubtitle": "Vaše karta Visa byla trvale uzavřena.",
+      "closeCardSuccessSubtitle": "Vaše Blink Card byla trvale uzavřena.",
       "closeCardSuccessButton": "Zpět na úvodní stránku",
       "closeCardError": "Nepodařilo se zavřít karetní účet. Kontaktujte prosím podporu."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Osobní údaje",
-      "blinkVisaCardholder": "Držitel karty Blink Visa",
+      "blinkCardholder": "Držitel Blink Card",
       "kycVerifiedInformation": "Ověřené KYC informace",
       "kycVerifiedDescription": "Vaše jméno, datum narození a adresa jsou ověřeny prostřednictvím našeho KYC procesu. Informace můžete změnit opětovným provedením KYC procesu. Schválení nezaručujeme.",
       "changeKycInformation": "Změnit KYC informace",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Pridat do mobilni penezenky",
       "addYourCard": "Pridejte svou kartu",
-      "addYourCardDescription": "Pridejte svou kartu Blink Visa do mobilni penezenky pro rychle a bezpecne platby",
+      "addYourCardDescription": "Přidejte svou Blink Card do mobilní peněženky pro rychlé a bezpečné platby",
       "addTo": "Pridat do",
       "Benefits": {
         "title": "Vyhody mobilni penezenky",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Karta Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Gratulujeme!",
-        "subtitle": "Vaše karta Blink Visa byla aktivována.",
+        "subtitle": "Vaše Blink Card byla aktivována.",
         "buttonLabel": "Objednat fyzickou kartu",
         "buttonLabelDashboard": "Přehled"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Objednejte si fyzickou kartu",
-        "subtitle": "Nechte si doručit svou kartu Blink Visa na adresu.",
         "registeredAddress": "Registrovaná adresa",
         "useRegisteredAddress": "Použít registrovanou adresu jako doručovací adresu",
         "delivery": "Doručení",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Ověření",
       "CardSubscription": {
         "subscribeTitle": "Předplatit",
-        "paymentTitle": "Platba",
         "acceptButton": "Přijmout",
-        "payButton": "Pokračovat a Zaplatit",
         "cardTitle": "Blink Orange",
         "free": "Zdarma",
         "forNow": "prozatím",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Další členské výhody"
         },
         "status": {
-          "label": "Stav",
           "specialOfferLabel": "Speciální nabídka",
-          "paymentPending": "Platba Čeká",
           "firstYearFree": "První rok zdarma"
         },
         "renewalDate": {
           "label": "Datum obnovení"
-        },
-        "agreement": {
-          "text": "Souhlasím s",
-          "termsOfService": "Podmínkami služby",
-          "privacyPolicy": "Zásadami ochrany osobních údajů",
-          "cardholderAgreement": "Smlouvou držitele karty",
-          "and": "a"
         },
         "feeSchedule": {
           "text": "Zkontroloval jsem a souhlasím se dokumentem",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Pojďme na to"
-      },
-      "LoadingCard": {
-        "title": "Pracujeme na vaší kartě",
-        "subtitle": "Upozorníme vás, jakmile bude připravena",
-        "codingBackend": "...kódujeme backend",
-        "buttonText": "Skvěle"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

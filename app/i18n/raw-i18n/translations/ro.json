@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Încă nu există tranzacții",
       "addFunds": "Adaugă fonduri",
       "transactionsTitle": "Tranzacții",
-      "title": "Card Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Niciun card disponibil",
       "cardNotUsable": "Acest card nu este disponibil pentru utilizare în acest moment",
       "cardUpdateError": "Nu s-a putut actualiza starea cardului"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Taxă anuală",
-          "subtitle": "Scutită în primul an de la data emiterii cardului",
-          "value": "{amount: string} / an"
+          "subtitle": "Blink Card nu are taxă anuală"
         },
         "cardReplacement": {
           "title": "Înlocuirea cardului"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Termeni și condiții card",
       "privacyPolicy": "Politica de confidențialitate card",
       "closeCardAccount": "Închide contul cardului",
-      "closeCardAccountDescription": "Închide permanent cardul tău Visa",
+      "closeCardAccountDescription": "Închide permanent Blink Card-ul tău",
       "addToAppleWallet": "Adauga in Apple Wallet",
       "notificationToggleError": "Actualizarea setărilor de notificare a eșuat",
-      "closeCardWarning": "Această acțiune este permanentă. Cardul tău Visa va fi anulat și nu poate fi reactivat.",
+      "closeCardWarning": "Această acțiune este permanentă. Blink Card-ul tău va fi anulat și nu poate fi reactivat.",
       "closeCardTypeClose": "Te rugăm să tastezi \"{close}\" pentru a confirma",
       "closeCardClose": "închide",
       "closeCardFinalConfirmTitle": "Confirmare Finală",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Ai tranzacții în așteptare. Te rugăm să aștepți până sunt procesate înainte de a închide cardul.",
       "closeCardBalanceWarning": "Cardul tău are un sold de {balance}. Te rugăm să retragi fondurile înainte de a închide. Vrei să continui oricum?",
       "closeCardSuccessTitle": "Cont de Card Închis",
-      "closeCardSuccessSubtitle": "Cardul tău Visa a fost închis permanent.",
+      "closeCardSuccessSubtitle": "Blink Card-ul tău a fost închis permanent.",
       "closeCardSuccessButton": "Înapoi la Pagina Principală",
       "closeCardError": "Nu s-a putut închide contul de card. Te rugăm să contactezi suportul."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Detalii personale",
-      "blinkVisaCardholder": "Deținător card Blink Visa",
+      "blinkCardholder": "Deținător Blink Card",
       "kycVerifiedInformation": "Informații KYC verificate",
       "kycVerifiedDescription": "Numele, data nașterii și adresa dumneavoastră sunt verificate prin procesul nostru KYC. Puteți modifica informațiile refăcând procesul KYC. Nu garantăm aprobarea.",
       "changeKycInformation": "Modifică informațiile KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Adauga in portofelul mobil",
       "addYourCard": "Adauga cardul tau",
-      "addYourCardDescription": "Adauga cardul Blink Visa in portofelul mobil pentru plati rapide si sigure",
+      "addYourCardDescription": "Adaugă Blink Card-ul în portofelul mobil pentru plăți rapide și sigure",
       "addTo": "Adauga in",
       "Benefits": {
         "title": "Beneficiile portofelului mobil",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Card Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Felicitări!",
-        "subtitle": "Cardul tău Blink Visa a fost activat.",
+        "subtitle": "Blink Card-ul tău a fost activat.",
         "buttonLabel": "Comandă card fizic",
         "buttonLabelDashboard": "Panou"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Comandă cardul tău fizic",
-        "subtitle": "Primește cardul tău Blink Visa la adresa ta.",
         "registeredAddress": "Adresă înregistrată",
         "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de livrare",
         "delivery": "Livrare",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Verificare",
       "CardSubscription": {
         "subscribeTitle": "Abonare",
-        "paymentTitle": "Plată",
         "acceptButton": "Acceptă",
-        "payButton": "Continuă și Plătește",
         "cardTitle": "Blink Orange",
         "free": "Gratuit",
         "forNow": "deocamdată",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Alte beneficii pentru membri"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Ofertă specială",
-          "paymentPending": "Plată în Așteptare",
           "firstYearFree": "Primul an gratuit"
         },
         "renewalDate": {
           "label": "Data de reînoire"
-        },
-        "agreement": {
-          "text": "Sunt de acord cu",
-          "termsOfService": "Termenii Serviciului",
-          "privacyPolicy": "Politica de Confidențialitate",
-          "cardholderAgreement": "Acordul Deținătorului de Card",
-          "and": "și"
         },
         "feeSchedule": {
           "text": "Am examinat și sunt de acord cu",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Hai să mergem"
-      },
-      "LoadingCard": {
-        "title": "Lucrăm la cardul tău",
-        "subtitle": "Te vom notifica când va fi gata",
-        "codingBackend": "...programăm backend-ul",
-        "buttonText": "Grozav"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

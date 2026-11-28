@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Akukho ntengiselwano okwangoku",
       "addFunds": "Yongeza imali",
       "transactionsTitle": "Iintengiselwano",
-      "title": "Ikhadi le-Visa",
+      "title": "Ikhadi le-Blink",
       "noCardAvailable": "Akukho zikhadi ezifumanekayo",
       "cardNotUsable": "Le khadi ayifumaneki ngokwangoku ukuze isebenze",
       "cardUpdateError": "Akukwazekanga ukuhlaziya isimo sekhadi"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Intlawulo yonyaka",
-          "subtitle": "Ixolelwe unyaka wokuqala ukususela kumhla wokukhutshwa kweKhadi",
-          "value": "{amount: string} / ngonyaka"
+          "subtitle": "iKhadi le-Blink alinayo intlawulo yonyaka"
         },
         "cardReplacement": {
           "title": "Ukutshintshwa kwekhadi"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Imiqathango yemiqathango yekhadi",
       "privacyPolicy": "Umgaqo-nkqubo wobumfihlo bekhadi",
       "closeCardAccount": "Vala iakhawunti yekhadi",
-      "closeCardAccountDescription": "Vala ikhadi lakho le-Visa ngokusisigxina",
+      "closeCardAccountDescription": "Vala ikhadi lakho le-Blink ngokusisigxina",
       "addToAppleWallet": "Yongeza ku-Apple Wallet",
       "notificationToggleError": "Ayiphumelelanga ukuhlaziya izicwangciso zezaziso",
-      "closeCardWarning": "Esi senzo sisigxina. Ikhadi lakho le-Visa liya kurhoxiswa kwaye alinakuhlaziywa kwakhona.",
+      "closeCardWarning": "Esi senzo sisigxina. Ikhadi lakho le-Blink liya kurhoxiswa kwaye alinakuhlaziywa kwakhona.",
       "closeCardTypeClose": "Nceda uchwetheze \"{close}\" ukuqinisekisa",
       "closeCardClose": "vala",
       "closeCardFinalConfirmTitle": "Ukuqinisekisa Kokugqibela",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Uneetransekshini ezilindileyo. Nceda ulinde zide zigqitywe phambi kokuvala ikhadi lakho.",
       "closeCardBalanceWarning": "Ikhadi lakho linebhalansi ye-{balance}. Nceda utsale imali yakho phambi kokuvala. Ngaba ufuna ukuqhubeka?",
       "closeCardSuccessTitle": "Iakhawunti Yekhadi Ivaliwe",
-      "closeCardSuccessSubtitle": "Ikhadi lakho le-Visa livaliwe ngokusisigxina.",
+      "closeCardSuccessSubtitle": "Ikhadi lakho le-Blink livaliwe ngokusisigxina.",
       "closeCardSuccessButton": "Buyela eKhaya",
       "closeCardError": "Koyekile ukuvala iakhawunti yekhadi. Nceda uqhagamshelane nenkxaso."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Iinkcukacha zobuqu",
-      "blinkVisaCardholder": "Umnini wekhadi ye-Blink Visa",
+      "blinkCardholder": "Umnini wekhadi le-Blink",
       "kycVerifiedInformation": "Ulwazi lwe-KYC oluqinisekisiweyo",
       "kycVerifiedDescription": "Igama lakho, umhla wokuzalwa nedilesi ziqinisekiswe ngenkqubo yethu ye-KYC. Ungalutshintsha ulwazi ngokuphinda inkqubo ye-KYC. Asiqinisekisi ukuvunywa.",
       "changeKycInformation": "Tshintsha ulwazi lwe-KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Yongeza kwisipaji sefowuni",
       "addYourCard": "Yongeza ikhadi lakho",
-      "addYourCardDescription": "Yongeza ikhadi lakho le-Blink Visa kwisipaji sefowuni ukuze uhlawule ngokukhawuleza nangokukhuselekileyo",
+      "addYourCardDescription": "Yongeza ikhadi lakho le-Blink kwisipaji sefowuni ukuze uhlawule ngokukhawuleza nangokukhuselekileyo",
       "addTo": "Yongeza ku",
       "Benefits": {
         "title": "Iinzuzo zesipaji sefowuni",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Ikhadi le-Visa",
+      "title": "Ikhadi le-Blink",
       "CardApproved": {
         "title": "Sivuyisana nawe!",
-        "subtitle": "Ikhadi lakho le-Blink Visa livuselelwe.",
+        "subtitle": "Ikhadi lakho le-Blink livuselelwe.",
         "buttonLabel": "Odola ikhadi lokwenyani",
         "buttonLabelDashboard": "Ideshibhodi"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Odola ikhadi lakho elibonakalayo",
-        "subtitle": "Fumana ikhadi lakho le-Blink Visa lilayishwa kwidilesi yakho.",
         "registeredAddress": "Idilesi ebhalisiweyo",
         "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengedilesi yokuhanjiswa",
         "delivery": "Ukuhanjiswa",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Ukuqinisekisa",
       "CardSubscription": {
         "subscribeTitle": "Bhalisa",
-        "paymentTitle": "Intlawulo",
         "acceptButton": "Yamkela",
-        "payButton": "Qhubeka kwaye Uhlawule",
         "cardTitle": "Blink Orange",
         "free": "Simahla",
         "forNow": "okwangoku",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Ezinye izibonelelo zobulungu"
         },
         "status": {
-          "label": "Isimo",
           "specialOfferLabel": "Inikelo elikhethekileyo",
-          "paymentPending": "Intlawulo Ilindile",
           "firstYearFree": "Unyaka wokuqala simahla"
         },
         "renewalDate": {
           "label": "Umhla wokuhlaziya"
-        },
-        "agreement": {
-          "text": "Ndiyavuma",
-          "termsOfService": "Imimmiselo yoMsebenzi",
-          "privacyPolicy": "Umgaqo waBucala",
-          "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
-          "and": "kunye"
         },
         "feeSchedule": {
           "text": "Ndiyiphengululile kwaye ndiyavuma",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Masiye"
-      },
-      "LoadingCard": {
-        "title": "Sisebenza kwikhadi lakho",
-        "subtitle": "Siza kukwazisa xa likulungele",
-        "codingBackend": "...ukubhala ikhowudi ye-backend",
-        "buttonText": "Kuhle"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

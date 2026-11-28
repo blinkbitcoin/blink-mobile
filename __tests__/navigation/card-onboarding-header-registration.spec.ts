@@ -19,6 +19,12 @@ describe("card onboarding header controls in root-navigator", () => {
 
   /** `headerBackVisible: false` alone hides only the native button: the navigator also
    *  draws its own back through `headerLeft`, which kept showing on these screens. */
+  /** Nothing is bought in the join flow: the membership is free for now, and a fee, if it
+   *  ever comes, is billed apart. The payment step had no way in and only logged a TODO. */
+  it("registers no payment step in the card onboarding", () => {
+    expect(navigatorSource).not.toContain('name="cardOnboardingPaymentScreen"')
+  })
+
   it("clears both back controls in one shared option set", () => {
     expect(navigatorSource).toMatch(
       /const noHeaderBack = \{\s*headerBackVisible: false,\s*headerLeft: \(\) => null,\s*\}/,

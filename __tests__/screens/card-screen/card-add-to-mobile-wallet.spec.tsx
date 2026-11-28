@@ -99,7 +99,7 @@ describe("CardAddToMobileWalletScreen", () => {
 
       expect(
         getByText(
-          "Add your Blink Visa card to your mobile wallet for quick and secure payments",
+          "Add your Blink Card to your mobile wallet for quick and secure payments",
         ),
       ).toBeTruthy()
     })
@@ -289,7 +289,7 @@ describe("CardAddToMobileWalletScreen", () => {
       expect(getByText("Add your card")).toBeTruthy()
       expect(
         getByText(
-          "Add your Blink Visa card to your mobile wallet for quick and secure payments",
+          "Add your Blink Card to your mobile wallet for quick and secure payments",
         ),
       ).toBeTruthy()
       expect(getByText("Add to")).toBeTruthy()

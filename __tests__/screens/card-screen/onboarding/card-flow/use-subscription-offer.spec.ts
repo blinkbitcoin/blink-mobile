@@ -41,9 +41,7 @@ describe("useSubscriptionOffer", () => {
 
   it("offers the membership for free when the price is zero", () => {
     mockPriceUsd = 0
-    const { result } = renderHook(() =>
-      useSubscriptionOffer({ isSubscribeVariant: true }),
-    )
+    const { result } = renderHook(() => useSubscriptionOffer())
 
     expect(result.current).toEqual({
       isFree: true,
@@ -58,10 +56,8 @@ describe("useSubscriptionOffer", () => {
     })
   })
 
-  it("shows the yearly price with the first year free while subscribing", () => {
-    const { result } = renderHook(() =>
-      useSubscriptionOffer({ isSubscribeVariant: true }),
-    )
+  it("shows the yearly price with the first year free", () => {
+    const { result } = renderHook(() => useSubscriptionOffer())
 
     expect(result.current).toMatchObject({
       isFree: false,
@@ -78,18 +74,6 @@ describe("useSubscriptionOffer", () => {
     expect(result.current.rows[1]).toMatchObject({
       label: "Renewal date",
       tone: "default",
-    })
-  })
-
-  it("shows the payment as pending on the payment step", () => {
-    const { result } = renderHook(() =>
-      useSubscriptionOffer({ isSubscribeVariant: false }),
-    )
-
-    expect(result.current.rows[0]).toEqual({
-      label: "Status",
-      value: "Payment Pending",
-      tone: "accent",
     })
   })
 })

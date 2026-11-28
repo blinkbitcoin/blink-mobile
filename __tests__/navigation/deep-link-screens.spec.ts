@@ -1,4 +1,6 @@
-import { DEEP_LINK_SCREENS } from "@app/navigation/deep-link-screens"
+import { getStateFromPath } from "@react-navigation/native"
+
+import { DEEP_LINK_SCREENS, isCardDeepLinkPath } from "@app/navigation/deep-link-screens"
 
 /**
  * The webView route's `allowArbitraryUrl` param bypasses the WebView entry-origin
@@ -82,9 +84,27 @@ describe("deep-linkable routes", () => {
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPersonalInfoScreen")
   })
 
-  it("still links to the card onboarding steps that only show an outcome", () => {
-    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPreapprovedScreen")
+  /**
+   * "We're working on your card" was dropped from the flow, and the screen with it: the
+   * wait goes Home on its own after a minute. Its old link must open nothing.
+   */
+  it("opens nothing at the link of the dropped card waiting screen", () => {
+    expect(
+      getStateFromPath("card/onboarding/loading", { screens: DEEP_LINK_SCREENS }),
+    ).toBeUndefined()
+  })
+
+  it("still links to the card onboarding step that shows a refusal", () => {
     expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingDeclinedScreen")
+  })
+
+  /**
+   * The confetti screen says the card is ready. The wait opens it once the issuer has
+   * approved the application, and no bulletin links to it: the approved bulletin opens
+   * the card's own approved screen. A link would announce an approval nobody gave.
+   */
+  it("links to no card onboarding step that announces an approval", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPreapprovedScreen")
   })
 
   /**
@@ -107,5 +127,45 @@ describe("deep-linkable routes", () => {
     const routeNames = collectRouteNames(DEEP_LINK_SCREENS as ScreenConfig)
     expect(routeNames).not.toContain("totpRegistrationValidate")
     expect(routeNames).not.toContain("totpRegistrationBackup")
+  })
+})
+
+describe("isCardDeepLinkPath", () => {
+  /** Every route with a path of its own, nested navigators included. */
+  const collectRoutePaths = (screens: ScreenConfig): [string, string][] =>
+    Object.entries(screens).flatMap(([name, value]) => {
+      const config = (typeof value === "string" ? { path: value } : value) as {
+        path?: string
+        screens?: ScreenConfig
+      }
+      const own: [string, string][] =
+        config.path === undefined ? [] : [[name, config.path]]
+      const nested = config.screens ? collectRoutePaths(config.screens) : []
+      return [...own, ...nested]
+    })
+  const routePaths = collectRoutePaths(DEEP_LINK_SCREENS as ScreenConfig)
+
+  /** Non-custodial mode drops these links; a card route left out would still open. */
+  it("covers every card route that can be linked to", () => {
+    const cardPaths = routePaths.filter(([name]) => name.startsWith("card"))
+
+    expect(cardPaths.length).toBeGreaterThan(0)
+    cardPaths.forEach(([, path]) => expect(isCardDeepLinkPath(path)).toBe(true))
+  })
+
+  it("leaves every other linked route out", () => {
+    routePaths
+      .filter(([name]) => !name.startsWith("card"))
+      .forEach(([, path]) => expect(isCardDeepLinkPath(path)).toBe(false))
+  })
+
+  it("reads the path with a leading slash or a query as well", () => {
+    expect(isCardDeepLinkPath("/card/onboarding")).toBe(true)
+    expect(isCardDeepLinkPath("card?ref=bulletin")).toBe(true)
+  })
+
+  it("does not take a path that only starts with the same letters", () => {
+    expect(isCardDeepLinkPath("cards")).toBe(false)
+    expect(isCardDeepLinkPath("cardano/payment")).toBe(false)
   })
 })

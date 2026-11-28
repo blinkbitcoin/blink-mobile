@@ -1,6 +1,5 @@
 import React from "react"
 import { render, fireEvent, act, within } from "@testing-library/react-native"
-import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSubscriptionScreen } from "@app/screens/card-screen/onboarding/card-flow/card-subscription-screen"
@@ -8,7 +7,6 @@ import { ContextForScreen } from "../../../helper"
 
 const mockNavigate = jest.fn()
 const mockSetOptions = jest.fn()
-const mockUseRoute = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -18,7 +16,6 @@ jest.mock("@react-navigation/native", () => {
       navigate: mockNavigate,
       setOptions: mockSetOptions,
     }),
-    useRoute: () => mockUseRoute(),
   }
 })
 
@@ -27,17 +24,10 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
 
-jest.mock("react-native-inappbrowser-reborn", () => ({
-  open: jest.fn(),
-}))
-
 let mockPriceUsd = 1000
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
-    cardTermsAndConditionsUrl: "https://example.com/terms",
-    cardPrivacyPolicyUrl: "https://example.com/privacy",
-    cardCardholderAgreementUrl: "https://example.com/cardholder",
     cardSubscriptionPriceUsd: mockPriceUsd,
   }),
 }))
@@ -56,16 +46,7 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-/** "TODO: payment flow" is what the payment step logs on press; captured so the expected
- *  log does not reach the CI output. */
-let consoleLogSpy: jest.SpyInstance
-
-beforeEach(() => {
-  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
-})
-
 afterEach(() => {
-  consoleLogSpy.mockRestore()
   mockPriceUsd = 1000
 })
 
@@ -97,7 +78,6 @@ describe("CardSubscriptionScreen - free offer", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockPriceUsd = 0
-    mockUseRoute.mockReturnValue({ name: "cardOnboardingSubscribeScreen" })
   })
 
   it("shows the membership as free for now, with nothing to pay", async () => {
@@ -142,7 +122,6 @@ describe("CardSubscriptionScreen - paid offer", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockUseRoute.mockReturnValue({ name: "cardOnboardingSubscribeScreen" })
   })
 
   it("shows the yearly price with the first year free", async () => {
@@ -274,7 +253,6 @@ describe("CardSubscriptionScreen - price change while mounted", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockUseRoute.mockReturnValue({ name: "cardOnboardingSubscribeScreen" })
   })
 
   const changePrice = async (
@@ -319,68 +297,5 @@ describe("CardSubscriptionScreen - price change while mounted", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
     })
-  })
-})
-
-describe("CardSubscriptionScreen - payment variant", () => {
-  beforeEach(() => {
-    loadLocale("en")
-    jest.clearAllMocks()
-    mockUseRoute.mockReturnValue({ name: "cardOnboardingPaymentScreen" })
-  })
-
-  it("displays payment pending status", async () => {
-    const { getByText } = await renderScreen()
-
-    expect(getByText("Status")).toBeTruthy()
-    expect(getByText("Payment Pending")).toBeTruthy()
-  })
-
-  it("keeps the header title the navigator gives it", async () => {
-    await renderScreen()
-
-    expect(mockSetOptions).not.toHaveBeenCalled()
-  })
-
-  it("does not display renew checkbox", async () => {
-    const { queryByText } = await renderScreen()
-
-    expect(
-      queryByText("I understand my subscription will automatically renew in 12 months"),
-    ).toBeNull()
-  })
-
-  it("logs the pending payment flow instead of opening the identity check", async () => {
-    const { getByText, getByRole } = await renderScreen()
-
-    await act(async () => {
-      fireEvent.press(getByRole("checkbox", { checked: false }))
-    })
-    await act(async () => {
-      fireEvent.press(getByText("Continue & Pay"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-    expect(consoleLogSpy).toHaveBeenCalledWith("TODO: payment flow")
-  })
-
-  it("opens each agreement from a link of its own, without ticking the box", async () => {
-    const agreementBox = {
-      name: "I agree to the Terms of Service, Privacy Policy, and Cardholder Agreement",
-    }
-    const { getByRole } = await renderScreen()
-
-    expect(within(getByRole("checkbox", agreementBox)).queryByRole("link")).toBeNull()
-
-    await act(async () => {
-      fireEvent.press(getByRole("link", { name: "Terms of Service" }))
-      fireEvent.press(getByRole("link", { name: "Privacy Policy" }))
-      fireEvent.press(getByRole("link", { name: "Cardholder Agreement" }))
-    })
-
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/cardholder")
-    expect(getByRole("checkbox", { ...agreementBox, checked: false })).toBeTruthy()
   })
 })

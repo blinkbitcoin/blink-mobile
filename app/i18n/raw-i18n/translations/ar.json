@@ -3261,7 +3261,7 @@
       "emptyTransactions": "لا توجد معاملات بعد",
       "addFunds": "إضافة أموال",
       "transactionsTitle": "المعاملات",
-      "title": "بطاقة Visa",
+      "title": "بطاقة Blink",
       "noCardAvailable": "لا توجد بطاقات متاحة",
       "cardNotUsable": "هذه البطاقة غير متاحة للاستخدام حاليًا",
       "cardUpdateError": "تعذر تحديث حالة البطاقة"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "الرسوم السنوية",
-          "subtitle": "معفاة للسنة الأولى من تاريخ إصدار البطاقة",
-          "value": "{amount: string} / سنة"
+          "subtitle": "لا توجد رسوم سنوية على بطاقة Blink"
         },
         "cardReplacement": {
           "title": "استبدال البطاقة"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "شروط وأحكام البطاقة",
       "privacyPolicy": "سياسة خصوصية البطاقة",
       "closeCardAccount": "إغلاق حساب البطاقة",
-      "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً",
+      "closeCardAccountDescription": "أغلق بطاقة Blink الخاصة بك نهائياً",
       "addToAppleWallet": "اضافة الى Apple Wallet",
       "notificationToggleError": "فشل في تحديث إعدادات الإشعارات",
-      "closeCardWarning": "هذا الإجراء نهائي. سيتم إلغاء بطاقة فيزا الخاصة بك ولا يمكن إعادة تفعيلها.",
+      "closeCardWarning": "هذا الإجراء نهائي. سيتم إلغاء بطاقة Blink الخاصة بك ولا يمكن إعادة تفعيلها.",
       "closeCardTypeClose": "يرجى كتابة \"{close}\" للتأكيد",
       "closeCardClose": "إغلاق",
       "closeCardFinalConfirmTitle": "التأكيد النهائي",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "لديك معاملات معلقة. يرجى الانتظار حتى تتم تسويتها قبل إغلاق بطاقتك.",
       "closeCardBalanceWarning": "بطاقتك بها رصيد قدره {balance}. يرجى سحب أموالك قبل الإغلاق. هل تريد المتابعة على أي حال؟",
       "closeCardSuccessTitle": "تم إغلاق حساب البطاقة",
-      "closeCardSuccessSubtitle": "تم إغلاق بطاقة فيزا الخاصة بك نهائياً.",
+      "closeCardSuccessSubtitle": "تم إغلاق بطاقة Blink الخاصة بك نهائياً.",
       "closeCardSuccessButton": "العودة إلى الرئيسية",
       "closeCardError": "فشل إغلاق حساب البطاقة. يرجى الاتصال بالدعم."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "البيانات الشخصية",
-      "blinkVisaCardholder": "حامل بطاقة Blink Visa",
+      "blinkCardholder": "حامل بطاقة Blink",
       "kycVerifiedInformation": "معلومات KYC موثقة",
       "kycVerifiedDescription": "تم التحقق من اسمك وتاريخ ميلادك وعنوانك من خلال عملية KYC. يمكنك تغيير المعلومات بإعادة عملية KYC. لا نضمن الموافقة.",
       "changeKycInformation": "تغيير معلومات KYC",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "اضافة الى المحفظة",
       "addYourCard": "اضف بطاقتك",
-      "addYourCardDescription": "اضف بطاقة Blink Visa الى محفظتك للدفع السريع والامن",
+      "addYourCardDescription": "أضف بطاقة Blink إلى محفظتك للدفع السريع والآمن",
       "addTo": "اضافة الى",
       "Benefits": {
         "title": "مزايا المحفظة",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "بطاقة فيزا",
+      "title": "بطاقة Blink",
       "CardApproved": {
         "title": "تهانينا!",
-        "subtitle": "تم تفعيل بطاقة Blink Visa الخاصة بك.",
+        "subtitle": "تم تفعيل بطاقة Blink الخاصة بك.",
         "buttonLabel": "اطلب البطاقة الفعلية",
         "buttonLabelDashboard": "لوحة التحكم"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "اطلب بطاقتك الفعلية",
-        "subtitle": "احصل على بطاقة Blink Visa الخاصة بك مُسلَّمة إلى عنوانك.",
         "registeredAddress": "العنوان المسجّل",
         "useRegisteredAddress": "استخدم العنوان المسجّل كعنوان للشحن",
         "delivery": "التسليم",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "التحقق",
       "CardSubscription": {
         "subscribeTitle": "اشتراك",
-        "paymentTitle": "الدفع",
         "acceptButton": "قبول",
-        "payButton": "متابعة والدفع",
         "cardTitle": "Blink Orange",
         "free": "مجاني",
         "forNow": "حاليًا",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "مزايا العضوية الأخرى"
         },
         "status": {
-          "label": "الحالة",
           "specialOfferLabel": "عرض خاص",
-          "paymentPending": "الدفع معلق",
           "firstYearFree": "السنة الأولى مجانية"
         },
         "renewalDate": {
           "label": "تاريخ التجديد"
-        },
-        "agreement": {
-          "text": "أوافق على",
-          "termsOfService": "شروط الخدمة",
-          "privacyPolicy": "سياسة الخصوصية",
-          "cardholderAgreement": "اتفاقية حامل البطاقة",
-          "and": "و"
         },
         "feeSchedule": {
           "text": "لقد راجعتُ وأوافق على",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "هيا بنا"
-      },
-      "LoadingCard": {
-        "title": "نعمل على بطاقتك",
-        "subtitle": "سنبلغك عندما تكون جاهزة",
-        "codingBackend": "...نبرمج الخلفية",
-        "buttonText": "رائع"
       },
       "WelcomeInvest": {
         "welcomeMessage": {

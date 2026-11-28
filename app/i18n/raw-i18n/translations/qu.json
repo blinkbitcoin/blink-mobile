@@ -3261,7 +3261,7 @@
       "emptyTransactions": "Aún no hay transacciones",
       "addFunds": "Agregar fondos",
       "transactionsTitle": "Transacciones",
-      "title": "Tarjeta Visa",
+      "title": "Blink tarjeta",
       "noCardAvailable": "Manan tarjetakuna kanchu",
       "cardNotUsable": "Kay tarjeta kunan mana atikunchu ruwakunapaq",
       "cardUpdateError": "Tarjetap kaynin mana hukchayta atinchu"
@@ -3313,8 +3313,7 @@
       "fees": {
         "annualFee": {
           "title": "Watapaq pagana",
-          "subtitle": "Ñawpaq watapi mana pagana tarjeta qusqan p'unchawmanta",
-          "value": "{amount: string} / wata"
+          "subtitle": "Blink tarjetaqa mana watapaq paganayuqchu"
         },
         "cardReplacement": {
           "title": "Tarjeta rantipuy"
@@ -3421,10 +3420,10 @@
       "termsAndConditions": "Tarjeta kamachiykuna",
       "privacyPolicy": "Tarjeta pakasqa kamachiy",
       "closeCardAccount": "Tarjeta kuntata wisqay",
-      "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay",
+      "closeCardAccountDescription": "Blink tarjetaykita wiñaypaq wisqay",
       "addToAppleWallet": "Yapaykuy Apple Wallet nisqaman",
       "notificationToggleError": "Mana atikurqachu willanakuy churanakuykunata",
-      "closeCardWarning": "Kay ruwayqa wiñaypaqmi. Visa tarjetaykiqa chinkachisqa kanqa, manam kutichiyta atikunkichu.",
+      "closeCardWarning": "Kay ruwayqa wiñaypaqmi. Blink tarjetaykiqa chinkachisqa kanqa, manam kutichiyta atikunkichu.",
       "closeCardTypeClose": "Ama hina kaspa \"{close}\" nispa qillqay takyachinapaq",
       "closeCardClose": "wisq'ay",
       "closeCardFinalConfirmTitle": "Qhipa Takyachiy",
@@ -3432,7 +3431,7 @@
       "closeCardPendingTransactions": "Suyachkaq ruwanakuna kapusunki. Ama hina kaspa suyay chaykunata tukurunankama tarjetaykita wisq'anaykipaq.",
       "closeCardBalanceWarning": "Tarjetaykipi {balance} saldo kachkan. Ama hina kaspa qullqiykita hurquy wisq'anaykipaq. ¿Ñawpaqman riyta munankichu?",
       "closeCardSuccessTitle": "Tarjeta Cuenta Wisq'asqa",
-      "closeCardSuccessSubtitle": "Visa tarjetaykiqa wiñaypaq wisq'asqa.",
+      "closeCardSuccessSubtitle": "Blink tarjetaykiqa wiñaypaq wisq'asqa.",
       "closeCardSuccessButton": "Qallariy panaman kutiy",
       "closeCardError": "Manam atikurqachu tarjeta cuentata wisq'ayta. Ama hina kaspa yanapakuqwan rimanakuy."
     },
@@ -3463,7 +3462,7 @@
     },
     "PersonalDetails": {
       "title": "Kikinpa willakuyninkuna",
-      "blinkVisaCardholder": "Blink Visa tarjeta hap'iq",
+      "blinkCardholder": "Blink tarjeta hap'iq",
       "kycVerifiedInformation": "KYC taripasqa willakuykuna",
       "kycVerifiedDescription": "Sutiyki, paqarisqa p'unchayniyki hinaspa tiyanayki KYC ruwayninchikwan taripasqa. Willakuykunata kutichiy atinki KYC ruwayta kutichispan. Mana ari ninata quwayku.",
       "changeKycInformation": "KYC willakuykunata tikray",
@@ -3489,7 +3488,7 @@
     "AddToMobileWallet": {
       "title": "Yapaykuy qullqi walitaman",
       "addYourCard": "Tarjetaykita yapaykuy",
-      "addYourCardDescription": "Blink Visa tarjetaykita yapaykuy qullqi walitaman utqaylla pagaypaq",
+      "addYourCardDescription": "Blink tarjetaykita yapaykuy qullqi walitaman utqaylla pagaypaq",
       "addTo": "Yapaykuy",
       "Benefits": {
         "title": "Qullqi walitap allin kayninkunan",
@@ -3500,10 +3499,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa tarjeta",
+      "title": "Blink tarjeta",
       "CardApproved": {
         "title": "¡Kusikuyki!",
-        "subtitle": "Blink Visa tarjetayki qallarisqa.",
+        "subtitle": "Blink tarjetayki qallarisqa.",
         "buttonLabel": "Tarjeta físicata mañakuy",
         "buttonLabelDashboard": "Ñawpaq panqa"
       },
@@ -3655,7 +3654,6 @@
       },
       "Shipping": {
         "title": "Tarjeta física mañakuy",
-        "subtitle": "Blink Visa tarjetaykiqa direcciónta apachisqa kanqa.",
         "registeredAddress": "Qillqasqa dirección",
         "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
         "delivery": "Apachiy",
@@ -3699,9 +3697,7 @@
       "kycHeaderTitle": "Verificación",
       "CardSubscription": {
         "subscribeTitle": "Qillqakuy",
-        "paymentTitle": "Pagay",
         "acceptButton": "Chaskiy",
-        "payButton": "Ñawpaqman rispa Pagay",
         "cardTitle": "Blink Orange",
         "free": "Mana qullqiyuq",
         "forNow": "kunanpaq",
@@ -3711,20 +3707,11 @@
           "memberBenefits": "Huk ayllu allinkunakuna"
         },
         "status": {
-          "label": "Kayninpi",
           "specialOfferLabel": "Sapaq ofrecimiento",
-          "paymentPending": "Pagay Suyachkan",
           "firstYearFree": "Ñawpaq wata qhasilla"
         },
         "renewalDate": {
           "label": "Musuqyachiy punchaw"
-        },
-        "agreement": {
-          "text": "Ari nispa nisani",
-          "termsOfService": "Yanapay Kamachikuykuna",
-          "privacyPolicy": "Pakasqa Kamachikuy",
-          "cardholderAgreement": "Tarjeta Hap'iq Rimanakuy",
-          "and": "chaymanta"
         },
         "feeSchedule": {
           "text": "Qhawarini hinaspa arinini",
@@ -3780,12 +3767,6 @@
           }
         },
         "buttonText": "Haku"
-      },
-      "LoadingCard": {
-        "title": "Tarjetaykipi llamkachkayku",
-        "subtitle": "Willasqayku listona kaptinña",
-        "codingBackend": "...backend-ta programachkayku",
-        "buttonText": "Allinmi"
       },
       "WelcomeInvest": {
         "welcomeMessage": {
