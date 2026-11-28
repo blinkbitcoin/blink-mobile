@@ -14,6 +14,12 @@
 
 set -uo pipefail
 
+# Telemetry is best-effort and optional: this skill still works when the
+# simulator skill's lib is absent (skills get copied around individually).
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../../react-native-ios-simulator/lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+
 IN=""; OUT=""; FORMAT=""; WIDTH=480; FPS=""; MAX_MB=10
 
 while [ $# -gt 0 ]; do
@@ -46,6 +52,10 @@ case "$FPS"   in ''|*[!0-9]*) die "--fps must be numeric, got '$FPS'" ;; esac
 
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/encode-demo.XXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
+
+T_ENCODE=$(tel_now)
+# Input duration makes the span a throughput number, not just a latency one.
+IN_DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$IN" 2>/dev/null || echo "")
 
 if [ "$FORMAT" = "webm" ]; then
   # VP9 at constant quality: -b:v 0 hands rate control entirely to -crf.
@@ -93,6 +103,8 @@ MB=$(python3 -c "print('%.1f' % ($BYTES/1048576.0))")
 echo "$FORMAT ${MB}MB (${WIDTH}px, ${FPS}fps) -> $OUT"
 
 OVER=$(python3 -c "print(1 if $BYTES > $MAX_MB*1048576 else 0)")
+tel_emit vid.encode.total "$T_ENCODE" fmt="$FORMAT" fps="$FPS" width="$WIDTH" \
+  in_dur_s="$IN_DUR" out_bytes="$BYTES" over="$OVER"
 if [ "$OVER" = "1" ]; then
   echo "WARNING: ${MB}MB exceeds the ${MAX_MB}MB budget." >&2
   echo "         Shorten the flow, or retry with --width $((WIDTH * 3 / 4))" >&2

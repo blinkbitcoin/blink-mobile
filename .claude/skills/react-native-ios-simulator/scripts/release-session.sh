@@ -14,6 +14,12 @@
 
 set -euo pipefail
 
+# Telemetry is best-effort - a broken lib must never block a release.
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+T_RELEASE=$(tel_now)
+
 PR="${1:?usage: release-session.sh <pr-number> [--delete]}"
 DELETE="${2:-}"
 
@@ -118,3 +124,8 @@ if [ "$DELETE" = "--delete" ]; then
   rm -rf "$SESSION_DIR"
 fi
 "$(dirname "${BASH_SOURCE[0]}")/reap-stale.sh" || true
+
+# Only clean releases reach this line (the guards above exit non-zero), so
+# the absence of a release span for a session is itself a signal.
+DEMO_SIM_NAME="$EXPECTED_NAME" tel_emit sim.release.total "$T_RELEASE" \
+  deleted="$([ "$DELETE" = "--delete" ] && echo 1 || echo 0)"

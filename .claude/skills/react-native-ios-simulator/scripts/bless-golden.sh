@@ -36,6 +36,12 @@
 
 set -euo pipefail
 
+# Telemetry is best-effort - a broken lib must never block a bless.
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+T_BLESS=$(tel_now)
+
 die() { echo "FATAL: $*" >&2; exit 1; }
 
 PR="${1:?usage: bless-golden.sh <pr-number> [--sha <sha>]}"
@@ -114,6 +120,25 @@ if [ -n "${DEMO_APP_ID_IOS:-}" ]; then
   fi
 fi
 
+# --- Bake the Maestro driver -------------------------------------------------
+# Maestro installs a driver app pair on first contact with a device (~20s,
+# installer on screen). Doing it here, once, means every clone inherits the
+# driver and record-flow.sh can skip its per-recording warmup - as long as
+# the CLI version still matches (the driver is version-locked; the stamp
+# below is what a later claim compares against maestro --version).
+MAESTRO_VERSION=""
+WARMUP_FLOW="$(dirname "${BASH_SOURCE[0]}")/../../react-native-demo-videos/flows/_warmup.yaml"
+if command -v maestro >/dev/null 2>&1 && [ -f "$WARMUP_FLOW" ] && [ -n "${DEMO_APP_ID_IOS:-}" ]; then
+  if maestro test --udid "$UDID" -e APP_ID="$DEMO_APP_ID_IOS" "$WARMUP_FLOW" >/dev/null 2>&1; then
+    MAESTRO_VERSION=$(maestro --version 2>/dev/null | head -1 || true)
+    echo "baked the maestro driver (${MAESTRO_VERSION:-unknown version})"
+  else
+    echo "note: maestro warmup failed - the golden carries no baked driver; clones warm up themselves" >&2
+  fi
+else
+  echo "note: driver not baked (needs maestro, the videos skill's warmup flow, and DEMO_APP_ID_IOS) - clones warm up on first recording" >&2
+fi
+
 # Ours by the gate above, so shutting it down is as safe as release doing it.
 xcrun simctl shutdown "$UDID" 2>/dev/null || true
 
@@ -134,6 +159,10 @@ date=$(date +%Y-%m-%dT%H:%M:%S)
 device-type=$DEVICE_TYPE
 runtime=$RUNTIME
 EOF
+# Only a successfully baked driver earns a version line - record-flow.sh
+# treats its presence as "the clone is warm" and must never trust a bless
+# whose warmup failed.
+[ -n "$MAESTRO_VERSION" ] && echo "maestro-version=$MAESTRO_VERSION" >> "$NEW_STAMP"
 # The lockfile hash is what turns "is this golden's native build stale?" from
 # git archaeology into an instant claim-time comparison.
 if [ ! -f "$LOCKFILE" ]; then
@@ -212,6 +241,8 @@ if [ -n "${MISSING:-}" ]; then
   echo "$MISSING" >&2
   exit 1
 fi
+
+DEMO_SIM_NAME="$SIM_NAME" tel_emit sim.bless.total "$T_BLESS" golden="$GOLDEN_NAME" udid="$UDID"
 
 echo "blessed $GOLDEN_NAME ($UDID) - stamp: $GOLDEN_DIR/stamp"
 sed 's/^/  /' "$GOLDEN_DIR/stamp"
