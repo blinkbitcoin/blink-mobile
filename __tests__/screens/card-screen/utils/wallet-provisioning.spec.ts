@@ -14,14 +14,8 @@ jest.mock("@app/utils/error-reporting", () => ({
   recordAppError: (error: Error) => mockRecordAppError(error),
 }))
 
-let mockIsProvisioningAvailable = true
 const mockFetchProvisioningData = jest.fn()
-jest.mock("@app/screens/card-screen/utils/card-provisioning-data", () => ({
-  get fetchCardProvisioningData() {
-    if (!mockIsProvisioningAvailable) return null
-    return (cardId: string) => mockFetchProvisioningData(cardId)
-  },
-}))
+const fetchProvisioningData = (cardId: string) => mockFetchProvisioningData(cardId)
 
 const mockGetMeaWalletSdk = jest.fn()
 jest.mock("@app/screens/card-screen/utils/meawallet-sdk", () => ({
@@ -32,6 +26,7 @@ const card = { cardId: "card-1", lastFour: "4242" }
 const otherCard = { cardId: "card-2", lastFour: "1111" }
 
 const provisioning: CardProvisioningData = {
+  processorCardId: "processor-1",
   cardSecret: "secret-1",
   displayName: "Blink Visa •• 4242",
   address: {
@@ -81,14 +76,14 @@ const deferredProvisioning = () => {
 describe("canAddCardToWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockIsProvisioningAvailable = true
   })
 
-  it("does not offer the card while the backend cannot provision it", async () => {
-    mockIsProvisioningAvailable = false
+  it("never asks the backend, only the wallet on the device", async () => {
+    mockGetMeaWalletSdk.mockResolvedValue(fakeSdk())
 
-    await expect(canAddCardToWallet(card)).resolves.toBe(false)
-    expect(mockGetMeaWalletSdk).not.toHaveBeenCalled()
+    await canAddCardToWallet(card)
+
+    expect(mockFetchProvisioningData).not.toHaveBeenCalled()
   })
 
   it("does not offer the card when the build carries no device wallet SDK", async () => {
@@ -115,7 +110,6 @@ describe("canAddCardToWallet", () => {
 describe("addCardToWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockIsProvisioningAvailable = true
     mockFetchProvisioningData.mockResolvedValue(provisioning)
   })
 
@@ -123,16 +117,18 @@ describe("addCardToWallet", () => {
     const sdk = fakeSdk()
     mockGetMeaWalletSdk.mockResolvedValue(sdk)
 
-    await expect(addCardToWallet(card)).resolves.toBe(WalletAddResult.Added)
+    await expect(addCardToWallet(card, fetchProvisioningData)).resolves.toBe(
+      WalletAddResult.Added,
+    )
     expect(mockFetchProvisioningData).toHaveBeenCalledWith("card-1")
-    expect(sdk.cardWithSecret).toHaveBeenCalledWith("card-1", "secret-1")
+    expect(sdk.cardWithSecret).toHaveBeenCalledWith("processor-1", "secret-1")
     expect(mockRecordAppError).not.toHaveBeenCalled()
   })
 
   it("fails and reports when the build carries no device wallet SDK", async () => {
     mockGetMeaWalletSdk.mockResolvedValue(null)
 
-    await expect(addCardToWallet(card)).rejects.toThrow(
+    await expect(addCardToWallet(card, fetchProvisioningData)).rejects.toThrow(
       "This build carries no device wallet SDK",
     )
     expect(mockFetchProvisioningData).not.toHaveBeenCalled()
@@ -141,22 +137,13 @@ describe("addCardToWallet", () => {
     )
   })
 
-  it("fails and reports when the backend cannot provision cards yet", async () => {
-    mockIsProvisioningAvailable = false
-    mockGetMeaWalletSdk.mockResolvedValue(fakeSdk())
-
-    await expect(addCardToWallet(card)).rejects.toThrow(
-      "The backend does not provide card provisioning data yet",
-    )
-    expect(mockGetMeaWalletSdk).not.toHaveBeenCalled()
-    expect(mockRecordAppError).toHaveBeenCalledTimes(1)
-  })
-
   it("fails and reports when the backend cannot provision the card", async () => {
     mockGetMeaWalletSdk.mockResolvedValue(fakeSdk())
     mockFetchProvisioningData.mockRejectedValue(new Error("provisioning unavailable"))
 
-    await expect(addCardToWallet(card)).rejects.toThrow("provisioning unavailable")
+    await expect(addCardToWallet(card, fetchProvisioningData)).rejects.toThrow(
+      "provisioning unavailable",
+    )
     expect(mockRecordAppError).toHaveBeenCalledTimes(1)
   })
 
@@ -169,8 +156,8 @@ describe("addCardToWallet", () => {
       const pending = deferredProvisioning()
       mockFetchProvisioningData.mockReturnValueOnce(pending.promise)
 
-      const first = addCardToWallet(card)
-      const second = addCardToWallet(card)
+      const first = addCardToWallet(card, fetchProvisioningData)
+      const second = addCardToWallet(card, fetchProvisioningData)
       expect(second).toBe(first)
 
       pending.reject(new Error("provisioning unavailable"))
@@ -182,18 +169,20 @@ describe("addCardToWallet", () => {
       const pending = deferredProvisioning()
       mockFetchProvisioningData.mockReturnValueOnce(pending.promise)
 
-      const first = addCardToWallet(card)
-      await expect(addCardToWallet(otherCard)).resolves.toBe(WalletAddResult.Busy)
+      const first = addCardToWallet(card, fetchProvisioningData)
+      await expect(addCardToWallet(otherCard, fetchProvisioningData)).resolves.toBe(
+        WalletAddResult.Busy,
+      )
 
       pending.resolve(provisioning)
       await expect(first).resolves.toBe(WalletAddResult.Added)
     })
 
     it("starts a new add once the previous one settles", async () => {
-      const first = addCardToWallet(card)
+      const first = addCardToWallet(card, fetchProvisioningData)
       await expect(first).resolves.toBe(WalletAddResult.Added)
 
-      const second = addCardToWallet(otherCard)
+      const second = addCardToWallet(otherCard, fetchProvisioningData)
 
       expect(second).not.toBe(first)
       await expect(second).resolves.toBe(WalletAddResult.Added)
@@ -203,10 +192,12 @@ describe("addCardToWallet", () => {
       mockFetchProvisioningData.mockRejectedValueOnce(
         new Error("provisioning unavailable"),
       )
-      const first = addCardToWallet(card)
+      const first = addCardToWallet(card, fetchProvisioningData)
       await expect(first).rejects.toThrow()
 
-      await expect(addCardToWallet(otherCard)).resolves.toBe(WalletAddResult.Added)
+      await expect(addCardToWallet(otherCard, fetchProvisioningData)).resolves.toBe(
+        WalletAddResult.Added,
+      )
     })
   })
 })

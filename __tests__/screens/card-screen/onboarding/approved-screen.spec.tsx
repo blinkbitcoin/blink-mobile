@@ -1,9 +1,11 @@
 import React from "react"
+import { it } from "@jest/globals"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardActivationStep } from "@app/graphql/generated"
 import { CardApprovedScreen } from "@app/screens/card-screen/onboarding/approved-screen"
+import { WalletAddResult } from "@app/screens/card-screen/types"
 import { ContextForScreen } from "../../helper"
 
 jest.mock("@react-native-community/blur", () => ({
@@ -19,12 +21,12 @@ type LayoutProps = {
   subtitle: string
   buttonLabel: string
   onPrimaryButtonPress: () => void
-  secondaryButtonLabel: string
-  onSecondaryButtonPress: () => void
+  secondaryButtonLabel?: string
+  onSecondaryButtonPress?: () => void
   cardId?: string
   cardNumber?: string
   showAddToWallet?: boolean
-  onAddToWallet: () => void
+  onAddToWallet: () => Promise<void> | void
   isAddingToWallet?: boolean
 }
 
@@ -191,8 +193,8 @@ describe("CardApprovedScreen", () => {
       expect(mockNavigate).toHaveBeenCalledWith("orderCardScreen")
     })
 
-    it("moves the activation on when the member skips for now", async () => {
-      const { getByText } = render(
+    it("offers no way past without the physical card or the wallet", async () => {
+      const { queryByText } = render(
         <ContextForScreen>
           <CardApprovedScreen />
         </ContextForScreen>,
@@ -200,11 +202,8 @@ describe("CardApprovedScreen", () => {
 
       await act(async () => {})
 
-      await act(async () => {
-        fireEvent.press(getByText("Skip for now"))
-      })
-
-      expect(mockMoveOn).toHaveBeenCalledWith(CardActivationStep.Activated)
+      expect(queryByText("Skip for now")).toBeNull()
+      expect(lastLayoutProps().secondaryButtonLabel).toBeUndefined()
     })
 
     it("stays while no way has been taken yet", async () => {
@@ -274,7 +273,7 @@ describe("CardApprovedScreen", () => {
           cardId: "card-123",
           cardNumber: "1234",
           showAddToWallet: true,
-          onAddToWallet: mockAddToWallet,
+          onAddToWallet: expect.any(Function),
           isAddingToWallet: false,
         }),
       )
@@ -289,6 +288,34 @@ describe("CardApprovedScreen", () => {
         expect.objectContaining({ cardId: undefined, isFrozen: false }),
       )
     })
+
+    it("goes on to the PIN once the wallet takes the card", async () => {
+      mockAddToWallet.mockResolvedValue(WalletAddResult.Added)
+      await renderScreen()
+
+      await act(async () => {
+        await lastLayoutProps().onAddToWallet()
+      })
+
+      expect(mockAddToWallet).toHaveBeenCalledTimes(1)
+      expect(mockMoveOn).toHaveBeenCalledWith(CardActivationStep.Activated, {
+        isWalletAdded: true,
+      })
+    })
+
+    it.each([WalletAddResult.Cancelled, WalletAddResult.Busy, undefined])(
+      "stays when the wallet does not take the card (%s)",
+      async (walletAnswer) => {
+        mockAddToWallet.mockResolvedValue(walletAnswer)
+        await renderScreen()
+
+        await act(async () => {
+          await lastLayoutProps().onAddToWallet()
+        })
+
+        expect(mockMoveOn).not.toHaveBeenCalled()
+      },
+    )
 
     it("hides the add to wallet button when the wallet cannot take the card", async () => {
       mockUseAddToWallet.mockReturnValue({

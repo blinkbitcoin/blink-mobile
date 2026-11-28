@@ -12,7 +12,7 @@ export type GooglePayAddress = {
   administrativeArea: string
   postalCode: string
   countryCode: string
-  phoneNumber: string
+  phoneNumber?: string
 }
 
 /** What Apple Pay answers to start adding a card, handed back to show its sheet. */
@@ -35,7 +35,11 @@ type GooglePayModule = {
   /** The tokens Google Wallet holds for cards ending in these digits. */
   checkWalletForCardSuffix(suffix: string): Promise<readonly GoogleWalletToken[]>
   /** Answers what it pushed, which the app does not read. */
-  push(card: MppCardData, displayName: string, address: GooglePayAddress): Promise<object>
+  push(
+    card: MppCardData,
+    displayName: string,
+    address?: GooglePayAddress,
+  ): Promise<object>
 }
 
 export type MeaWalletSdk = {

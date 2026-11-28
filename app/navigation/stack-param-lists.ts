@@ -346,6 +346,7 @@ export type RootStackParamList = {
   cardOnboardingProcessingScreen: { applicationId: string }
   cardOnboardingApprovedScreen: undefined
   cardActivationOrderOfferScreen: undefined
+  cardActivationWalletOfferScreen: undefined
   cardActivationTopUpScreen: undefined
   selfCustodialBackupMethod: undefined
   selfCustodialCloudBackup: undefined

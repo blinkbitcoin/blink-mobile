@@ -129,6 +129,7 @@ import {
   CardStatementsScreen,
   CardOrderOfferScreen,
   CardStatusScreen,
+  CardWalletOfferScreen,
   CardTopUpScreen,
   CardTransactionDetailsScreen,
 } from "@app/screens/card-screen"
@@ -1087,6 +1088,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="cardActivationOrderOfferScreen"
         component={CardOrderOfferScreen}
+        options={{ title: LL.CardFlow.CardStatus.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardActivationWalletOfferScreen"
+        component={CardWalletOfferScreen}
         options={{ title: LL.CardFlow.CardStatus.title() }}
       />
       <RootNavigator.Screen

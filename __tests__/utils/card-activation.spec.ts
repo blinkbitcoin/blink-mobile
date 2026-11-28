@@ -16,19 +16,33 @@ const factsWith = (
   isSetupComplete: false,
   isPinSet: false,
   hasPhysicalCard: false,
+  isWalletAdded: false,
   ...overrides,
 })
 
 const route = (name: string, key = `${name}-key`) => ({ name, key })
 
 describe("isStepDone", () => {
-  it("settles the first way and the other way with a physical card", () => {
-    const withCard = factsWith({ hasPhysicalCard: true })
-
-    expect(isStepDone(CardActivationStep.Activated, withCard)).toBe(true)
-    expect(isStepDone(CardActivationStep.OfferOtherWay, withCard)).toBe(true)
+  it("settles the first way with either the physical card or the wallet", () => {
+    expect(
+      isStepDone(CardActivationStep.Activated, factsWith({ hasPhysicalCard: true })),
+    ).toBe(true)
+    expect(
+      isStepDone(CardActivationStep.Activated, factsWith({ isWalletAdded: true })),
+    ).toBe(true)
     expect(isStepDone(CardActivationStep.Activated, factsWith())).toBe(false)
-    expect(isStepDone(CardActivationStep.OfferOtherWay, factsWith())).toBe(false)
+  })
+
+  it("settles the other way only once both ways are taken", () => {
+    const bothWays = factsWith({ hasPhysicalCard: true, isWalletAdded: true })
+
+    expect(isStepDone(CardActivationStep.OfferOtherWay, bothWays)).toBe(true)
+    expect(
+      isStepDone(CardActivationStep.OfferOtherWay, factsWith({ hasPhysicalCard: true })),
+    ).toBe(false)
+    expect(
+      isStepDone(CardActivationStep.OfferOtherWay, factsWith({ isWalletAdded: true })),
+    ).toBe(false)
   })
 
   it("settles the PIN once the shown card has one", () => {
@@ -66,8 +80,28 @@ describe("activationPlace", () => {
     expect(activationPlace(pinWithoutCard)).toBe(CardActivationStep.OfferOtherWay)
   })
 
+  it("offers the other way after the PIN when only one way is taken", () => {
+    const physicalFirst = factsWith({
+      step: CardActivationStep.Pin,
+      hasPhysicalCard: true,
+      isPinSet: true,
+    })
+    const walletFirst = factsWith({
+      step: CardActivationStep.Pin,
+      isWalletAdded: true,
+      isPinSet: true,
+    })
+
+    expect(activationPlace(physicalFirst)).toBe(CardActivationStep.OfferOtherWay)
+    expect(activationPlace(walletFirst)).toBe(CardActivationStep.OfferOtherWay)
+  })
+
   it("ends on the top-up, which is only ever skipped", () => {
-    const allTaken = factsWith({ hasPhysicalCard: true, isPinSet: true })
+    const allTaken = factsWith({
+      hasPhysicalCard: true,
+      isWalletAdded: true,
+      isPinSet: true,
+    })
 
     expect(activationPlace(allTaken)).toBe(CardActivationStep.TopUp)
     expect(
@@ -115,19 +149,38 @@ describe("stepAfter", () => {
 })
 
 describe("activationScreen", () => {
+  const facts = factsWith()
+
   it("names the screen of each place", () => {
-    expect(activationScreen(CardActivationStep.Activated)).toBe(
+    expect(activationScreen(CardActivationStep.Activated, facts)).toBe(
       "cardOnboardingApprovedScreen",
     )
-    expect(activationScreen(CardActivationStep.Pin)).toBe("cardCreatePinScreen")
-    expect(activationScreen(CardActivationStep.OfferOtherWay)).toBe(
-      "cardActivationOrderOfferScreen",
-    )
-    expect(activationScreen(CardActivationStep.BalanceUnit)).toBe(
+    expect(activationScreen(CardActivationStep.Pin, facts)).toBe("cardCreatePinScreen")
+    expect(activationScreen(CardActivationStep.BalanceUnit, facts)).toBe(
       "cardActivationTopUpScreen",
     )
-    expect(activationScreen(CardActivationStep.TopUp)).toBe("cardActivationTopUpScreen")
-    expect(activationScreen(ACTIVATION_DONE)).toBe("cardDashboardScreen")
+    expect(activationScreen(CardActivationStep.TopUp, facts)).toBe(
+      "cardActivationTopUpScreen",
+    )
+    expect(activationScreen(ACTIVATION_DONE, facts)).toBe("cardDashboardScreen")
+  })
+
+  it("offers the physical card as the other way to a member who took the wallet", () => {
+    expect(
+      activationScreen(
+        CardActivationStep.OfferOtherWay,
+        factsWith({ isWalletAdded: true }),
+      ),
+    ).toBe("cardActivationOrderOfferScreen")
+  })
+
+  it("offers the wallet as the other way once the physical card is ordered", () => {
+    expect(
+      activationScreen(
+        CardActivationStep.OfferOtherWay,
+        factsWith({ hasPhysicalCard: true }),
+      ),
+    ).toBe("cardActivationWalletOfferScreen")
   })
 })
 
@@ -219,6 +272,41 @@ describe("routesTo", () => {
       route: next,
       place: ACTIVATION_DONE,
       facts: factsWith({ step: CardActivationStep.TopUp }),
+    })
+
+    expect(routes).toEqual([home, next])
+  })
+
+  it("keeps a skipped wallet offer under the next step, as any skipped step", () => {
+    const walletOffer = route("cardActivationWalletOfferScreen")
+    const next = { name: "cardActivationTopUpScreen" }
+
+    const routes = routesTo([home, walletOffer], {
+      route: next,
+      place: CardActivationStep.TopUp,
+      facts: factsWith({
+        step: CardActivationStep.TopUp,
+        hasPhysicalCard: true,
+        isPinSet: true,
+      }),
+    })
+
+    expect(routes).toEqual([home, walletOffer, next])
+  })
+
+  it("drops the wallet offer once the wallet took the card", () => {
+    const walletOffer = route("cardActivationWalletOfferScreen")
+    const next = { name: "cardActivationTopUpScreen" }
+
+    const routes = routesTo([home, walletOffer], {
+      route: next,
+      place: CardActivationStep.TopUp,
+      facts: factsWith({
+        step: CardActivationStep.TopUp,
+        hasPhysicalCard: true,
+        isWalletAdded: true,
+        isPinSet: true,
+      }),
     })
 
     expect(routes).toEqual([home, next])
