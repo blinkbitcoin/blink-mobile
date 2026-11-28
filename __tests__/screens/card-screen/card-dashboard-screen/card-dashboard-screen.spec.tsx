@@ -44,7 +44,7 @@ jest.mock("@app/hooks/use-card-data", () => ({
 
 const mockUseCardBalance = jest.fn()
 jest.mock("@app/hooks/use-card-balance", () => ({
-  useCardBalance: (cardId: string | undefined) => mockUseCardBalance(cardId),
+  useCardBalance: (options: { skip?: boolean }) => mockUseCardBalance(options),
 }))
 
 const mockUseCardFreeze = jest.fn()
@@ -542,7 +542,7 @@ describe("CardDashboardScreen", () => {
   })
 
   describe("hook calls", () => {
-    it("passes card id to useCardBalance", async () => {
+    it("reads the Card Balance for a member with a card", async () => {
       render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -551,7 +551,7 @@ describe("CardDashboardScreen", () => {
 
       await act(async () => {})
 
-      expect(mockUseCardBalance).toHaveBeenCalledWith("card-1")
+      expect(mockUseCardBalance).toHaveBeenCalledWith({ skip: false })
     })
 
     it("passes card id to useCardTransactions", async () => {
@@ -577,7 +577,7 @@ describe("CardDashboardScreen", () => {
 
       await act(async () => {})
 
-      expect(mockUseCardBalance).toHaveBeenCalledWith(undefined)
+      expect(mockUseCardBalance).toHaveBeenCalledWith({ skip: true })
       expect(mockUseCardTransactions).toHaveBeenCalledWith(undefined)
     })
   })

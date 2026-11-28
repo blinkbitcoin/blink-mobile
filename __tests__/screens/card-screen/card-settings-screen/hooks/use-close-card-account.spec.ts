@@ -14,29 +14,30 @@ jest.mock("@app/hooks/use-card-data", () => ({
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useCardUpdateMutation: () => [mockCardUpdateMutation, { loading: false }],
-  useCardBalanceQuery: () => ({
-    data: {
-      cardBalance: {
-        pending: 0,
-        available: 50000,
-      },
-    },
-  }),
 }))
 
-jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => true,
+type CardBalanceState = {
+  availableSats?: number
+  pendingSats?: number
+  balanceSecondary: string
+}
+const knownBalance: CardBalanceState = {
+  availableSats: 50000,
+  pendingSats: 0,
+  balanceSecondary: "~$15.00",
+}
+let mockCardBalance: CardBalanceState = knownBalance
+const mockUseCardBalance = jest.fn()
+jest.mock("@app/hooks/use-card-balance", () => ({
+  useCardBalance: (options: { skip?: boolean }) => {
+    mockUseCardBalance(options)
+    return mockCardBalance
+  },
 }))
 
 jest.mock("@app/graphql/utils", () => ({
   getErrorMessages: (errors: readonly { message: string }[]) =>
     errors.map((e) => e.message).join(", "),
-}))
-
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    moneyAmountToDisplayCurrencyString: () => "~$15.00",
-  }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -63,15 +64,11 @@ jest.mock("@react-navigation/native", () => ({
     replace: mockReplace,
   }),
 }))
-
-jest.mock("@app/types/amounts", () => ({
-  toBtcMoneyAmount: (sats: number) => ({ amount: sats, currency: "BTC" }),
-}))
-
 describe("useCloseCardAccount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseCardData.mockReturnValue({ card: { id: "card-123" }, hasPhysicalCard: false })
+    mockCardBalance = knownBalance
   })
 
   it("returns expected shape", () => {
@@ -95,6 +92,32 @@ describe("useCloseCardAccount", () => {
     const { result } = renderHook(() => useCloseCardAccount())
 
     expect(result.current.hasPendingTransactions).toBe(false)
+  })
+
+  it("detects pending transactions from what unsettled payments hold", () => {
+    mockCardBalance = { ...knownBalance, pendingSats: 2500 }
+
+    const { result } = renderHook(() => useCloseCardAccount())
+
+    expect(result.current.hasPendingTransactions).toBe(true)
+  })
+
+  it("reads an unknown balance as neither positive nor pending", () => {
+    mockCardBalance = { balanceSecondary: "" }
+
+    const { result } = renderHook(() => useCloseCardAccount())
+
+    expect(result.current.hasPositiveBalance).toBe(false)
+    expect(result.current.hasPendingTransactions).toBe(false)
+  })
+
+  it("reads the member's Card Balance only with a card", () => {
+    renderHook(() => useCloseCardAccount())
+    expect(mockUseCardBalance).toHaveBeenLastCalledWith({ skip: false })
+
+    mockUseCardData.mockReturnValue({ card: null, hasPhysicalCard: false })
+    renderHook(() => useCloseCardAccount())
+    expect(mockUseCardBalance).toHaveBeenLastCalledWith({ skip: true })
   })
 
   it("does nothing when card is not available", async () => {
